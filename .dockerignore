@@ -1,0 +1,29 @@
+# Fuentes de referencia: nunca entran en imágenes Docker
+datos_iniciales/
+**/datos_iniciales/
+
+# Control de versiones y metadatos locales
+.git
+.gitignore
+.DS_Store
+**/.DS_Store
+.claude/
+.specify/
+specs/
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+**/.dev.vars
+
+# Dependencias y artefactos
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/dist
+frontend/capturas/

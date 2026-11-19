@@ -1,0 +1,16 @@
+{
+  "fecha_exportacion": "2026-11-19",
+  "commit_fuente": "9e0768887bcdfac5c361a4c4256ff59d76b5c296",
+  "referencia_visual": "https://trail-penasagra-nueva-web.jrblanco.chatgpt.site",
+  "web_original": "https://xn--trailpeasagra-okb.com/",
+  "cambios_en_la_copia": [
+    "Eliminado project_id del manifiesto para evitar publicar sobre la propuesta existente.",
+    "Añadida documentación y utilidades de arranque local.",
+    "Documentación y fichas revisadas para importación CSV, tabla de participantes y pruebas específicas.",
+    "Añadida especificación Markdown de la arquitectura FastAPI/PostgreSQL y plan para el siguiente agente; código sin cambios."
+  ],
+  "incluye_credenciales": false,
+  "incluye_sesiones_o_base_de_datos_privada": false,
+  "actualizacion": "Clasificaciones CSV por carrera/edición y exclusión del Dorsal Solidario",
+  "actualizacion_documental": "Arquitectura aprobada documentada en docs/14_BACKEND_FASTAPI_POSTGRESQL.md; migración no implementada."
+}

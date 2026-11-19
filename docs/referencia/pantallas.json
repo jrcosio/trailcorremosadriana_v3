@@ -1,0 +1,242 @@
+[
+  {
+    "area": "publica",
+    "nombre": "Inicio",
+    "ruta": "/",
+    "ficha": "screens/publica/01-inicio.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Pruebas y recorridos",
+    "ruta": "/carreras",
+    "ficha": "screens/publica/02-carreras.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Trail Peñasagra",
+    "ruta": "/carreras/trail-27k",
+    "ficha": "screens/publica/03-trail-27k.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Speed Trail",
+    "ruta": "/carreras/speed-14k",
+    "ficha": "screens/publica/04-speed-14k.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Familiar Peñasagra",
+    "ruta": "/carreras/familiar-7k",
+    "ficha": "screens/publica/05-familiar-7k.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Inscripciones",
+    "ruta": "/inscripciones",
+    "ficha": "screens/publica/06-inscripciones.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Noticias",
+    "ruta": "/noticias",
+    "ficha": "screens/publica/07-noticias.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Detalle de noticia",
+    "ruta": "/noticias/:id",
+    "ficha": "screens/publica/08-noticia-detalle.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Galería de imágenes",
+    "ruta": "/galeria",
+    "ficha": "screens/publica/09-galeria.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Detalle de álbum",
+    "ruta": "/galeria/:id",
+    "ficha": "screens/publica/10-album.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Clasificaciones",
+    "ruta": "/clasificaciones",
+    "ficha": "screens/publica/11-clasificaciones.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Reglamento",
+    "ruta": "/reglamento",
+    "ficha": "screens/publica/12-reglamento.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Corremos por Adriana",
+    "ruta": "/solidaridad",
+    "ficha": "screens/publica/13-solidaridad.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Patrocinadores y colaboradores",
+    "ruta": "/patrocinadores",
+    "ficha": "screens/publica/14-patrocinadores.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Contacto",
+    "ruta": "/contacto",
+    "ficha": "screens/publica/15-contacto.md"
+  },
+  {
+    "area": "publica",
+    "nombre": "Índice de revisión",
+    "ruta": "/pantallas",
+    "ficha": "screens/publica/16-indice-pantallas.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Acceso de administrador",
+    "ruta": "/admin (sin sesión)",
+    "ficha": "screens/admin/01-acceso.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Resumen del administrador",
+    "ruta": "/admin (con sesión)",
+    "ficha": "screens/admin/02-resumen.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Noticias · listado",
+    "ruta": "/admin/noticias",
+    "ficha": "screens/admin/03-noticias-listado.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Noticias · crear",
+    "ruta": "/admin/noticias/nuevo",
+    "ficha": "screens/admin/04-noticias-nuevo.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Noticias · editar",
+    "ruta": "/admin/noticias/:id",
+    "ficha": "screens/admin/05-noticias-editar.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Clasificaciones · listado",
+    "ruta": "/admin/clasificaciones",
+    "ficha": "screens/admin/06-clasificaciones-listado.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Clasificaciones · crear",
+    "ruta": "/admin/clasificaciones/nuevo",
+    "ficha": "screens/admin/07-clasificaciones-nuevo.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Clasificaciones · editar",
+    "ruta": "/admin/clasificaciones/:id",
+    "ficha": "screens/admin/08-clasificaciones-editar.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Galería · listado",
+    "ruta": "/admin/galeria",
+    "ficha": "screens/admin/09-galeria-listado.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Galería · crear",
+    "ruta": "/admin/galeria/nuevo",
+    "ficha": "screens/admin/10-galeria-nuevo.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Galería · editar",
+    "ruta": "/admin/galeria/:id",
+    "ficha": "screens/admin/11-galeria-editar.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Pruebas y rutas · listado",
+    "ruta": "/admin/recorridos",
+    "ficha": "screens/admin/12-recorridos-listado.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Pruebas y rutas · crear",
+    "ruta": "/admin/recorridos/nuevo",
+    "ficha": "screens/admin/13-recorridos-nuevo.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Pruebas y rutas · editar",
+    "ruta": "/admin/recorridos/:id",
+    "ficha": "screens/admin/14-recorridos-editar.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Patrocinadores · listado",
+    "ruta": "/admin/patrocinadores",
+    "ficha": "screens/admin/15-patrocinadores-listado.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Patrocinadores · crear",
+    "ruta": "/admin/patrocinadores/nuevo",
+    "ficha": "screens/admin/16-patrocinadores-nuevo.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Patrocinadores · editar",
+    "ruta": "/admin/patrocinadores/:id",
+    "ficha": "screens/admin/17-patrocinadores-editar.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Colaboradores · listado",
+    "ruta": "/admin/colaboradores",
+    "ficha": "screens/admin/18-colaboradores-listado.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Colaboradores · crear",
+    "ruta": "/admin/colaboradores/nuevo",
+    "ficha": "screens/admin/19-colaboradores-nuevo.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Colaboradores · editar",
+    "ruta": "/admin/colaboradores/:id",
+    "ficha": "screens/admin/20-colaboradores-editar.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Inscripciones",
+    "ruta": "/admin/inscripciones",
+    "ficha": "screens/admin/21-inscripciones.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Fecha y contador",
+    "ruta": "/admin/evento",
+    "ficha": "screens/admin/22-evento.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Reglamento",
+    "ruta": "/admin/reglamento",
+    "ficha": "screens/admin/23-reglamento.md"
+  },
+  {
+    "area": "admin",
+    "nombre": "Contacto y ajustes",
+    "ruta": "/admin/ajustes",
+    "ficha": "screens/admin/24-ajustes.md"
+  }
+]
