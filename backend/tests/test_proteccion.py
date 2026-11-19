@@ -53,11 +53,16 @@ def test_sin_csrf_o_csrf_ajeno_403(base_con_admin, metodo, ruta):
             assert r.json()["error"].startswith("Comprobación de seguridad no válida")
 
 
-@pytest.mark.parametrize(("metodo", "ruta"), ESCRITURAS)
-def test_escritura_valida_en_seccion_sin_persistencia_501(cliente_admin, metodo, ruta):
-    r = _peticion(cliente_admin, metodo, ruta, token=csrf(cliente_admin))
+def test_escritura_valida_en_seccion_sin_persistencia_501(cliente_admin):
+    r = _peticion(cliente_admin, "PUT", "/api/content", token=csrf(cliente_admin))
     assert r.status_code == 501
     assert r.json() == {"error": "Esta sección del panel todavía no guarda cambios."}
+
+
+def test_subida_con_proteccion_valida_llega_a_validar_el_archivo(cliente_admin):
+    # Desde la feature 003 la subida es real: sin archivo responde 400 (no 501).
+    r = _peticion(cliente_admin, "POST", "/api/upload", token=csrf(cliente_admin))
+    assert r.status_code == 400
 
 
 def test_logout_con_sesion_exige_csrf(cliente_admin):

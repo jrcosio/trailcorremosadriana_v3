@@ -4,30 +4,32 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 002-administrador (merge local en `main`)
-- **Siguiente feature**: 003-archivos
+- **Última feature cerrada**: 003-archivos (merge local en `main`)
+- **Siguiente feature**: 004-evento-carreras
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Feature activa en Spec Kit**: `.specify/feature.json` apunta todavía a `specs/002-administrador`;
-  el `/speckit-specify` de la 003 la actualizará.
-- **Siguiente acción concreta**: `git switch -c 003-archivos main` y `/speckit-specify` de archivos:
-  - interfaz `Almacenamiento` con adaptador local (volumen) y S3/R2 (boto3, probado con MinIO en el
-    perfil `s3`);
-  - `POST /api/upload` real (sustituye al 501) con validación de tipo, tamaño y bytes mágicos, sin
-    SVG;
-  - `GET /media/{clave}` con caché inmutable y CSP sandbox;
-  - tabla `archivos`;
-  - recursos de la v2 que falten.
-- **Entorno local**: `docker compose up -d` (web en http://localhost:8080). Esquema en
-  `0002_administracion`. Administrador local `admin`: la contraseña no se versiona; se crea con
-  `python -m app.cli crear-admin`.
+- **Feature activa en Spec Kit**: `.specify/feature.json` apunta todavía a `specs/003-archivos`;
+  el `/speckit-specify` de la 004 la actualizará.
+- **Siguiente acción concreta**: `git switch -c 004-evento-carreras main` y `/speckit-specify`.
+  Alcance:
+  - tablas `ediciones` (año, fecha y hora con zona Europe/Madrid, contador, edición actual,
+    `version`), `carreras` (slugs `trail-27k`, `speed-14k`, `familiar-7k`) y `carreras_edicion`
+    (datos de referencia de 2026, GPX con `/media/…`, `published`);
+  - importación idempotente desde la semilla, con la edición 2026 con fecha 11/07/2026 09:00 y la
+    2027 sin fecha;
+  - endpoints de administración por recurso con versión y 409;
+  - el adaptador `/api/content` lee `settings` y `races` desde PostgreSQL;
+  - reconexión de `/admin/evento` y `/admin/recorridos` en `Admin.tsx`;
+  - pantallas públicas `/`, `/carreras`, `/carreras/:id` y el contador.
+- **Entorno local**: `docker compose up -d` (http://localhost:8080). Esquema en `0003_archivos`.
+  Cuenta local `admin` (contraseña no versionada).
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0 (preparación), 001 (base del proyecto), 002 (administrador) |
+| Terminadas | 0 (preparación), 001 (base del proyecto), 002 (administrador), 003 (archivos) |
 | Activa | — |
-| Pendientes | 003 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 004 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -49,6 +51,9 @@
 | 2026-11-20 | Secciones sin persistencia: `PUT /api/content` y `POST /api/upload` → 501 tras la protección completa | 002 research R8 |
 | 2026-11-20 | Caddy devuelve 503 JSON si la API no responde (estado «error de servicio» del acceso) | 002 implementación |
 | 2026-11-20 | Política de contraseña: 12–128 caracteres, distinta del usuario | 002 spec FR-003 |
+| 2026-11-20 | Archivos públicos por clave aleatoria (también los de borradores); sin borrado físico hasta la 011 | 003 spec Assumptions, research R7 |
+| 2026-11-20 | Entrega de `/media` siempre a través de la API (también con R2); CDN directa a valorar en la 011 | 003 research R1 |
+| 2026-11-20 | S3 de desarrollo y pruebas con moto (`motoserver/moto:5.2.5`): la imagen pública de MinIO ya no está disponible | 003 research R2 |
 
 ## Supuestos
 
@@ -96,6 +101,18 @@
 | 2026-11-20 | 002 | Revisión visual del acceso y del resumen frente a `/pantallas/admin` | Idénticos (salvo la franja de vista de diseño) |
 | 2026-11-20 | 002 | IP real: petición desde otro contenedor (172.21.0.5) a `web` con `X-Forwarded-For: 6.6.6.6` | Clave = sha256(172.21.0.5); no es la de Caddy (172.21.0.2) ni la falsificada |
 | 2026-11-20 | 002 | `/speckit-converge` | 1.ª pasada: 2 tareas (T037–T038) resueltas; 2.ª pasada: Converged |
+| 2026-11-20 | 003 | Checklists `requirements` 16/16 y `seguridad` 18/18 (con evidencia); `analyze`: 2 LOW corregidos | OK |
+| 2026-11-20 | 003 | pytest (PostgreSQL real y S3 real con moto por HTTP) | **173 passed** |
+| 2026-11-20 | 003 | `alembic upgrade head` → `0003_archivos` | OK |
+| 2026-11-20 | 003 | Subida por Caddy (webp real) y entrega `/media`: cabeceras (inmutable, ETag, CSP sandbox, nosniff), HEAD, 304, bytes idénticos | OK |
+| 2026-11-20 | 003 | Rechazos por Caddy: SVG 400, sin CSRF 403, 11 MB 413 (Caddy), 10,5 MB 413 (API) | OK |
+| 2026-11-20 | 003 | Subida de 9,9 MB (SC-004) | 0,07 s |
+| 2026-11-20 | 003 | `docker compose down` + `up`: archivo subido intacto | Bytes idénticos |
+| 2026-11-20 | 003 | Recursos estáticos `/reused`, `/images`, `/fonts`, `/templates`, `robots.txt` | 200 |
+| 2026-11-20 | 003 | `backup.sh` con base y archivos (`media-*.tgz`) | OK |
+| 2026-11-20 | 003 | `verificar-subida.mjs` (subida desde el panel y rechazo de SVG), `verificar-acceso.mjs`, `verificar-rutas.mjs` | OK; 42/42 |
+| 2026-11-20 | 003 | Modo S3 completo con `compose.s3.yaml` (Caddy → API → moto) | Objeto en el bucket, no en el volumen local; entrega con bytes idénticos |
+| 2026-11-20 | 003 | `/speckit-converge` | 1.ª pasada: 2 tareas (T020–T021) resueltas; 2.ª pasada: Converged |
 
 ## Bloqueos
 
@@ -104,6 +121,9 @@ trabajo: fecha 2027, enlaces de inscripción y de pago solidario, webs de patroc
 reglamento definitivo, GPX y autorizaciones de imagen para el lanzamiento.
 
 ## Avisos técnicos menores
+
+- En esta máquina el puerto 8000 del host está ocupado por otro proceso. `compose.dev.yaml` permite
+  cambiarlo con `API_PORT_LOCAL` (por ejemplo, `API_PORT_LOCAL=8001`).
 
 - `Site.tsx` (propuesta) no consume el cuerpo de una respuesta de error de `/api/content`, así que
   Chromium deja esa petición abierta. No afecta al usuario. Las verificaciones con la API caída

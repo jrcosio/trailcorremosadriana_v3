@@ -14,16 +14,28 @@ services:
       # Servidor de desarrollo de Vite (npm run dev)
       ORIGENES_PERMITIDOS: ${ORIGENES_PERMITIDOS:-http://localhost:5173}
 
+  # Servicio compatible con S3 para desarrollo y pruebas (moto). Sin credenciales reales.
+  s3-dev:
+    image: motoserver/moto:5.2.5
+    profiles: [test, s3]
+    networks: [interna]
+
   api-test:
     profiles: [test]
     build:
       context: ./backend
       target: test
     environment:
+      S3_TEST_ENDPOINT_URL: http://s3-dev:5000
+      S3_TEST_BUCKET: trail-media-pruebas
+      S3_TEST_ACCESS_KEY_ID: prueba
+      S3_TEST_SECRET_ACCESS_KEY: prueba
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-trail}:${POSTGRES_PASSWORD:-trail_dev}@db:5432/${POSTGRES_DB:-trail}
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
       ENTORNO: desarrollo
     depends_on:
       db:
         condition: service_healthy
+      s3-dev:
+        condition: service_started
     networks: [interna]

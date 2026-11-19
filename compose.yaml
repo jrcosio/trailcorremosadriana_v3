@@ -46,6 +46,17 @@ services:
       LOGIN_VENTANA_MINUTOS: ${LOGIN_VENTANA_MINUTOS:-15}
       # La API solo es accesible desde Caddy (red interna): se confía en su X-Forwarded-For.
       FORWARDED_ALLOW_IPS: "*"
+      ALMACENAMIENTO: ${ALMACENAMIENTO:-local}
+      MEDIA_DIR: /data/media
+      UPLOAD_MAX_BYTES: ${UPLOAD_MAX_BYTES:-10000000}
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_REGION: ${S3_REGION:-auto}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_CREAR_BUCKET: ${S3_CREAR_BUCKET:-false}
+    volumes:
+      - media:/data/media
     depends_on:
       db:
         condition: service_healthy
@@ -76,6 +87,7 @@ services:
 
 volumes:
   pgdata:
+  media:
   caddy_data:
 
 networks:
