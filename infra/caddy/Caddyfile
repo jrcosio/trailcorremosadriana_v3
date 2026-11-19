@@ -1,0 +1,44 @@
+# Trail Peñasagra — entrada web (mismo origen para web, API y archivos).
+# Contrato: specs/001-base-proyecto/contracts/rutas-web.md
+{
+	admin off
+}
+
+:80 {
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
+		-Server
+	}
+
+	# API y archivos: proxy al servicio FastAPI.
+	@backend path /api/* /media/*
+	handle @backend {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+
+		# Caché: recursos con hash inmutables; el resto se revalida.
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		@no_assets not path /assets/*
+		header @no_assets Cache-Control "no-cache"
+
+		# Panel y vistas de revisión: un único HTML con robots noindex.
+		@admin path /admin /admin/*
+		rewrite @admin /admin/index.html
+		@pantallas path /pantallas /pantallas/*
+		rewrite @pantallas /pantallas/index.html
+
+		# HTML por ruta pública (sin redirección de barra final); detalles y rutas
+		# desconocidas usan app.html (404 HTTP real en la feature 011).
+		try_files {path}/index.html {path} /app.html
+
+		file_server
+	}
+}

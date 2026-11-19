@@ -1,0 +1,19 @@
+/*
+ * Ajustes sobre la hoja aprobada (globals.css se conserva idéntica a la propuesta).
+ * Cada ajuste corrige un defecto verificado sin cambiar las decisiones visuales aprobadas.
+ */
+
+/*
+ * A-001 (feature 001): a 360 px el botón de menú de la cabecera sobresalía 9 px y provocaba
+ * desplazamiento horizontal en todas las páginas (también en la referencia publicada).
+ * Criterio de aceptación: sin desbordamiento a 360 px (docs/referencia/09_CRITERIOS_ACEPTACION.md).
+ * Solo se reduce el espaciado en pantallas muy estrechas; tamaños y textos no cambian.
+ */
+@media (max-width: 400px) {
+  .header-inner {
+    gap: 6px;
+  }
+  .menu-toggle {
+    padding: 8px 4px;
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "settings": {
+    "edition": "2027",
+    "date": "",
+    "countdown": true,
+    "registrationsOpen": false,
+    "solidarityRegistration": "",
+    "registrationMessage": "Estamos preparando la próxima edición. Pronto anunciaremos la fecha y la apertura de inscripciones.",
+    "email": "asociacionpenasagra@gmail.com",
+    "phone": "+34619364819",
+    "instagram": "https://www.instagram.com/asociacion_penasagra/"
+  },
+  "races": [
+    {
+      "id": "trail-27k",
+      "title": "Trail Peñasagra",
+      "label": "LA PRUEBA REINA",
+      "km": "27",
+      "elevation": "1700",
+      "price": "28 €",
+      "image": "/reused/img/trail_inscripciones.webp",
+      "color": "#dc693a",
+      "description": "Senderos de montaña, el carácter del cortafuegos y las laderas de la Sierra de Peñasagra. Un recorrido exigente para disfrutar de la montaña en su estado más puro.",
+      "terrain": "Sendero y pista de montaña",
+      "start": "09:00",
+      "route": "https://es.wikiloc.com/rutas-carrera-por-montana/trail-sierra-penasagra-260167031",
+      "wikiloc": "260167031",
+      "gpx": "",
+      "registration": "",
+      "edition": "2026",
+      "aid": "Braña de Roja · Refugio de Busneu · Pozo Verde · Meta",
+      "published": true
+    },
+    {
+      "id": "speed-14k",
+      "title": "Speed Trail",
+      "label": "MONTAÑA A TU RITMO",
+      "km": "14",
+      "elevation": "800",
+      "price": "18 €",
+      "image": "/reused/img/speed_trail_inscripciones.webp",
+      "color": "#f2b544",
+      "description": "Una distancia para quienes quieren descubrir el trail o disfrutar de una carrera más rápida. Senderos, desnivel y la misma esencia de Peñasagra.",
+      "terrain": "Senderos de montaña",
+      "start": "09:00",
+      "route": "https://es.wikiloc.com/rutas-carrera-por-montana/trail-sierra-penasagra-14k-176672547",
+      "wikiloc": "176672547",
+      "gpx": "",
+      "registration": "",
+      "edition": "2026",
+      "aid": "Avituallamientos en recorrido y meta",
+      "published": true
+    },
+    {
+      "id": "familiar-7k",
+      "title": "Familiar Peñasagra",
+      "label": "PARA COMPARTIR",
+      "km": "7",
+      "elevation": "250",
+      "price": "12 € / 5 €",
+      "image": "/reused/img/familiar_trail_inscripciones.webp",
+      "color": "#80a397",
+      "description": "Una marcha para compartir en familia, recorrer el valle y disfrutar de una jornada de naturaleza y solidaridad.",
+      "terrain": "Senderos y caminos del valle",
+      "start": "09:00",
+      "route": "https://es.wikiloc.com/rutas-carrera-por-montana/trail-sierra-penasagra-marcha-7k-260165721",
+      "wikiloc": "260165721",
+      "gpx": "",
+      "registration": "",
+      "edition": "2026",
+      "aid": "Avituallamiento en meta",
+      "published": true
+    }
+  ],
+  "news": [
+    {
+      "id": "proxima-edicion",
+      "title": "Peñasagra 2027 ya está en el horizonte",
+      "category": "Próxima edición",
+      "date": "",
+      "image": "/reused/fondos/fondo.webp",
+      "excerpt": "Después de la edición 2026, miramos hacia la próxima salida. Gracias por formar parte de esta carrera.",
+      "body": "La edición 2026 ya se ha celebrado. Gracias a todos los participantes por formar parte del Trail Peñasagra.\n\nLa fecha y las inscripciones para la edición 2027 se anunciarán próximamente. En esta sección encontrarás las novedades de la organización.",
+      "published": true
+    }
+  ],
+  "albums": [
+    {
+      "id": "edicion-2026",
+      "title": "Volver a sentir la montaña",
+      "year": "2026",
+      "image": "/reused/img/trail_inscripciones.webp",
+      "url": "https://photos.app.goo.gl/A5ksyLsC3cSc2HHWA",
+      "photos": [],
+      "published": true
+    },
+    {
+      "id": "edicion-2025",
+      "title": "Una carrera que nos une",
+      "year": "2025",
+      "image": "/reused/img/speed_trail_inscripciones.webp",
+      "url": "https://photos.app.goo.gl/cubEC9ev2Y9N5LAYA",
+      "photos": [],
+      "published": true
+    },
+    {
+      "id": "edicion-2024",
+      "title": "Así empezó el camino",
+      "year": "2024",
+      "image": "/reused/img/familiar_trail_inscripciones.webp",
+      "url": "https://photos.app.goo.gl/NvoukMiSsSCHmijw9",
+      "photos": [],
+      "published": true
+    }
+  ],
+  "results": [],
+  "sponsors": [
+    {
+      "id": "carandia",
+      "name": "Carandía",
+      "image": "/reused/logos/patrocinadores/banner_carandia.png",
+      "url": "",
+      "order": 0,
+      "published": true
+    },
+    {
+      "id": "jvcosio",
+      "name": "JV Cosío",
+      "image": "/reused/logos/patrocinadores/banner_jvcosio.png",
+      "url": "",
+      "order": 1,
+      "published": true
+    },
+    {
+      "id": "andros",
+      "name": "Andros",
+      "image": "/reused/logos/patrocinadores/banner_andros.png",
+      "url": "",
+      "order": 2,
+      "published": true
+    },
+    {
+      "id": "aljomar",
+      "name": "Aljomar",
+      "image": "/reused/logos/patrocinadores/banner_aljomar.png",
+      "url": "",
+      "order": 3,
+      "published": true
+    },
+    {
+      "id": "artipublic",
+      "name": "Artipublic",
+      "image": "/reused/logos/patrocinadores/banner_artipublic.png",
+      "url": "",
+      "order": 4,
+      "published": true
+    },
+    {
+      "id": "grupochovi",
+      "name": "Grupo Choví",
+      "image": "/reused/logos/patrocinadores/banner_grupochovi.png",
+      "url": "",
+      "order": 5,
+      "published": true
+    },
+    {
+      "id": "natuber",
+      "name": "Natuber",
+      "image": "/reused/logos/patrocinadores/banner_natuber.png",
+      "url": "",
+      "order": 6,
+      "published": true
+    },
+    {
+      "id": "rionansa",
+      "name": "Ayuntamiento de Rionansa",
+      "image": "/reused/logos/patrocinadores/banner_rionansa.png",
+      "url": "",
+      "order": 7,
+      "published": true
+    }
+  ],
+  "collaborators": [],
+  "regulation": "Información de referencia: edición 2026. Las condiciones de la próxima edición deberán confirmarse antes de inscribirse.\n\nINSCRIPCIONES Y DORSALES\nLa inscripción es personal y no se puede transferir. En 2026, los dorsales se recogieron el 11 de julio, entre las 7:30 y las 8:30, en la Plaza de Cosío.\n\nCATEGORÍAS\nAbsoluta, Sénior y Veteranos A (40–45), B (46–50) y C (+50), con premios locales de Rionansa.\n\nMATERIAL\nLleva tu recipiente para beber y calzado de trail. Se recomienda manta térmica; el cortavientos dependerá del tiempo.\n\nENTORNO Y SEGURIDAD\nRespeta el itinerario y deposita los residuos en las zonas habilitadas. La organización podrá cambiar el trazado por seguridad.\n\nRESPONSABILIDAD Y SEGURO\nEl participante debe encontrarse en condiciones adecuadas, conocer el recorrido y respetar la circulación en tramos compartidos. La información original menciona un seguro de responsabilidad civil y limitaciones de responsabilidad de la organización.\n\nPENALIZACIONES\nSe sancionan la omisión de controles, los residuos, usar un dorsal ajeno, conductas antideportivas, faltas de respeto y acompañamiento motorizado.\n\nIMÁGENES\nEl reglamento original contempla autorización de uso promocional de fotografías, vídeos y nombre, sin contraprestación.\n\nCONSULTA\nConfirma con la organización el reglamento completo vigente."
+}

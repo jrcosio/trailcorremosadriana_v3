@@ -1,0 +1,4 @@
+posicion;dorsal;nombre;apellidos;tiempo;categoria;club;sexo;estado
+1;101;Participante;Ejemplo Uno;01:42:10;Senior;Club de ejemplo;F;
+2;102;Participante;Ejemplo Dos;01:43:22;Veterano;Club de ejemplo;M;
+DNF;103;Participante;Ejemplo Tres;;Senior;;F;DNF

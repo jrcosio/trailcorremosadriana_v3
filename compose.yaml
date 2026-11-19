@@ -1,0 +1,74 @@
+# Trail Peñasagra — servicios base.
+# Uso (ver docs/desarrollo.md):
+#   docker compose build
+#   docker compose up -d db
+#   docker compose run --rm api alembic upgrade head   # paso explícito de esquema
+#   docker compose up -d
+# Los valores por defecto son SOLO de desarrollo local. El despliegue de producción
+# (feature 011) exigirá variables propias sin valores por defecto.
+name: trail-penasagra
+
+x-postgres-env: &postgres-env
+  POSTGRES_DB: ${POSTGRES_DB:-trail}
+  POSTGRES_USER: ${POSTGRES_USER:-trail}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trail_dev}
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      <<: *postgres-env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [interna]
+    restart: unless-stopped
+    # Sin puertos publicados: PostgreSQL solo es accesible desde la red interna.
+
+  api:
+    build:
+      context: ./backend
+      target: runtime
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-trail}:${POSTGRES_PASSWORD:-trail_dev}@db:5432/${POSTGRES_DB:-trail}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      ENTORNO: ${ENTORNO:-desarrollo}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks: [interna]
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      api:
+        condition: service_started
+    networks: [interna]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  caddy_data:
+
+networks:
+  interna:
