@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Trail Peñasagra API — evento y carreras (feature 004)
+  version: 0.4.0
+  description: >
+    Escrituras con la protección de la feature 002 (Origin → sesión → X-CSRF-Token).
+    Errores {"error": "..."}; 409 = versión obsoleta.
+components:
+  schemas:
+    Evento:
+      type: object
+      required: [edition, date, countdown, version]
+      properties:
+        edition: { type: string, pattern: "^20\\d\\d$" }
+        date: { type: string, description: "'' o ISO 8601 (con zona; sin zona = Europe/Madrid). Respuesta: ISO UTC …Z" }
+        countdown: { type: boolean }
+        version: { type: integer, minimum: 0, description: "0 si no existe edición actual" }
+    Carrera:
+      type: object
+      required: [title, edition, km, elevation, price, image, published]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 150 }
+        label: { type: string, maxLength: 60 }
+        color: { type: string, pattern: "^(#[0-9a-fA-F]{6})?$" }
+        edition: { type: string, pattern: "^20\\d\\d$" }
+        km: { type: [string, number], description: "≥ 0, hasta 2 decimales" }
+        elevation: { type: [string, number], description: "entero ≥ 0" }
+        price: { type: string, minLength: 1, maxLength: 40 }
+        start: { type: string, pattern: "^(([01]\\d|2[0-3]):[0-5]\\d)?$" }
+        terrain: { type: string, maxLength: 150 }
+        description: { type: string, maxLength: 5000 }
+        aid: { type: string, maxLength: 1000 }
+        image: { type: string, description: "regla de referencias (003), obligatoria" }
+        route: { type: string }
+        wikiloc: { type: string, pattern: "^\\d{0,20}$" }
+        gpx: { type: string }
+        registration: { type: string }
+        published: { type: boolean }
+        version: { type: integer, minimum: 0, description: "0/ausente al crear" }
+paths:
+  /api/admin/evento:
+    get:
+      summary: Edición actual
+      responses:
+        "200": { description: Evento, content: { application/json: { schema: { $ref: "#/components/schemas/Evento" } } } }
+        "401": { description: Sin sesión }
+    put:
+      summary: Guardar edición actual, fecha y contador (cambiar de año convierte esa edición en la actual)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/Evento" } } } }
+      responses:
+        "200": { description: Guardado, content: { application/json: { schema: { $ref: "#/components/schemas/Evento" } } } }
+        "400": { description: Datos no válidos }
+        "401": { description: Sin sesión }
+        "403": { description: Origin o CSRF }
+        "409": { description: Versión obsoleta }
+  /api/admin/carreras/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, pattern: "^[A-Za-z0-9_-]{1,100}$" } }
+    put:
+      summary: Crear o actualizar una prueba y su ficha para la edición indicada
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/Carrera" } } } }
+      responses:
+        "200": { description: Guardada; devuelve el Item con id y version nuevos }
+        "400": { description: Datos no válidos (mensaje con el campo) }
+        "401": { description: Sin sesión }
+        "403": { description: Origin o CSRF }
+        "409": { description: Versión obsoleta (incluido crear un id existente) }
+    delete:
+      summary: Borrar la prueba y sus fichas
+      parameters:
+        - { name: version, in: query, required: true, schema: { type: integer } }
+      responses:
+        "200": { description: "Borrada: {ok: true}" }
+        "401": { description: Sin sesión }
+        "403": { description: Origin o CSRF }
+        "404": { description: No existe }
+        "409": { description: Versión obsoleta o prueba con clasificaciones }
