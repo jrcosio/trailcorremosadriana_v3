@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+.dev.vars
+!.dev.vars.example
+.claude/settings.local.json
+
+# Dependencias y builds
+node_modules/
+.next/
+.open-next/
+.wrangler/
+dist/
+build/
+.venv/
+__pycache__/
+
+# Material de referencia local (no se versiona)
+datos_iniciales/
