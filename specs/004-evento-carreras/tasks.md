@@ -16,7 +16,7 @@ description: "Tareas de implementación de la feature 004-evento-carreras"
 
 - [ ] T002 Crear `backend/app/models/evento.py` con `Edicion` (data-model.md `Edicion.id`, `Edicion.anio`, `Edicion.fecha_hora`, `Edicion.mostrar_contador`, `Edicion.es_actual`, `Edicion.version`, `Edicion.creado_en`, `Edicion.actualizado_en`), `Carrera` (`Carrera.id`, `Carrera.slug`, `Carrera.nombre`, `Carrera.etiqueta`, `Carrera.color`, `Carrera.orden`) y `CarreraEdicion` (`CarreraEdicion.id`, `CarreraEdicion.carrera_id`, `CarreraEdicion.edicion_id`, `CarreraEdicion.km`, `CarreraEdicion.desnivel`, `CarreraEdicion.precio`, `CarreraEdicion.hora_salida`, `CarreraEdicion.terreno`, `CarreraEdicion.descripcion`, `CarreraEdicion.avituallamientos`, `CarreraEdicion.imagen`, `CarreraEdicion.ruta`, `CarreraEdicion.wikiloc`, `CarreraEdicion.gpx`, `CarreraEdicion.url_inscripcion`, `CarreraEdicion.publicada`, `CarreraEdicion.version`, `CarreraEdicion.actualizado_en`), y registrarlos en `backend/app/models/__init__.py`
 - [ ] T003 Escribir `backend/alembic/versions/0004_evento_carreras.py` con los CHECK, UNIQUE, índice parcial y FK de data-model.md, con su `downgrade`
-- [ ] T004 Crear `backend/app/schemas/evento.py` con `EventoEntrada` y `CarreraEntrada`, que aplican las reglas de data-model.md a todos los campos citados en T002 y usan `referencia_valida` (003) en `CarreraEdicion.imagen`, `CarreraEdicion.ruta`, `CarreraEdicion.gpx` y `CarreraEdicion.url_inscripcion`
+- [ ] T004 Crear `backend/app/schemas/evento.py` con `EventoEntrada` y `CarreraEntrada`, que aplican las reglas de data-model.md a todos los campos citados en T002 y usan `referencia_valida` (003) en `CarreraEdicion.imagen`, `CarreraEdicion.ruta` y `CarreraEdicion.url_inscripcion`; `CarreraEdicion.gpx` se limita a vacío, `/media/<clave>.gpx` o https
 
 ## Phase 3: User Story 3 - Datos iniciales (P1)
 
@@ -30,7 +30,7 @@ description: "Tareas de implementación de la feature 004-evento-carreras"
 
 ## Phase 5: User Story 2 - Gestionar las pruebas (P1)
 
-- [ ] T009 [P] [US2] Escribir `backend/tests/test_carreras.py`: crear como borrador o publicada; editar; cambiar la edición conserva la ficha anterior; 409 con versión obsoleta y al crear un id existente; borrar con versión; 404 si no existe; validaciones de FR-006 (cada regla); protección de la 002
+- [ ] T009 [P] [US2] Escribir `backend/tests/test_carreras.py`: crear como borrador o publicada; editar; cambiar la edición conserva la ficha anterior; 409 con versión obsoleta y al crear un id existente; borrar con versión; 404 si no existe; validaciones de FR-006 (cada regla); protección de la 002. El rechazo del borrado con clasificaciones (FR-009) se prueba en la feature 006, cuando exista la tabla
 - [ ] T010 [US2] Implementar `backend/app/services/carreras.py` y `backend/app/api/admin_carreras.py` y registrarlo en `backend/app/main.py`
 
 ## Phase 6: User Story 4 - Web pública desde la base de datos (P2)
@@ -42,7 +42,7 @@ description: "Tareas de implementación de la feature 004-evento-carreras"
 
 - [ ] T013 [P] [US2] Crear `frontend/src/lib/persistencia.ts` (`guardarCambios`: comparar secciones, reparto por recurso, recarga de la vista privada, primer error) y `frontend/tests/persistencia.test.ts`
 - [ ] T014 [US2] Cambiar `save()` en `frontend/src/components/admin/Admin.tsx` para usar `guardarCambios` y fijar los datos devueltos por el servidor; sin cambios visuales
-- [ ] T015 [US2] Crear `frontend/scripts/verificar-evento-carreras.mjs` (Playwright, quickstart §3 con restauración posterior) y ejecutarlo
+- [ ] T015 [US2] Crear `frontend/scripts/verificar-evento-carreras.mjs` (Playwright, quickstart §3 con restauración posterior, incluido que el detalle de una prueba retirada muestra «Este sendero no está en el mapa.») y ejecutarlo
 
 ## Phase 8: Polish
 
