@@ -1,15 +1,24 @@
-"""Contenido público transitorio servido desde la semilla curada (backend/seed)."""
+"""Contrato transitorio `SiteData` (GET /api/content).
+
+Desde la feature 004, la edición, la fecha, el contador y las pruebas proceden de PostgreSQL. El
+resto de secciones sigue saliendo de la semilla curada hasta su feature. En una base sin
+inicializar (sin ediciones ni pruebas) se usa la semilla completa (comportamiento transitorio).
+"""
 
 import json
+import logging
 import re
 import unicodedata
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy.orm import Session
+
 from app.schemas.contenido import SiteData
 
 RUTA_SEMILLA = Path(__file__).resolve().parents[2] / "seed" / "contenido_inicial.json"
 COLECCIONES = ("races", "news", "albums", "results", "sponsors", "collaborators")
+registro = logging.getLogger(__name__)
 
 
 def cargar_contenido(ruta: Path = RUTA_SEMILLA) -> SiteData:
@@ -41,12 +50,33 @@ def _clasificacion_visible(item: dict[str, Any]) -> bool:
     )
 
 
-def datos_publicos(contenido: SiteData) -> dict[str, Any]:
+def filtrar_publicos(data: dict[str, Any]) -> dict[str, Any]:
     """Equivalente a `publicData` del frontend: solo elementos publicados."""
-    data = contenido.model_dump(mode="json")
     for clave in COLECCIONES:
         if clave == "results":
             data[clave] = [i for i in data[clave] if _clasificacion_visible(i)]
         else:
             data[clave] = [i for i in data[clave] if i.get("published") is True]
     return data
+
+
+def datos_publicos(contenido: SiteData) -> dict[str, Any]:
+    return filtrar_publicos(contenido.model_dump(mode="json"))
+
+
+def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
+    """`SiteData` con las secciones migradas leídas de la base de datos."""
+    from app.services import carreras, evento  # importación diferida: evita ciclos con los modelos
+
+    data = semilla.model_dump(mode="json")
+    if carreras.hay_datos(db):
+        ev = evento.a_contrato(evento.actual(db))
+        data["settings"].update(edition=ev["edition"], date=ev["date"], countdown=ev["countdown"])
+        if privado:
+            data["settings"]["eventVersion"] = ev["version"]
+        data["races"] = carreras.listar(db, privado=privado)
+    else:
+        registro.warning(
+            "Base sin ediciones ni pruebas: se sirve la semilla (ejecuta importar-inicial)."
+        )
+    return data if privado else filtrar_publicos(data)

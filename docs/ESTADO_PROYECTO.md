@@ -4,32 +4,33 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 003-archivos (merge local en `main`)
-- **Siguiente feature**: 004-evento-carreras
+- **Última feature cerrada**: 004-evento-carreras (merge local en `main`)
+- **Siguiente feature**: 005-inscripciones-dorsal
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Feature activa en Spec Kit**: `.specify/feature.json` apunta todavía a `specs/003-archivos`;
-  el `/speckit-specify` de la 004 la actualizará.
-- **Siguiente acción concreta**: `git switch -c 004-evento-carreras main` y `/speckit-specify`.
-  Alcance:
-  - tablas `ediciones` (año, fecha y hora con zona Europe/Madrid, contador, edición actual,
-    `version`), `carreras` (slugs `trail-27k`, `speed-14k`, `familiar-7k`) y `carreras_edicion`
-    (datos de referencia de 2026, GPX con `/media/…`, `published`);
-  - importación idempotente desde la semilla, con la edición 2026 con fecha 11/07/2026 09:00 y la
-    2027 sin fecha;
-  - endpoints de administración por recurso con versión y 409;
-  - el adaptador `/api/content` lee `settings` y `races` desde PostgreSQL;
-  - reconexión de `/admin/evento` y `/admin/recorridos` en `Admin.tsx`;
-  - pantallas públicas `/`, `/carreras`, `/carreras/:id` y el contador.
-- **Entorno local**: `docker compose up -d` (http://localhost:8080). Esquema en `0003_archivos`.
-  Cuenta local `admin` (contraseña no versionada).
+- **Feature activa en Spec Kit**: `.specify/feature.json` apunta todavía a
+  `specs/004-evento-carreras`.
+- **Siguiente acción concreta**: `git switch -c 005-inscripciones-dorsal main` y
+  `/speckit-specify`.
+  - Columnas en `ediciones` (migración 0005): `inscripciones_abiertas`,
+    `mensaje_inscripciones` y `url_dorsal_solidario`. Se importan desde la semilla.
+  - `PUT /api/admin/inscripciones`, con versión y con la regla «no abrir sin ningún destino
+    válido».
+  - Validación HTTPS sin credenciales de la URL del dorsal y de los enlaces de inscripción por
+    prueba (`carreras_edicion.url_inscripcion`).
+  - Añadir `registrationsOpen`, `registrationMessage` y `solidarityRegistration` a
+    `persistencia.ts`. La pantalla `/admin/inscripciones` también cambia
+    `races[].registration`.
+  - Comprobar la matriz 4×2 en Inicio, Solidaridad e Inscripciones.
+- **Entorno local**: `docker compose up -d` (http://localhost:8080). Esquema en
+  `0004_evento_carreras`, con los datos importados. Cuenta local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0 (preparación), 001 (base del proyecto), 002 (administrador), 003 (archivos) |
+| Terminadas | 0, 001 (base), 002 (administrador), 003 (archivos), 004 (evento y carreras) |
 | Activa | — |
-| Pendientes | 004 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 005 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -54,6 +55,9 @@
 | 2026-11-20 | Archivos públicos por clave aleatoria (también los de borradores); sin borrado físico hasta la 011 | 003 spec Assumptions, research R7 |
 | 2026-11-20 | Entrega de `/media` siempre a través de la API (también con R2); CDN directa a valorar en la 011 | 003 research R1 |
 | 2026-11-20 | S3 de desarrollo y pruebas con moto (`motoserver/moto:5.2.5`): la imagen pública de MinIO ya no está disponible | 003 research R2 |
+| 2026-11-20 | El panel guarda por recursos mediante `lib/persistencia.ts` (sin `PUT` del documento completo) | 004 research R1 |
+| 2026-11-20 | Una prueba tiene una ficha por edición; la web muestra la publicada más reciente | 004 research R2 |
+| 2026-11-20 | Edición 2026 con fecha oficial 11/07/2026 09:00 (dato de producción) importada como histórico | 004 research R6 |
 
 ## Supuestos
 
@@ -113,6 +117,16 @@
 | 2026-11-20 | 003 | `verificar-subida.mjs` (subida desde el panel y rechazo de SVG), `verificar-acceso.mjs`, `verificar-rutas.mjs` | OK; 42/42 |
 | 2026-11-20 | 003 | Modo S3 completo con `compose.s3.yaml` (Caddy → API → moto) | Objeto en el bucket, no en el volumen local; entrega con bytes idénticos |
 | 2026-11-20 | 003 | `/speckit-converge` | 1.ª pasada: 2 tareas (T020–T021) resueltas; 2.ª pasada: Converged |
+| 2026-11-20 | 004 | Checklists `requirements` 16/16 y `datos` 13/13 (1 hueco corregido: regla de cambio horario); `analyze`: 3 LOW corregidos | OK |
+| 2026-11-20 | 004 | pytest (PostgreSQL real) | **226 passed** |
+| 2026-11-20 | 004 | vitest (incluye `persistencia.ts`) y typecheck | **52 passed**; OK |
+| 2026-11-20 | 004 | `alembic upgrade head` → 0004; `importar-inicial` dos veces | Datos creados; 2.ª vez «Sin cambios» |
+| 2026-11-20 | 004 | Textos de 44 capturas frente a la 001 (SC-001) y `verificar-rutas` | 0 diferencias; 0 desbordamientos; 42/42 |
+| 2026-11-20 | 004 | `verificar-evento-carreras.mjs` (fecha de verano e invierno, sin fecha, km, borrador → publicada → retirada → borrada, conflicto 409, restauración) | 12/12 OK |
+| 2026-11-20 | 004 | Cambio de contador y `docker compose restart` (SC-003) | Persiste; restaurado |
+| 2026-11-20 | 004 | Regresión: `verificar-acceso` 7/7, `verificar-subida` 2/2, `verificar-admin` 2/2 | OK |
+| 2026-11-20 | 004 | Convergencia: descarga GPX en el detalle (attachment) y fecha pasada (contador a cero), restaurados | 16/16 OK en `verificar-evento-carreras.mjs` |
+| 2026-11-20 | 004 | `/speckit-converge` | 1.ª pasada: 2 tareas (T018–T019) resueltas; 2.ª pasada: Converged |
 
 ## Bloqueos
 

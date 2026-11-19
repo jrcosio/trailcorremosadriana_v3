@@ -9,11 +9,34 @@ from sqlalchemy.exc import OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.formparsers import MultiPartException
 
-from app.api import archivos, contenido, media, salud, sesion
+from app.api import admin_carreras, admin_evento, archivos, contenido, media, salud, sesion
 from app.core.config import Settings, get_settings
 from app.core.db import crear_engine
 from app.services.contenido import cargar_contenido
+from app.services.errores import Conflicto, NoEncontrado
 from app.storage import AlmacenamientoNoDisponible, crear_almacenamiento
+
+# Nombres legibles de los campos de los formularios del panel (mensajes de validación).
+ETIQUETAS = {
+    "title": "nombre",
+    "label": "frase corta",
+    "color": "color",
+    "edition": "edición",
+    "km": "distancia",
+    "elevation": "desnivel",
+    "price": "precio",
+    "start": "hora de salida",
+    "terrain": "terreno",
+    "description": "descripción",
+    "aid": "avituallamientos",
+    "image": "fotografía",
+    "route": "enlace a la ruta",
+    "wikiloc": "ID de Wikiloc",
+    "gpx": "track GPX",
+    "registration": "enlace de inscripción",
+    "date": "fecha y hora",
+    "version": "versión",
+}
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -54,9 +77,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return JSONResponse({"error": detalle}, status_code=exc.status_code, headers=exc.headers)
 
     @app.exception_handler(RequestValidationError)
-    async def error_validacion(_: Request, __: RequestValidationError) -> JSONResponse:
-        # Sin detalles internos del esquema (FR-021 de la feature 002).
+    async def error_validacion(_: Request, exc: RequestValidationError) -> JSONResponse:
+        # Mensaje claro con el campo afectado, sin detalles internos del esquema (002 FR-021).
+        for error in exc.errors():
+            campo = str(error.get("loc", ("",))[-1])
+            if campo in ETIQUETAS:
+                return JSONResponse(
+                    {"error": f"Revisa el campo «{ETIQUETAS[campo]}»."}, status_code=400
+                )
         return JSONResponse({"error": "Datos no válidos."}, status_code=400)
+
+    @app.exception_handler(Conflicto)
+    async def conflicto(_: Request, exc: Conflicto) -> JSONResponse:
+        return JSONResponse({"error": exc.mensaje}, status_code=409)
+
+    @app.exception_handler(NoEncontrado)
+    async def no_encontrado(_: Request, exc: NoEncontrado) -> JSONResponse:
+        return JSONResponse({"error": exc.mensaje}, status_code=404)
 
     @app.exception_handler(OperationalError)
     async def base_no_disponible(_: Request, __: OperationalError) -> JSONResponse:
@@ -81,6 +118,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(sesion.router)
     app.include_router(archivos.router)
     app.include_router(media.router)
+    app.include_router(admin_evento.router)
+    app.include_router(admin_carreras.router)
     return app
 
 

@@ -68,6 +68,42 @@ repositorio.
 - OpenAPI en `/api/docs` solo con `ENTORNO=desarrollo`. Los contratos versionados están en
   `specs/*/contracts/`.
 
+## Persistencia del panel por recursos (desde la feature 004)
+
+`Admin.tsx` guarda siempre un `SiteData` completo con `save()`. `frontend/src/lib/persistencia.ts`
+(`guardarCambios`) compara el estado anterior con el nuevo y reparte los cambios:
+
+| Cambio | Destino |
+|---|---|
+| `settings.edition`, `date`, `countdown` | `PUT /api/admin/evento` |
+| prueba nueva o editada | `PUT /api/admin/carreras/{id}` (con `version`) |
+| prueba borrada | `DELETE /api/admin/carreras/{id}?version=N` |
+| secciones aún no migradas | `PUT /api/content`, que responde 501 «Esta sección del panel todavía no guarda cambios.» |
+
+Después se relee `GET /api/content?admin=1`, así que el panel muestra lo que confirmó el
+servidor, con sus versiones. Cada feature siguiente añade su recurso a este módulo.
+
+## Evento y carreras (feature 004)
+
+- **Tablas**:
+  - `ediciones`: año único, `fecha_hora` timestamptz nula, contador, `es_actual` (índice único
+    parcial) y `version`.
+  - `carreras`: el `slug` es la URL estable.
+  - `carreras_edicion`: UNIQUE por carrera y edición, con los datos de la prueba, `publicada` y
+    `version`.
+- **Ficha mostrada**: la web enseña la ficha *publicada* de año más alto; el panel, la de año más
+  alto en cualquier estado. Cambiar la edición de una prueba crea otra ficha y la anterior queda
+  como histórico.
+- **Fechas**: la API acepta ISO con zona o una hora local interpretada en Europe/Madrid (`fold=0`)
+  y devuelve ISO UTC `…Z` (`app/services/fechas.py`).
+- **Errores**: 409 con «Otra persona ha modificado estos datos…» ante una versión obsoleta; 400
+  con «Revisa el campo «…».» ante un dato no válido.
+- **Importación**: `python -m app.cli importar-inicial` carga las ediciones 2026 (11/07/2026 09:00)
+  y 2027 (actual, sin fecha) y las 3 pruebas con datos de 2026. Solo rellena las partes vacías;
+  `--reemplazar` exige confirmación escrita.
+- **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
+  ediciones ni pruebas (base sin inicializar), se sirve la semilla.
+
 ## Archivos (feature 003)
 
 - **Subida**: `POST /api/upload` con la protección de escritura de la 002. Acepta JPEG, PNG, WebP,
