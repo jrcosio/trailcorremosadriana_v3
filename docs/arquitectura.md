@@ -68,6 +68,39 @@ repositorio.
 - OpenAPI en `/api/docs` solo con `ENTORNO=desarrollo`. Los contratos versionados están en
   `specs/*/contracts/`.
 
+## Archivos (feature 003)
+
+- **Subida**: `POST /api/upload` con la protección de escritura de la 002. Acepta JPEG, PNG, WebP,
+  PDF y GPX.
+  - El tipo se detecta por los bytes mágicos.
+  - El GPX se analiza con `defusedxml`: sin DTD ni entidades, raíz `gpx`.
+  - SVG, HTML y cualquier otro formato se rechazan.
+  - Límite de 10 MB (`UPLOAD_MAX_BYTES`): Caddy corta a 11 MB y la API a 10 MB, ambos con 413 en
+    JSON.
+  - Clave aleatoria `uuid4().hex.<ext>`. Primero se guarda el objeto y después la fila en
+    `archivos` (tipo, tamaño, sha256, nombre saneado, quién lo subió y cuándo). Si falla el
+    almacenamiento: 503 sin fila.
+- **Entrega**: `GET` y `HEAD` de `/media/{clave}` son públicos (la clave no se puede adivinar).
+  Cualquier otra ruta bajo `/media/` devuelve el mismo 404 genérico.
+  - Cabeceras: caché inmutable de 1 año, ETag = sha256 (con 304), `nosniff` y
+    `CSP default-src 'none'; sandbox`.
+  - Los GPX se descargan con nombre saneado.
+  - Una clave no válida o inexistente devuelve 404 genérico.
+- **Almacenamiento** (`app/storage/`): se elige con `ALMACENAMIENTO`.
+  - `local`: volumen `media` en `/data/media`, con escritura atómica.
+  - `s3`: `boto3` con `endpoint_url`, para Cloudflare R2 en producción.
+  - Las credenciales solo existen en el servidor.
+  - En desarrollo y pruebas, el servidor S3 es moto (`motoserver/moto:5.2.5`, servicio `s3-dev`);
+    la imagen pública de MinIO ya no está disponible.
+  - `compose.s3.yaml` arranca la API completa en modo S3, sin publicar puertos.
+- **Referencias de contenido** (`app/core/referencias.py`): se aceptan valores vacíos,
+  `/reused/…` (sin `..`), `/media/<clave>` o `https://` sin credenciales, de hasta 2200
+  caracteres. Las features 004–010 las validan con esta regla.
+- **Recursos estáticos**: `/reused/`, `/images/`, `/fonts/` y `/templates/` siguen sirviéndose
+  desde `frontend/public` sin cambios.
+- **Sin borrado físico**: retirar contenido no borra archivos. La limpieza de archivos sin uso
+  llega en la 011.
+
 ## Seguridad del panel (feature 002)
 
 - **Cuentas**:

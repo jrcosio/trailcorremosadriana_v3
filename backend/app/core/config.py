@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     login_max_intentos: int = 8
     login_ventana_minutos: int = 15
 
+    # Archivos (feature 003)
+    almacenamiento: Literal["local", "s3"] = "local"
+    media_dir: str = "/data/media"
+    upload_max_bytes: int = 10_000_000
+    s3_endpoint_url: str = ""
+    s3_bucket: str = ""
+    s3_region: str = "auto"
+    s3_access_key_id: str = ""
+    s3_secret_access_key: str = ""
+    s3_crear_bucket: bool = False
+
     @property
     def es_desarrollo(self) -> bool:
         return self.entorno == "desarrollo"

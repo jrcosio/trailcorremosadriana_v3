@@ -7,11 +7,13 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.formparsers import MultiPartException
 
-from app.api import archivos, contenido, salud, sesion
+from app.api import archivos, contenido, media, salud, sesion
 from app.core.config import Settings, get_settings
 from app.core.db import crear_engine
 from app.services.contenido import cargar_contenido
+from app.storage import AlmacenamientoNoDisponible, crear_almacenamiento
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -35,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.engine = crear_engine(settings.database_url, settings.db_connect_timeout)
+    app.state.almacenamiento = crear_almacenamiento(settings)
 
     @app.middleware("http")
     async def cabeceras_seguras(request: Request, call_next):
@@ -61,10 +64,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             {"error": "El servicio no está disponible. Inténtalo más tarde."}, status_code=503
         )
 
+    @app.exception_handler(AlmacenamientoNoDisponible)
+    async def almacenamiento_no_disponible(
+        _: Request, __: AlmacenamientoNoDisponible
+    ) -> JSONResponse:
+        return JSONResponse(
+            {"error": "No se ha podido guardar el archivo. Inténtalo más tarde."}, status_code=503
+        )
+
+    @app.exception_handler(MultiPartException)
+    async def multipart_no_valido(_: Request, __: MultiPartException) -> JSONResponse:
+        return JSONResponse({"error": "Selecciona un archivo."}, status_code=400)
+
     app.include_router(salud.router)
     app.include_router(contenido.router)
     app.include_router(sesion.router)
     app.include_router(archivos.router)
+    app.include_router(media.router)
     return app
 
 

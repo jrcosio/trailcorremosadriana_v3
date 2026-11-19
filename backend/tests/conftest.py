@@ -4,6 +4,7 @@ Cada prueba que lo necesita recibe una base de datos temporal (`trail_test_<id>`
 servidor PostgreSQL de Compose y eliminada al terminar. Nunca se usa SQLite.
 """
 
+import tempfile
 import uuid
 from collections.abc import Iterator
 from pathlib import Path
@@ -61,6 +62,8 @@ def crear_cliente(database_url: str, ip: str = "203.0.113.10", **ajustes) -> Tes
     ajustes.setdefault("public_origin", ORIGEN)
     # httpx no envía cookies Secure por HTTP; las pruebas de atributos lo activan explícitamente.
     ajustes.setdefault("cookie_secure", False)
+    # Cada cliente usa un almacenamiento local propio salvo que se indique otro.
+    ajustes.setdefault("media_dir", tempfile.mkdtemp(prefix="media-pruebas-"))
     app = create_app(Settings(database_url=database_url, **ajustes))
     return TestClient(app, base_url=ORIGEN, client=(ip, 50000), headers={"Origin": ORIGEN})
 
@@ -113,3 +116,25 @@ def cliente_admin(base_con_admin: str) -> Iterator[TestClient]:
         r = entrar(c)
         assert r.status_code == 200, r.text
         yield c
+
+
+# --- Archivos de prueba (bytes mínimos con la firma de cada tipo) ---
+JPEG = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00" + b"\x00" * 64 + b"\xff\xd9"
+PNG = b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + b"\x00" * 64
+WEBP = b"RIFF\x24\x00\x00\x00WEBPVP8 " + b"\x00" * 64
+PDF = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n1 0 obj\n<<>>\nendobj\ntrailer<<>>\n%%EOF\n"
+GPX = (
+    b'<?xml version="1.0" encoding="UTF-8"?>\n'
+    b'<gpx version="1.1" creator="prueba" xmlns="http://www.topografix.com/GPX/1/1">'
+    b'<trk><name>Ruta</name><trkseg><trkpt lat="43.2" lon="-4.5"/></trkseg></trk></gpx>'
+)
+
+
+def subir(cliente: TestClient, datos: bytes, nombre: str = "archivo.bin", **extra):
+    """Sube un archivo con sesión y CSRF del cliente."""
+    return cliente.post(
+        "/api/upload",
+        files={"file": (nombre, datos, "application/octet-stream")},
+        headers={"X-CSRF-Token": csrf(cliente)},
+        **extra,
+    )

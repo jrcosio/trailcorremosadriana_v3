@@ -33,6 +33,17 @@ Para desbloquear el acceso en local tras 8 intentos fallidos:
 Cada vez que una feature añada migraciones hay que repetir `alembic upgrade head`. Mientras
 falten, `/api/ready` responde `migraciones_pendientes`.
 
+## Almacenamiento S3 en desarrollo
+
+```bash
+docker compose -f compose.yaml -f compose.s3.yaml up -d   # API con ALMACENAMIENTO=s3 contra moto (s3-dev)
+docker compose up -d                                       # volver al almacenamiento local
+```
+
+Los archivos subidos en un modo no están en el otro: la base guarda la referencia, pero los
+bytes se quedan en su almacenamiento. En producción (Cloudflare R2) se configuran las variables
+`S3_*` reales en el entorno del servidor, nunca en el repositorio.
+
 ## Frontend con recarga en caliente
 
 ```bash
@@ -46,7 +57,7 @@ El servidor de Vite hace proxy de `/api` y `/media` a `127.0.0.1:8000` (variable
 ## Pruebas
 
 ```bash
-# Backend contra PostgreSQL real (crea y borra bases temporales trail_test_*)
+# Backend contra PostgreSQL real (bases temporales trail_test_*) y S3 real por HTTP (moto, s3-dev)
 docker compose -f compose.yaml -f compose.dev.yaml --profile test run --rm --build api-test
 
 # Frontend
@@ -57,6 +68,7 @@ node scripts/verificar-rutas.mjs          # todas las rutas, al abrir y al recar
 node scripts/verificar-admin.mjs          # acceso erróneo genérico; vistas de diseño sin escritura
 ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-acceso.mjs --bloqueo   # acceso real de extremo a extremo
 node scripts/capturas.mjs http://localhost:8080 capturas/local   # 360/768/1024/1440 + desbordamiento
+ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-subida.mjs   # subida real desde el panel
 ```
 
 `verificar-respaldo.mjs` se ejecuta con la API detenida (`docker compose stop api`).
@@ -68,8 +80,8 @@ node scripts/capturas.mjs http://localhost:8080 capturas/local   # 360/768/1024/
 | Estado de los servicios | `docker compose ps` |
 | Registros de la API | `docker compose logs -f api` |
 | Revisión de esquema aplicada | `docker compose run --rm api alembic current` |
-| Copia de seguridad de la base | `infra/scripts/backup.sh` |
-| Restaurar una copia | `infra/scripts/restore.sh <archivo.dump>` |
+| Copia de seguridad (base y archivos locales) | `infra/scripts/backup.sh` |
+| Restaurar una copia | `infra/scripts/restore.sh <archivo.dump> [media.tgz]` |
 | Parar sin borrar datos | `docker compose down` |
 | Borrar también los datos (¡destructivo!) | `docker compose down -v` |
 

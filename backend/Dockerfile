@@ -21,7 +21,8 @@ CMD ["pytest"]
 
 # Imagen de ejecución: sin dependencias de desarrollo ni tests, usuario sin privilegios.
 FROM base AS runtime
-RUN useradd --system --uid 10001 --no-create-home app
+RUN useradd --system --uid 10001 --no-create-home app \
+    && mkdir -p /data/media && chown app /data/media
 COPY alembic.ini ./
 COPY alembic ./alembic
 COPY app ./app

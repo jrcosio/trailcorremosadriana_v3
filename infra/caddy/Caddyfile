@@ -14,14 +14,27 @@
 		-Server
 	}
 
+	# Subidas: cuerpo máximo 11 MB (la API limita a 10 MB por archivo).
+	@subida path /api/upload
+	request_body @subida {
+		max_size 11MB
+	}
+
 	# API y archivos: proxy al servicio FastAPI.
 	@backend path /api/* /media/*
 	handle @backend {
 		reverse_proxy api:8000
 	}
 
-	# Si la API no responde, error de servicio en JSON (el panel lo muestra tal cual).
+	# Errores generados por Caddy en la API, en JSON (el panel muestra el campo `error`).
 	handle_errors {
+		@demasiado_grande expression `{err.status_code} == 413`
+		handle @demasiado_grande {
+			header Content-Type "application/json"
+			header Cache-Control "no-store"
+			respond `{"error":"Máximo 10 MB por archivo."}` 413
+		}
+		# Si la API no responde (502/503/504): error de servicio.
 		@backend_caido path /api/* /media/*
 		handle @backend_caido {
 			header Content-Type "application/json"

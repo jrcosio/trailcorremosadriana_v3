@@ -1,0 +1,21 @@
+# Almacenamiento compatible con S3 en desarrollo (servidor moto, sin credenciales reales):
+#   docker compose -f compose.yaml -f compose.s3.yaml up -d
+# Para volver al almacenamiento local: docker compose up -d
+# En producción (R2) se configuran S3_* reales en el entorno, nunca en el repositorio.
+services:
+  s3-dev:
+    image: motoserver/moto:5.2.5
+    networks: [interna]
+
+  api:
+    environment:
+      ALMACENAMIENTO: s3
+      S3_ENDPOINT_URL: http://s3-dev:5000
+      S3_BUCKET: trail-media
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: desarrollo
+      S3_SECRET_ACCESS_KEY: desarrollo
+      S3_CREAR_BUCKET: "true"
+    depends_on:
+      s3-dev:
+        condition: service_started
