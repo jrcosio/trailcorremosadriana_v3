@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: Trail Peñasagra API — archivos (feature 003)
+  version: 0.3.0
+  description: Subida autenticada y entrega pública de archivos. Errores {"error": "..."}.
+paths:
+  /api/upload:
+    post:
+      summary: Subir un archivo (sustituye al 501 de la feature 002)
+      description: >
+        Protección de escritura de la feature 002 (Origin → sesión → X-CSRF-Token).
+        Tipo detectado por contenido: JPEG, PNG, WebP, PDF o GPX (XML seguro con raíz gpx).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        "200":
+          description: Guardado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url]
+                properties:
+                  url: { type: string, pattern: "^/media/[0-9a-f]{32}\\.(jpg|png|webp|pdf|gpx)$" }
+        "400":
+          description: Sin archivo, tipo no admitido o contenido que no coincide
+          content: { application/json: { example: { error: "Sube imágenes JPG, PNG o WebP, documentos PDF o rutas GPX." } } }
+        "401": { description: Sin sesión }
+        "403": { description: Origin o CSRF no válidos }
+        "413":
+          description: Más de UPLOAD_MAX_BYTES
+          content: { application/json: { example: { error: "Máximo 10 MB por archivo." } } }
+        "503":
+          description: Almacenamiento o base de datos no disponibles; no se registra nada
+          content: { application/json: { example: { error: "No se ha podido guardar el archivo. Inténtalo más tarde." } } }
+  /media/{clave}:
+    get:
+      summary: Entrega pública de un archivo
+      parameters:
+        - name: clave
+          in: path
+          required: true
+          schema: { type: string, pattern: "^[0-9a-f]{32}\\.(jpg|png|webp|pdf|gpx)$" }
+        - name: If-None-Match
+          in: header
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: >
+            Bytes del archivo. Cabeceras: Content-Type registrado; Cache-Control
+            public, max-age=31536000, immutable; ETag "<sha256>"; X-Content-Type-Options nosniff;
+            Content-Security-Policy default-src 'none'; sandbox; Content-Disposition inline
+            (imágenes/PDF) o attachment; filename="<nombre>.gpx" (GPX).
+        "304": { description: ETag coincidente; sin cuerpo }
+        "404":
+          description: Clave no válida o inexistente
+          content: { application/json: { example: { error: "Archivo no encontrado." } } }
