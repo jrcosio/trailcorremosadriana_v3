@@ -3,6 +3,7 @@
 from collections.abc import Iterator
 from functools import lru_cache
 
+from fastapi import Request
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -25,7 +26,8 @@ def get_engine() -> Engine:
     return crear_engine(settings.database_url, settings.db_connect_timeout)
 
 
-def get_session() -> Iterator[Session]:
-    fabrica = sessionmaker(bind=get_engine(), expire_on_commit=False)
-    with fabrica() as session:
-        yield session
+def get_db(request: Request) -> Iterator[Session]:
+    """Sesión de base de datos ligada al engine de la aplicación (no conecta hasta usarse)."""
+    fabrica = sessionmaker(bind=request.app.state.engine, expire_on_commit=False)
+    with fabrica() as db:
+        yield db

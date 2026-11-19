@@ -68,11 +68,46 @@ repositorio.
 - OpenAPI en `/api/docs` solo con `ENTORNO=desarrollo`. Los contratos versionados están en
   `specs/*/contracts/`.
 
-## Seguridad (estado actual)
+## Seguridad del panel (feature 002)
 
-- Sin autenticación hasta la feature 002: `/api/session` responde `authenticated: false` y
-  `/api/login` responde 503 sin cookies. La variante `?admin=1` de contenido responde 401.
-- Caddy añade `nosniff`, `Referrer-Policy` y `X-Frame-Options: SAMEORIGIN`. La CSP completa se
-  define en la feature 011 (iframe de Wikiloc).
-- Sin secretos en el repositorio: `.env` está ignorado y `.env.example` solo tiene valores de
-  desarrollo.
+- **Cuentas**:
+  - Solo se crean con el comando de operador `python -m app.cli`: `crear-admin`,
+    `restablecer-password`, `desactivar`, `activar`, `revocar-sesiones` y `listar-admins`. No hay
+    registro público.
+  - Contraseñas en Argon2id (`argon2-cffi`), de 12 a 128 caracteres y distintas del usuario.
+  - La contraseña se introduce de forma oculta o por `--password-stdin`, nunca como argumento.
+- **Sesión**:
+  - Token opaco de 256 bits en la cookie `penasagra_admin`, con `HttpOnly`, `SameSite=Strict` y
+    `Path=/`. El atributo `Secure` depende de `COOKIE_SECURE`, que es `true` por defecto y
+    `false` solo en el Compose de desarrollo por HTTP.
+  - Caduca a las 8 h exactas (`SESSION_HOURS`). En PostgreSQL solo se guarda la huella SHA-256.
+  - Se revoca al cerrar sesión, desactivar la cuenta, restablecer la contraseña o mediante
+    `revocar-sesiones`.
+- **Escrituras**: se comprueban por este orden.
+  1. **Origin** ∈ {`PUBLIC_ORIGIN`} ∪ `ORIGENES_PERMITIDOS`; si no, 403.
+  2. **Sesión** válida; si no, 401.
+  3. **CSRF** de doble envío vinculado a la sesión: la cookie legible `penasagra_csrf` debe ir
+     también en la cabecera `X-CSRF-Token`; si no, 403.
+
+  El panel usa `frontend/src/lib/api.ts` (`apiFetch`). `/api/session` vuelve a emitir el
+  comprobante si falta.
+- **Límite de acceso**:
+  - Máximo de 8 fallos en 15 minutos por IP (`LOGIN_MAX_INTENTOS`, `LOGIN_VENTANA_MINUTOS`), con
+    respuesta 429 y `Retry-After`.
+  - Se guarda en la tabla `limites_login` (clave = huella de la IP) con `SELECT … FOR UPDATE`.
+  - La IP real llega en el `X-Forwarded-For` que pone Caddy, que ignora el del cliente. Uvicorn
+    usa `--proxy-headers` y confía en él (`FORWARDED_ALLOW_IPS=*`) solo porque la API no es
+    accesible fuera de la red interna. Uvicorn lee esa variable del entorno, así que el
+    Dockerfile no la fija. Comprobado: la clave es la huella de la IP real del cliente, no la de
+    Caddy ni la de un `X-Forwarded-For` falsificado.
+- **Errores**:
+  - Mensaje genérico idéntico para usuario inexistente, contraseña errónea y cuenta inactiva.
+  - Tiempo igualado con un hash ficticio.
+  - Con la base caída: 503 genérico. Si la API no responde, Caddy devuelve 503 en JSON
+    (`handle_errors`).
+- **Transitorio**: `PUT /api/content` y `POST /api/upload` aplican toda la protección y
+  responden 501 («Esta sección del panel todavía no guarda cambios.») hasta sus features.
+- **Otras cabeceras**: Caddy añade `nosniff`, `Referrer-Policy` y `X-Frame-Options: SAMEORIGIN`.
+  La CSP completa se define en la feature 011 (iframe de Wikiloc).
+- **Sin secretos en el repositorio**: `.env` está ignorado y `.env.example` solo contiene valores
+  de desarrollo.

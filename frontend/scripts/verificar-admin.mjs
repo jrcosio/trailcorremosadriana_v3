@@ -1,4 +1,4 @@
-// /admin no concede acceso hasta la feature 002 y las vistas de diseño no escriben (FR-018/019).
+// /admin rechaza credenciales incorrectas con mensaje genérico (002) y las vistas de diseño no escriben.
 // Uso: node scripts/verificar-admin.mjs [url-base]
 import { fallo, navegador, ok } from './comun.mjs';
 
@@ -10,19 +10,19 @@ page.on('request', (r) => {
   if (r.url().includes('/api/') && !['GET', 'HEAD'].includes(r.method())) escrituras.push(`${r.method()} ${r.url()}`);
 });
 
-// 1. Acceso real: error claro y sin acceso.
+// 1. Acceso con credenciales incorrectas: mensaje genérico y sin acceso.
 await page.goto(base + '/admin', { waitUntil: 'networkidle' });
-await page.fill('input[name="username"]', 'admin');
+await page.fill('input[name="username"]', 'usuario-inexistente');
 await page.fill('input[name="password"]', 'cualquier-cosa');
 await page.click('button[type="submit"]');
 await page.waitForSelector('.error-message[role="alert"]');
 const error = await page.textContent('.error-message[role="alert"]');
 const sigueEnLogin = await page.isVisible('input[name="password"]');
 const cookies = await page.context().cookies();
-if (!error?.includes('El acceso de administración todavía no está disponible.')) fallo(`/admin: mensaje inesperado «${error}»`);
+if (error?.trim() !== 'Usuario o contraseña incorrectos.') fallo(`/admin: mensaje inesperado «${error}»`);
 else if (!sigueEnLogin) fallo('/admin: el formulario desapareció (¿acceso concedido?)');
 else if (cookies.length) fallo('/admin: se emitieron cookies');
-else ok('/admin: error claro, sin acceso y sin cookies');
+else ok('/admin: mensaje genérico, sin acceso y sin cookies');
 
 // 2. Vista de diseño: guardar no envía escrituras.
 escrituras.length = 0;

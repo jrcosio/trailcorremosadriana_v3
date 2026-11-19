@@ -1,0 +1,123 @@
+openapi: 3.1.0
+info:
+  title: Trail Peñasagra API — administración (feature 002)
+  version: 0.2.0
+  description: >
+    Acceso, sesión y protección de escrituras. Orden de comprobación en escrituras:
+    1) Origin permitido (403) · 2) sesión válida (401) · 3) comprobante CSRF (403).
+    Errores en formato {"error": "..."}; nunca incluyen tokens ni contraseñas.
+components:
+  securitySchemes:
+    sesion:
+      type: apiKey
+      in: cookie
+      name: penasagra_admin
+      description: Token opaco (HttpOnly, SameSite=Strict, Path=/, Secure en producción, Max-Age 8 h)
+    csrf:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: Valor de la cookie legible penasagra_csrf; obligatorio en escrituras autenticadas
+  parameters:
+    Origin:
+      name: Origin
+      in: header
+      required: true
+      schema: { type: string }
+      description: Debe ser PUBLIC_ORIGIN o uno de ORIGENES_PERMITIDOS
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties: { error: { type: string } }
+  responses:
+    OrigenProhibido:
+      description: Origin ausente o no permitido
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "Origen no permitido." } } }
+    SinSesion:
+      description: Sin sesión válida (falta, caducada, revocada o cuenta inactiva)
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "Sesión no válida o caducada." } } }
+    CsrfInvalido:
+      description: Falta X-CSRF-Token o no corresponde a la sesión
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "Comprobación de seguridad no válida. Recarga la página." } } }
+paths:
+  /api/login:
+    post:
+      summary: Iniciar sesión
+      parameters: [{ $ref: "#/components/parameters/Origin" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: Sesión creada. Set-Cookie penasagra_admin (HttpOnly) y penasagra_csrf (legible).
+          content: { application/json: { schema: { type: object, required: [ok, usuario], properties: { ok: { const: true }, usuario: { type: string } } } } }
+        "400":
+          description: Cuerpo mal formado
+          content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+        "401":
+          description: Credenciales incorrectas o cuenta inactiva (mensaje único)
+          content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "Usuario o contraseña incorrectos." } } }
+        "403": { $ref: "#/components/responses/OrigenProhibido" }
+        "429":
+          description: Demasiados intentos desde este origen; cabecera Retry-After (segundos)
+          content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "Demasiados intentos. Espera unos minutos antes de volver a intentarlo." } } }
+        "503":
+          description: Servicio de datos no disponible
+          content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "El servicio no está disponible. Inténtalo más tarde." } } }
+  /api/session:
+    get:
+      summary: Estado de sesión (reemite penasagra_csrf si una sesión válida no la trae)
+      responses:
+        "200":
+          description: Estado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [authenticated]
+                properties:
+                  authenticated: { type: boolean }
+                  usuario: { type: string, description: "Solo si authenticated=true" }
+  /api/logout:
+    post:
+      summary: Cerrar sesión (revoca en servidor y borra cookies)
+      security: [{ sesion: [], csrf: [] }]
+      parameters: [{ $ref: "#/components/parameters/Origin" }]
+      responses:
+        "200": { description: Sesión revocada o inexistente; cookies borradas, content: { application/json: { schema: { type: object, properties: { ok: { const: true } } } } } }
+        "403": { description: Origin no permitido, o sesión válida sin CSRF correcto, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+  /api/content:
+    get:
+      summary: Contenido; con admin=1 requiere sesión y devuelve también borradores
+      parameters:
+        - { name: admin, in: query, required: false, schema: { type: string, enum: ["1"] } }
+      responses:
+        "200": { description: Contenido (ver contrato de la feature 001) }
+        "401": { $ref: "#/components/responses/SinSesion" }
+    put:
+      summary: Transitorio — la edición por documento completo no existe
+      security: [{ sesion: [], csrf: [] }]
+      parameters: [{ $ref: "#/components/parameters/Origin" }]
+      responses:
+        "401": { $ref: "#/components/responses/SinSesion" }
+        "403": { description: Origin o CSRF no válidos }
+        "501":
+          description: La sección aún no guarda cambios (se sustituye por endpoints por recurso en 003–010)
+          content: { application/json: { schema: { $ref: "#/components/schemas/Error" }, example: { error: "Esta sección del panel todavía no guarda cambios." } } }
+  /api/upload:
+    post:
+      summary: Transitorio — subida de archivos llega en la feature 003
+      security: [{ sesion: [], csrf: [] }]
+      parameters: [{ $ref: "#/components/parameters/Origin" }]
+      responses:
+        "401": { $ref: "#/components/responses/SinSesion" }
+        "403": { description: Origin o CSRF no válidos }
+        "501": { description: Aún no disponible, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }

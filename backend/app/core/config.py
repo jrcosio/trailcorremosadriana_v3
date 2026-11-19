@@ -2,8 +2,17 @@
 
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def normalizar_origen(valor: str) -> str:
+    """`Esquema://host[:puerto]` en minúsculas y sin barra final; vacío si no es válido."""
+    partes = urlsplit(valor.strip())
+    if partes.scheme not in ("http", "https") or not partes.netloc:
+        return ""
+    return f"{partes.scheme.lower()}://{partes.netloc.lower()}"
 
 
 class Settings(BaseSettings):
@@ -16,9 +25,21 @@ class Settings(BaseSettings):
     # Tiempo máximo de conexión a PostgreSQL (segundos); acota /api/ready con la base caída.
     db_connect_timeout: int = 3
 
+    # Administración (feature 002)
+    session_hours: int = 8
+    cookie_secure: bool = True
+    origenes_permitidos: str = ""
+    login_max_intentos: int = 8
+    login_ventana_minutos: int = 15
+
     @property
     def es_desarrollo(self) -> bool:
         return self.entorno == "desarrollo"
+
+    @property
+    def origenes_validos(self) -> frozenset[str]:
+        candidatos = [self.public_origin, *self.origenes_permitidos.split(",")]
+        return frozenset(o for o in map(normalizar_origen, candidatos) if o)
 
 
 @lru_cache

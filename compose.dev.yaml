@@ -10,6 +10,9 @@ services:
   api:
     ports:
       - "127.0.0.1:${API_PORT_LOCAL:-8000}:8000"
+    environment:
+      # Servidor de desarrollo de Vite (npm run dev)
+      ORIGENES_PERMITIDOS: ${ORIGENES_PERMITIDOS:-http://localhost:5173}
 
   api-test:
     profiles: [test]

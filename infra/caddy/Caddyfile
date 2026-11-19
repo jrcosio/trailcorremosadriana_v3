@@ -20,6 +20,16 @@
 		reverse_proxy api:8000
 	}
 
+	# Si la API no responde, error de servicio en JSON (el panel lo muestra tal cual).
+	handle_errors {
+		@backend_caido path /api/* /media/*
+		handle @backend_caido {
+			header Content-Type "application/json"
+			header Cache-Control "no-store"
+			respond `{"error":"El servicio no está disponible. Inténtalo más tarde."}` 503
+		}
+	}
+
 	handle {
 		root * /srv
 
