@@ -1,0 +1,99 @@
+"""Importación idempotente de los datos aprobados (FR-010 de la feature 004).
+
+Solo actúa sobre las partes vacías y nunca sobrescribe datos existentes sin `reemplazar=True`.
+"""
+
+import json
+from datetime import datetime
+from decimal import Decimal
+from pathlib import Path
+
+from sqlalchemy import delete, func, select
+from sqlalchemy.orm import Session
+
+from app.models import Carrera, CarreraEdicion, Edicion
+from app.services.contenido import RUTA_SEMILLA
+from app.services.fechas import MADRID
+
+# Fecha oficial de la edición 2026 (web de producción): sábado 11/07/2026, salida a las 09:00.
+FECHA_2026 = datetime(2026, 7, 11, 9, 0, tzinfo=MADRID)
+
+
+def _semilla(ruta: Path = RUTA_SEMILLA) -> dict:
+    return json.loads(ruta.read_text(encoding="utf-8"))
+
+
+def importar(db: Session, reemplazar: bool = False, ruta: Path = RUTA_SEMILLA) -> list[str]:
+    """Devuelve la lista de acciones realizadas (vacía si no había nada que hacer)."""
+    acciones: list[str] = []
+    semilla = _semilla(ruta)
+    if reemplazar:
+        db.execute(delete(CarreraEdicion))
+        db.execute(delete(Carrera))
+        db.execute(delete(Edicion))
+        acciones.append("Datos de evento y pruebas eliminados para reemplazarlos.")
+
+    if not db.scalar(select(func.count(Edicion.id))):
+        actual = int(semilla["settings"]["edition"])
+        db.add(
+            Edicion(
+                anio=2026, fecha_hora=FECHA_2026, mostrar_contador=False, es_actual=False, version=1
+            )
+        )
+        db.add(
+            Edicion(
+                anio=actual,
+                fecha_hora=None,
+                mostrar_contador=bool(semilla["settings"].get("countdown", True)),
+                es_actual=True,
+                version=1,
+            )
+        )
+        db.flush()
+        acciones.append(
+            f"Ediciones creadas: 2026 (11/07/2026 09:00) y {actual} (actual, sin fecha)."
+        )
+
+    if not db.scalar(select(func.count(Carrera.id))):
+        ediciones = {e.anio: e for e in db.scalars(select(Edicion))}
+        for orden, r in enumerate(semilla["races"]):
+            anio = int(r["edition"])
+            if anio not in ediciones:
+                ediciones[anio] = Edicion(anio=anio, es_actual=False, version=1)
+                db.add(ediciones[anio])
+                db.flush()
+            carrera = Carrera(
+                slug=r["id"],
+                nombre=r["title"],
+                etiqueta=r.get("label", ""),
+                color=r.get("color", ""),
+                orden=orden,
+            )
+            db.add(carrera)
+            db.add(
+                CarreraEdicion(
+                    carrera=carrera,
+                    edicion=ediciones[anio],
+                    km=Decimal(str(r["km"])),
+                    desnivel=int(r["elevation"]),
+                    precio=r["price"],
+                    hora_salida=r.get("start", ""),
+                    terreno=r.get("terrain", ""),
+                    descripcion=r.get("description", ""),
+                    avituallamientos=r.get("aid", ""),
+                    imagen=r["image"],
+                    ruta=r.get("route", ""),
+                    wikiloc=r.get("wikiloc", ""),
+                    gpx=r.get("gpx", ""),
+                    url_inscripcion=r.get("registration", ""),
+                    publicada=bool(r.get("published", False)),
+                    version=1,
+                )
+            )
+        acciones.append(
+            "Pruebas creadas con sus datos de referencia: "
+            + ", ".join(r["id"] for r in semilla["races"])
+            + "."
+        )
+    db.commit()
+    return acciones

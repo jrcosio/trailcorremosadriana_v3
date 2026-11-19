@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { LayoutDashboard, Newspaper, Trophy, Images, Route, Ticket, CalendarDays, Handshake, Heart, Settings, LogOut, ExternalLink, Plus, Pencil, Trash2, Upload, Check, X, LockKeyhole, Mountain, ChevronLeft, Search, FileText, Eye, Save, LoaderCircle, ChevronRight, Menu } from 'lucide-react';
 import { seed, type SiteData, type Item } from '@/lib/data';
 import { apiFetch } from '@/lib/api';
+import { guardarCambios } from '@/lib/persistencia';
 import ClassificationManager from './ClassificationManager';
 import { classificationRaces, isSolidarityRace } from '@/lib/classifications';
 const sections=[['Resumen','',LayoutDashboard],['Noticias','noticias',Newspaper],['Clasificaciones','clasificaciones',Trophy],['Galería de imágenes','galeria',Images],['Pruebas y rutas','recorridos',Route],['Inscripciones','inscripciones',Ticket],['Fecha y contador','evento',CalendarDays],['Patrocinadores','patrocinadores',Handshake],['Colaboradores','colaboradores',Heart],['Reglamento','reglamento',FileText],['Ajustes','ajustes',Settings]] as const;
@@ -14,7 +15,7 @@ export default function Admin({path,previewOnly=false}:{path:string;previewOnly?
  async function load(){try{const r=await fetch('/api/content?admin=1');if(r.status===401){setAuth(false);return;}if(!r.ok)throw Error('No se han podido cargar los contenidos.');const j:any=await r.json();setData(j.data);setRevision(j.revision)}catch(e){setError((e as Error).message)}}
  useEffect(()=>{if(previewOnly)return;fetch('/api/session').then(r=>r.json()).then((j:any)=>{setAuth(j.authenticated);if(j.authenticated)load()}).catch(()=>{setAuth(false);setError('No se puede conectar con el servidor.')})},[]);
  useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(t)},[toast]);
- async function save(next:SiteData){if(previewOnly){setError('Esta es una vista de diseño. Entra en /admin para guardar cambios reales.');return false;}setBusy(true);setError('');try{const r=await apiFetch('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:next,revision})});const j:any=await r.json();if(r.status===401)setAuth(false);if(!r.ok)throw Error(j.error);setData(next);setRevision(j.revision);setToast('Cambios guardados. La web ya está actualizada.');return true}catch(e){setError((e as Error).message);return false}finally{setBusy(false)}}
+ async function save(next:SiteData){if(previewOnly){setError('Esta es una vista de diseño. Entra en /admin para guardar cambios reales.');return false;}setBusy(true);setError('');try{const res=await guardarCambios(data!,next);if(!res.ok){if(res.estado===401)setAuth(false);throw Error(res.error)}setData(res.datos);setToast('Cambios guardados. La web ya está actualizada.');return true}catch(e){setError((e as Error).message);return false}finally{setBusy(false)}}
  if(auth===null)return <div className="admin-loading"><Mountain className="spin"/><p>Preparando el panel…</p></div>;
  if(!auth)return <Login onLogin={()=>{setAuth(true);load()}}/>;
  if(!data)return <div className="admin-loading"><p>{error||'Cargando contenidos…'}</p>{error&&<Btn onClick={load}>Reintentar</Btn>}</div>;

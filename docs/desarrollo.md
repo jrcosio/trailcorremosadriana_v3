@@ -10,6 +10,7 @@ cp .env.example .env            # opcional: Compose ya trae los mismos valores d
 docker compose build
 docker compose up -d db
 docker compose run --rm api alembic upgrade head    # paso explícito de esquema
+docker compose run --rm api python -m app.cli importar-inicial   # datos aprobados (solo partes vacías)
 docker compose up -d
 curl -s localhost:8080/api/ready                     # {"estado":"disponible"}
 ```

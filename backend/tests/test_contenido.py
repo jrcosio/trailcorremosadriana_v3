@@ -9,12 +9,11 @@ from app.schemas.contenido import SiteData
 from app.services.contenido import RUTA_SEMILLA, datos_publicos
 from tests.conftest import crear_cliente
 
-URL = "postgresql+psycopg://trail:clave@127.0.0.1:1/trail"
-
 
 @pytest.fixture
-def contenido():
-    with crear_cliente(URL) as c:
+def contenido(base_migrada):
+    # Base migrada sin importar: el adaptador sirve la semilla (comportamiento transitorio).
+    with crear_cliente(base_migrada) as c:
         r = c.get("/api/content")
     assert r.status_code == 200
     return r
@@ -66,8 +65,8 @@ def test_cabeceras(contenido):
     assert contenido.headers["x-content-type-options"] == "nosniff"
 
 
-def test_variante_admin_requiere_sesion():
-    with crear_cliente(URL) as c:
+def test_variante_admin_requiere_sesion(base_migrada):
+    with crear_cliente(base_migrada) as c:
         r = c.get("/api/content", params={"admin": "1"})
     assert r.status_code == 401
     assert "error" in r.json()

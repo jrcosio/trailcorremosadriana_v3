@@ -3,5 +3,15 @@
 from app.models.administracion import Administrador, LimiteLogin, Sesion
 from app.models.archivos import Archivo
 from app.models.base import Base
+from app.models.evento import Carrera, CarreraEdicion, Edicion
 
-__all__ = ["Administrador", "Archivo", "Base", "LimiteLogin", "Sesion"]
+__all__ = [
+    "Administrador",
+    "Archivo",
+    "Base",
+    "Carrera",
+    "CarreraEdicion",
+    "Edicion",
+    "LimiteLogin",
+    "Sesion",
+]

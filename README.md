@@ -15,6 +15,7 @@ Ver [docs/desarrollo.md](docs/desarrollo.md). En resumen:
 docker compose build
 docker compose up -d db
 docker compose run --rm api alembic upgrade head
+docker compose run --rm api python -m app.cli importar-inicial
 docker compose up -d        # http://localhost:8080
 ```
 

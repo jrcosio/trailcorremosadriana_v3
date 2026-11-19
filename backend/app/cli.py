@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.db import crear_engine
 from app.core.seguridad import CredencialInvalida
-from app.services import administradores
+from app.services import administradores, importacion
 from app.services.administradores import AdminNoEncontrado, AdminYaExiste
 
 OK, ERROR, INVALIDO = 0, 1, 2
@@ -42,6 +42,14 @@ def _parser() -> argparse.ArgumentParser:
     ):
         sub.add_parser(nombre, help=ayuda).add_argument("usuario")
     sub.add_parser("listar-admins", help="Lista las cuentas (sin datos sensibles)")
+    imp = sub.add_parser(
+        "importar-inicial", help="Importa los datos aprobados en las partes vacías"
+    )
+    imp.add_argument(
+        "--reemplazar",
+        action="store_true",
+        help="Borra y vuelve a importar (pide confirmación escrita)",
+    )
     return p
 
 
@@ -92,6 +100,20 @@ def main(
             elif args.orden == "revocar-sesiones":
                 n = administradores.revocar_sesiones(db, args.usuario)
                 decir(f"{n} sesiones revocadas.")
+            elif args.orden == "importar-inicial":
+                if args.reemplazar:
+                    decir(
+                        "Esto borrará el evento y las pruebas. Escribe REEMPLAZAR para continuar:"
+                    )
+                    if entrada.readline().strip() != "REEMPLAZAR":
+                        decir("Cancelado. No se ha modificado nada.")
+                        return ERROR
+                acciones = importacion.importar(db, reemplazar=args.reemplazar)
+                decir(
+                    "\n".join(acciones)
+                    if acciones
+                    else "Sin cambios: los datos ya estaban importados."
+                )
             elif args.orden == "listar-admins":
                 cuentas = administradores.listar(db)
                 if not cuentas:

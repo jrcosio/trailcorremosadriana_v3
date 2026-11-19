@@ -138,3 +138,34 @@ def subir(cliente: TestClient, datos: bytes, nombre: str = "archivo.bin", **extr
         headers={"X-CSRF-Token": csrf(cliente)},
         **extra,
     )
+
+
+def importar_datos(database_url: str) -> None:
+    """Importa los datos aprobados (ediciones y pruebas) en la base de pruebas."""
+    from sqlalchemy.orm import Session
+
+    from app.services import importacion
+
+    engine = create_engine(database_url)
+    with Session(engine) as db:
+        importacion.importar(db)
+    engine.dispose()
+
+
+@pytest.fixture
+def base_importada(base_con_admin: str) -> str:
+    importar_datos(base_con_admin)
+    return base_con_admin
+
+
+@pytest.fixture
+def admin_importado(base_importada: str) -> Iterator[TestClient]:
+    with crear_cliente(base_importada) as c:
+        assert entrar(c).status_code == 200
+        yield c
+
+
+def escribir(cliente: TestClient, metodo: str, ruta: str, **kw):
+    """Escritura autenticada con CSRF del cliente."""
+    cabeceras = {"X-CSRF-Token": csrf(cliente), **kw.pop("headers", {})}
+    return cliente.request(metodo, ruta, headers=cabeceras, **kw)
