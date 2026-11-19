@@ -41,13 +41,6 @@ def _https_sin_credenciales(valor: str) -> str:
     return valor
 
 
-def _url_permitida(valor: str) -> str:
-    """Vacía, recurso propio (`/reused/`, `/media/`) o https sin credenciales."""
-    if valor == "" or (len(valor) <= MAX_URL and valor.startswith(("/reused/", "/media/"))):
-        return valor
-    return _https_sin_credenciales(valor)
-
-
 def _email(valor: str) -> str:
     if not PATRON_EMAIL.match(valor):
         raise ValueError("Correo electrónico no válido")
@@ -65,7 +58,7 @@ class Settings(BaseModel):
     registrationMessage: str = Field(default="", max_length=2000)
     email: Annotated[str, AfterValidator(_email)]
     phone: str = Field(default="", max_length=40)
-    instagram: Annotated[str, AfterValidator(_url_permitida)] = ""
+    instagram: Annotated[str, AfterValidator(_https_sin_credenciales)] = ""
 
 
 class Item(BaseModel):

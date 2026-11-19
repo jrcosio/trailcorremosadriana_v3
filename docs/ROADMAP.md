@@ -6,8 +6,8 @@ corresponde. Estado: ⏳ pendiente · 🔄 activa · ✅ terminada.
 | # | Feature | Depende de | Estado | Rama / spec |
 |---|---|---|---|---|
 | 0 | Preparación: fuentes protegidas, referencia, constitución, roadmap | — | ✅ | `main` |
-| 1 | Base del proyecto: frontend reutilizado, FastAPI, PostgreSQL, Alembic, Compose, salud | 0 | ⏳ | `001-base-proyecto` |
-| 2 | Administrador: usuario inicial seguro, login, sesión, logout, permisos, intentos, CSRF | 1 | ⏳ | `002-administrador` |
+| 1 | Base del proyecto: frontend reutilizado, FastAPI, PostgreSQL, Alembic, Compose, salud | 0 | ✅ | `001-base-proyecto` |
+| 2 | Administrador: usuario inicial seguro, login, sesión, logout, permisos, intentos, CSRF | 1 | ⏳ siguiente | `002-administrador` |
 | 3 | Archivos: almacenamiento local/S3, subida, validación, entrega de imágenes y GPX | 2 | ⏳ | `003-archivos` |
 | 4 | Evento y carreras: ediciones, fecha Europe/Madrid, contador, recorridos | 2, 3 | ⏳ | `004-evento-carreras` |
 | 5 | Inscripciones y Dorsal Solidario: apertura/cierre, enlaces por carrera y pago solidario | 4 | ⏳ | `005-inscripciones-dorsal` |

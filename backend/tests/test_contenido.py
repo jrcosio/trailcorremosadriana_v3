@@ -107,6 +107,8 @@ def test_solo_publicados_y_sin_clasificaciones_solidarias_ni_legadas():
         lambda d: d["settings"].update(registrationMessage="x" * 2001),
         lambda d: d["settings"].update(email="no-es-un-correo"),
         lambda d: d["settings"].update(phone="9" * 41),
+        lambda d: d["settings"].update(instagram="/reused/logos/logo1.webp"),
+        lambda d: d["settings"].update(instagram="http://instagram.com/x"),
         lambda d: d["races"][0].update(id="id con espacios"),
         lambda d: d["races"][0].pop("published"),
         lambda d: d.update(regulation="x" * 100001),
