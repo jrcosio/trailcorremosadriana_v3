@@ -6,13 +6,14 @@ from sqlalchemy import create_engine, pool
 
 from alembic import context
 from app.core.config import get_settings
+from app.models import Base
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Los modelos se registrarán aquí a medida que las features creen tablas.
-target_metadata = None
+# Metadatos de todos los modelos (app/models) para autogenerar y comparar migraciones.
+target_metadata = Base.metadata
 
 
 def _url() -> str:

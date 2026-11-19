@@ -7,7 +7,10 @@ const AVISO = 'No se han podido comprobar las últimas novedades';
 const browser = await navegador();
 const page = await browser.newPage();
 for (const [ruta, esperado] of [['/', 'PENASAGRA'], ['/carreras', 'Speed Trail'], ['/patrocinadores', 'Patrocinadores']]) {
-  await page.goto(base + ruta, { waitUntil: 'networkidle' });
+  // Site.tsx no consume el cuerpo de una respuesta de error: Chromium deja esa petición abierta y
+  // `networkidle` nunca llega. Se espera a la carga y al aviso de respaldo.
+  await page.goto(base + ruta, { waitUntil: 'load' });
+  await page.waitForSelector('.load-error', { timeout: 10000 }).catch(() => {});
   const texto = await page.evaluate(() => document.body.innerText);
   if (!texto.includes(AVISO)) fallo(`${ruta}: falta el aviso de respaldo`);
   else if (!texto.includes(esperado)) fallo(`${ruta}: falta el contenido de referencia «${esperado}»`);

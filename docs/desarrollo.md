@@ -14,7 +14,20 @@ docker compose up -d
 curl -s localhost:8080/api/ready                     # {"estado":"disponible"}
 ```
 
-La web queda en <http://localhost:8080>. PostgreSQL y la API no publican puertos con
+La web queda en <http://localhost:8080>.
+
+### Administrador local
+
+```bash
+docker compose run --rm api python -m app.cli crear-admin admin   # pide la contraseña dos veces
+```
+
+El panel está en <http://localhost:8080/admin>. Otros comandos de operador: `restablecer-password`,
+`desactivar`, `activar`, `revocar-sesiones` y `listar-admins`
+(`specs/002-administrador/contracts/cli-operador.md`).
+
+Para desbloquear el acceso en local tras 8 intentos fallidos:
+`docker compose exec db psql -U trail -c 'DELETE FROM limites_login'`. PostgreSQL y la API no publican puertos con
 `compose.yaml`.
 
 Cada vez que una feature añada migraciones hay que repetir `alembic upgrade head`. Mientras
@@ -41,7 +54,8 @@ cd frontend && npm run typecheck && npm test && npm run build
 
 # Verificaciones en navegador (con el entorno arrancado; requiere `npx playwright install chromium`)
 node scripts/verificar-rutas.mjs          # todas las rutas, al abrir y al recargar
-node scripts/verificar-admin.mjs          # /admin sin acceso; vistas de diseño sin escritura
+node scripts/verificar-admin.mjs          # acceso erróneo genérico; vistas de diseño sin escritura
+ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-acceso.mjs --bloqueo   # acceso real de extremo a extremo
 node scripts/capturas.mjs http://localhost:8080 capturas/local   # 360/768/1024/1440 + desbordamiento
 ```
 

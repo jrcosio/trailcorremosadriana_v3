@@ -38,6 +38,14 @@ services:
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
       ENTORNO: ${ENTORNO:-desarrollo}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      SESSION_HOURS: ${SESSION_HOURS:-8}
+      # Desarrollo local por HTTP: cookies sin Secure. Producción (011) exige true.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ORIGENES_PERMITIDOS: ${ORIGENES_PERMITIDOS:-}
+      LOGIN_MAX_INTENTOS: ${LOGIN_MAX_INTENTOS:-8}
+      LOGIN_VENTANA_MINUTOS: ${LOGIN_VENTANA_MINUTOS:-15}
+      # La API solo es accesible desde Caddy (red interna): se confía en su X-Forwarded-For.
+      FORWARDED_ALLOW_IPS: "*"
     depends_on:
       db:
         condition: service_healthy

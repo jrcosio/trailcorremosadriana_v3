@@ -3,11 +3,12 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.exceptions import HTTPException
+from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.api import contenido, salud, sesion
+from app.api import archivos, contenido, salud, sesion
 from app.core.config import Settings, get_settings
 from app.core.db import crear_engine
 from app.services.contenido import cargar_contenido
@@ -49,9 +50,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         detalle = exc.detail if isinstance(exc.detail, str) else "Error"
         return JSONResponse({"error": detalle}, status_code=exc.status_code, headers=exc.headers)
 
+    @app.exception_handler(RequestValidationError)
+    async def error_validacion(_: Request, __: RequestValidationError) -> JSONResponse:
+        # Sin detalles internos del esquema (FR-021 de la feature 002).
+        return JSONResponse({"error": "Datos no válidos."}, status_code=400)
+
+    @app.exception_handler(OperationalError)
+    async def base_no_disponible(_: Request, __: OperationalError) -> JSONResponse:
+        return JSONResponse(
+            {"error": "El servicio no está disponible. Inténtalo más tarde."}, status_code=503
+        )
+
     app.include_router(salud.router)
     app.include_router(contenido.router)
     app.include_router(sesion.router)
+    app.include_router(archivos.router)
     return app
 
 
