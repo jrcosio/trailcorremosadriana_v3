@@ -21,3 +21,12 @@ __pycache__/
 
 # Material de referencia local (no se versiona)
 /datos_iniciales/
+
+# Artefactos de pruebas y herramientas
+*.log
+.pytest_cache/
+.ruff_cache/
+frontend/capturas/
+frontend/test-results/
+frontend/playwright-report/
+copias/

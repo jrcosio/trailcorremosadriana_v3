@@ -1,0 +1,142 @@
+openapi: 3.1.0
+info:
+  title: Trail Peñasagra API — base (feature 001)
+  version: 0.1.0
+  description: >
+    Contrato de la base del servicio. Todas las rutas cuelgan del mismo origen que la web
+    (Caddy hace proxy de /api/* y /media/* a la API). Las respuestas JSON llevan
+    `Cache-Control: no-store` y `X-Content-Type-Options: nosniff`.
+paths:
+  /api/health:
+    get:
+      summary: Salud (proceso vivo). No consulta la base de datos.
+      responses:
+        "200":
+          description: Proceso vivo
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [estado]
+                properties:
+                  estado: { type: string, const: viva }
+  /api/ready:
+    get:
+      summary: Disponibilidad (base de datos accesible y esquema en la última versión)
+      responses:
+        "200":
+          description: Disponible
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [estado]
+                properties:
+                  estado: { type: string, const: disponible }
+        "503":
+          description: No disponible. Sin detalles internos ni credenciales.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [estado, motivo]
+                properties:
+                  estado: { type: string, const: no_disponible }
+                  motivo:
+                    type: string
+                    enum: [base_de_datos_inaccesible, migraciones_pendientes]
+  /api/content:
+    get:
+      summary: Contenido público transitorio (adaptador de solo lectura)
+      parameters:
+        - name: admin
+          in: query
+          required: false
+          schema: { type: string, enum: ["1"] }
+          description: Variante con borradores; requiere sesión (feature 002).
+      responses:
+        "200":
+          description: Contenido publicado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, revision]
+                properties:
+                  data: { $ref: "#/components/schemas/SiteData" }
+                  revision: { type: integer, minimum: 0 }
+        "401":
+          description: Variante admin sin sesión
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/session:
+    get:
+      summary: Estado de sesión (hasta la feature 002 siempre sin sesión)
+      responses:
+        "200":
+          description: Estado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [authenticated]
+                properties:
+                  authenticated: { type: boolean }
+  /api/login:
+    post:
+      summary: Acceso del administrador (no disponible hasta la feature 002)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        "503":
+          description: Servicio de acceso aún no disponible; nunca concede acceso
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+components:
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+    Item:
+      type: object
+      required: [id, published]
+      properties:
+        id: { type: string, pattern: "^[\\w-]{1,100}$" }
+        published: { type: boolean }
+      additionalProperties: true
+    SiteData:
+      type: object
+      required: [settings, races, news, albums, results, sponsors, collaborators, regulation]
+      properties:
+        settings:
+          type: object
+          required: [edition, date, countdown, registrationsOpen, solidarityRegistration, registrationMessage, email, phone, instagram]
+          properties:
+            edition: { type: string, pattern: "^20\\d\\d$" }
+            date: { type: string, description: "Vacío o ISO 8601 con zona" }
+            countdown: { type: boolean }
+            registrationsOpen: { type: boolean }
+            solidarityRegistration: { type: string, maxLength: 2200 }
+            registrationMessage: { type: string, maxLength: 2000 }
+            email: { type: string, format: email }
+            phone: { type: string, maxLength: 40 }
+            instagram: { type: string, maxLength: 2200 }
+          additionalProperties: true
+        races: { type: array, maxItems: 30, items: { $ref: "#/components/schemas/Item" } }
+        news: { type: array, maxItems: 500, items: { $ref: "#/components/schemas/Item" } }
+        albums: { type: array, maxItems: 200, items: { $ref: "#/components/schemas/Item" } }
+        results: { type: array, maxItems: 500, items: { $ref: "#/components/schemas/Item" } }
+        sponsors: { type: array, maxItems: 200, items: { $ref: "#/components/schemas/Item" } }
+        collaborators: { type: array, maxItems: 200, items: { $ref: "#/components/schemas/Item" } }
+        regulation: { type: string, maxLength: 100000 }

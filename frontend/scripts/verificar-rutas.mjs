@@ -1,0 +1,50 @@
+// Verifica todas las rutas de FR-001: HTTP 200 y pantalla esperada al abrir y al recargar.
+// Uso: node scripts/verificar-rutas.mjs [url-base]
+import { fallo, navegador, ok } from './comun.mjs';
+
+const base = process.argv[2] ?? 'http://localhost:8080';
+const ADMIN = ['', '/noticias', '/noticias/nuevo', '/noticias/proxima-edicion', '/clasificaciones', '/clasificaciones/nuevo', '/galeria', '/galeria/nuevo', '/galeria/edicion-2026', '/recorridos', '/recorridos/nuevo', '/recorridos/trail-27k', '/patrocinadores', '/patrocinadores/nuevo', '/colaboradores', '/colaboradores/nuevo', '/inscripciones', '/evento', '/reglamento', '/ajustes'];
+// [ruta, texto que debe aparecer]
+const RUTAS = [
+  ['/', 'PENASAGRA'],
+  ['/carreras', 'Trail Peñasagra'],
+  ['/carreras/trail-27k', 'Trail Peñasagra'],
+  ['/carreras/speed-14k', 'Speed Trail'],
+  ['/carreras/familiar-7k', 'Familiar'],
+  ['/recorridos', 'Speed Trail'],
+  ['/recorridos/speed-14k', 'Speed Trail'],
+  ['/inscripciones', 'Inscripciones'],
+  ['/noticias', 'Peñasagra 2027'],
+  ['/noticias/proxima-edicion', 'Peñasagra 2027 ya está en el horizonte'],
+  ['/galeria', 'Volver a sentir la montaña'],
+  ['/galeria/edicion-2026', 'Volver a sentir la montaña'],
+  ['/clasificaciones', 'Clasificaciones'],
+  ['/reglamento', 'Reglamento'],
+  ['/solidaridad', 'Nuestra razón para correr.'],
+  ['/patrocinadores', 'Patrocinadores'],
+  ['/contacto', 'asociacionpenasagra@gmail.com'],
+  ['/pantallas', 'Todo Peñasagra, pantalla a pantalla.'],
+  ['/admin', 'Hola, equipo.'],
+  ['/carreras/no-existe', 'Este sendero no está en el mapa.'],
+  ['/noticias/no-existe', 'Este sendero no está en el mapa.'],
+  ['/no-existe', 'Este sendero no está en el mapa.'],
+  ...ADMIN.map((s) => ['/pantallas/admin' + s, 'Vista de diseño']),
+];
+
+const browser = await navegador();
+const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+let comprobadas = 0;
+for (const [ruta, esperado] of RUTAS) {
+  const respuesta = await page.goto(base + ruta, { waitUntil: 'networkidle' });
+  const estado = respuesta?.status();
+  const texto1 = await page.evaluate(() => document.body.innerText);
+  await page.reload({ waitUntil: 'networkidle' });
+  const texto2 = await page.evaluate(() => document.body.innerText);
+  if (estado !== 200) fallo(`${ruta}: HTTP ${estado}`);
+  else if (!texto1.includes(esperado)) fallo(`${ruta}: no aparece «${esperado}» al abrir`);
+  else if (!texto2.includes(esperado)) fallo(`${ruta}: no aparece «${esperado}» al recargar`);
+  else ok(`${ruta} → «${esperado}»`);
+  comprobadas++;
+}
+await browser.close();
+console.log(`\n${comprobadas} rutas comprobadas`);
