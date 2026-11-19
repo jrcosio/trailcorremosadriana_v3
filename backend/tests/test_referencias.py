@@ -41,3 +41,26 @@ def test_aceptadas(valor):
 )
 def test_rechazadas(valor):
     assert not referencia_valida(valor)
+
+
+@pytest.mark.parametrize(
+    ("valor", "valido"),
+    [
+        ("", True),
+        ("https://www.gedsports.com/inscription/trail-sierra-de-penasagra--27-km", True),
+        ("https://example.com/dorsal?modalidad=solidario", True),
+        ("http://example.com/pago", False),
+        ("javascript:alert(1)", False),
+        ("https://usuario:clave@example.com/pago", False),
+        ("https://", False),
+        ("https:///sin-host", False),
+        (" https://example.com", False),
+        ("https://example.com/a b", False),
+        ("/reused/img/x.webp", False),
+        ("https://example.com/" + "a" * 2200, False),
+    ],
+)
+def test_url_externa_segura(valor, valido):
+    from app.core.referencias import url_externa_segura
+
+    assert url_externa_segura(valor) is valido

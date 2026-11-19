@@ -7,7 +7,9 @@
  * guarda cambios.» Tras guardar se vuelve a leer la vista privada para mostrar los datos y las
  * versiones confirmados por el servidor.
  *
- * Recursos migrados: evento (feature 004) y pruebas (feature 004).
+ * Recursos migrados: evento y pruebas (feature 004), inscripciones y Dorsal Solidario (005).
+ * Orden: pruebas → evento → inscripciones → resto (un enlace de prueba nuevo debe existir antes de
+ * abrir las inscripciones).
  */
 import { apiFetch } from './api';
 import type { Item, SiteData } from './data';
@@ -16,6 +18,8 @@ export type Operacion = { metodo: 'PUT' | 'DELETE'; url: string; cuerpo?: unknow
 export type Resultado = { ok: true; datos: SiteData } | { ok: false; estado: number; error: string };
 
 const CAMPOS_EVENTO = ['edition', 'date', 'countdown'] as const;
+const CAMPOS_INSCRIPCION = ['registrationsOpen', 'registrationMessage', 'solidarityRegistration'] as const;
+const CAMPOS_MIGRADOS = new Set<string>([...CAMPOS_EVENTO, ...CAMPOS_INSCRIPCION]);
 const CAMPOS_TECNICOS = new Set(['eventVersion']);
 const SECCIONES_SIN_PERSISTENCIA = ['news', 'albums', 'results', 'sponsors', 'collaborators', 'regulation'] as const;
 const ERROR_GENERICO = 'No se han podido guardar los cambios. Inténtalo de nuevo.';
@@ -27,14 +31,6 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
   const operaciones: Operacion[] = [];
   const a = anterior.settings;
   const s = siguiente.settings;
-
-  if (CAMPOS_EVENTO.some((k) => !igual(a[k], s[k]))) {
-    operaciones.push({
-      metodo: 'PUT',
-      url: '/api/admin/evento',
-      cuerpo: { edition: s.edition, date: s.date ?? '', countdown: !!s.countdown, version: a.eventVersion ?? 0 },
-    });
-  }
 
   const previas = porId(anterior.races);
   for (const prueba of siguiente.races) {
@@ -57,9 +53,31 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
     }
   }
 
+  let version = a.eventVersion ?? 0;
+  if (CAMPOS_EVENTO.some((k) => !igual(a[k], s[k]))) {
+    operaciones.push({
+      metodo: 'PUT',
+      url: '/api/admin/evento',
+      cuerpo: { edition: s.edition, date: s.date ?? '', countdown: !!s.countdown, version },
+    });
+    version += 1; // evento e inscripciones comparten la versión de la edición
+  }
+  if (CAMPOS_INSCRIPCION.some((k) => !igual(a[k], s[k]))) {
+    operaciones.push({
+      metodo: 'PUT',
+      url: '/api/admin/inscripciones',
+      cuerpo: {
+        registrationsOpen: !!s.registrationsOpen,
+        registrationMessage: s.registrationMessage ?? '',
+        solidarityRegistration: s.solidarityRegistration ?? '',
+        version,
+      },
+    });
+  }
+
   const ajustesPendientes = new Set([...Object.keys(a), ...Object.keys(s)]);
   const otrosAjustes = [...ajustesPendientes].some(
-    (k) => !CAMPOS_EVENTO.includes(k as (typeof CAMPOS_EVENTO)[number]) && !CAMPOS_TECNICOS.has(k) && !igual(a[k], s[k]),
+    (k) => !CAMPOS_MIGRADOS.has(k) && !CAMPOS_TECNICOS.has(k) && !igual(a[k], s[k]),
   );
   if (otrosAjustes || SECCIONES_SIN_PERSISTENCIA.some((k) => !igual(anterior[k], siguiente[k]))) {
     operaciones.push({ metodo: 'PUT', url: '/api/content', cuerpo: { data: siguiente, revision: 0 } });

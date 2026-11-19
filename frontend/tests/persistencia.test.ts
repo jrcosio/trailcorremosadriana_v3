@@ -41,8 +41,34 @@ describe('planificar', () => {
     const a = base();
     const s = base();
     s.regulation += '\nNuevo';
-    s.settings.registrationsOpen = true;
     expect(planificar(a, s)).toEqual([{ metodo: 'PUT', url: '/api/content', cuerpo: { data: s, revision: 0 } }]);
+  });
+
+  it('inscripciones: enlaces de prueba primero y apertura después', () => {
+    const a = base();
+    const s = base();
+    s.races[0] = { ...s.races[0], registration: 'https://example.com/insc' };
+    s.settings.registrationsOpen = true;
+    s.settings.solidarityRegistration = 'https://example.com/dorsal';
+    expect(planificar(a, s).map((o) => `${o.metodo} ${o.url}`)).toEqual([
+      'PUT /api/admin/carreras/trail-27k',
+      'PUT /api/admin/inscripciones',
+    ]);
+    expect(planificar(a, s)[1].cuerpo).toEqual({
+      registrationsOpen: true,
+      registrationMessage: s.settings.registrationMessage,
+      solidarityRegistration: 'https://example.com/dorsal',
+      version: 3,
+    });
+  });
+
+  it('evento e inscripciones juntos encadenan la versión compartida', () => {
+    const a = base();
+    const s = base();
+    s.settings.countdown = false;
+    s.settings.registrationMessage = 'Otro';
+    const ops = planificar(a, s);
+    expect(ops.map((o) => (o.cuerpo as { version: number }).version)).toEqual([3, 4]);
   });
 
   it('eventVersion no se considera un cambio de contenido', () => {

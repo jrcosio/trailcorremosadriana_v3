@@ -29,6 +29,7 @@ class Edicion(Base):
     __tablename__ = "ediciones"
     __table_args__ = (
         CheckConstraint("anio BETWEEN 2000 AND 2099", name="anio_rango"),
+        CheckConstraint("length(mensaje_inscripciones) <= 2000", name="mensaje_longitud"),
         Index("uq_ediciones_actual", "es_actual", unique=True, postgresql_where=text("es_actual")),
     )
 
@@ -37,6 +38,14 @@ class Edicion(Base):
     fecha_hora: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     mostrar_contador: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
     es_actual: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    # Inscripciones y Dorsal Solidario (feature 005)
+    inscripciones_abiertas: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default="false"
+    )
+    mensaje_inscripciones: Mapped[str] = mapped_column(Text, nullable=False, server_default="")
+    url_dorsal_solidario: Mapped[str] = mapped_column(
+        String(2200), nullable=False, server_default=""
+    )
     version: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
     creado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=AHORA

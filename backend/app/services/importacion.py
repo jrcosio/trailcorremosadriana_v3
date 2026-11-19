@@ -54,6 +54,23 @@ def importar(db: Session, reemplazar: bool = False, ruta: Path = RUTA_SEMILLA) -
             f"Ediciones creadas: 2026 (11/07/2026 09:00) y {actual} (actual, sin fecha)."
         )
 
+    # Inscripciones de la edición actual (feature 005): solo si siguen en sus valores por defecto.
+    actual = db.scalar(select(Edicion).where(Edicion.es_actual.is_(True)))
+    if (
+        actual is not None
+        and not actual.inscripciones_abiertas
+        and actual.mensaje_inscripciones == ""
+        and actual.url_dorsal_solidario == ""
+    ):
+        ajustes = semilla["settings"]
+        actual.inscripciones_abiertas = bool(ajustes.get("registrationsOpen", False))
+        actual.mensaje_inscripciones = ajustes.get("registrationMessage", "")
+        actual.url_dorsal_solidario = ajustes.get("solidarityRegistration", "")
+        if actual.mensaje_inscripciones:
+            acciones.append(
+                "Inscripciones de la edición actual: cerradas, con el mensaje de la semilla."
+            )
+
     if not db.scalar(select(func.count(Carrera.id))):
         ediciones = {e.anio: e for e in db.scalars(select(Edicion))}
         for orden, r in enumerate(semilla["races"]):

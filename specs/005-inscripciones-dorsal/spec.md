@@ -55,10 +55,11 @@ y comprobar el botón, su destino y el mensaje.
 
 **Acceptance Scenarios** (matriz de 09_CRITERIOS_ACEPTACION.md):
 
-1. **Given** cerradas y sin URL, **When** se abren las tres páginas, **Then** muestran
-   «Próximamente disponible» y «Disponible cuando se abran las inscripciones», sin enlace.
+1. **Given** cerradas y sin URL, **When** se abren Inicio y Solidaridad, **Then** muestran
+   «Próximamente disponible» y «Disponible cuando se abran las inscripciones», sin enlace; e
+   `/inscripciones` muestra su estado cerrado aprobado (sin bloque del dorsal ni enlace de pago).
 2. **Given** cerradas con URL válida, **When** se abren, **Then** muestran lo mismo que en el
-   escenario 1 y la URL se conserva en el panel.
+   escenario 1 (la URL nunca aparece) y la URL se conserva en el panel.
 3. **Given** abiertas sin URL, **When** se abren, **Then** muestran «Próximamente disponible» y
    el aviso de enlace pendiente, sin navegación alternativa.
 4. **Given** abiertas con URL HTTPS válida, **When** se abren, **Then** muestran «Pagar dorsal
@@ -140,7 +141,8 @@ comprobar las tarjetas; cerrar y comprobar el estado cerrado.
 ### Measurable Outcomes
 
 - **SC-001**: Las 4 combinaciones de la matriz se comportan como se especifica en las 3 páginas
-  (12 de 12 comprobaciones).
+  (12 de 12 comprobaciones; con las inscripciones cerradas, `/inscripciones` cumple mostrando su
+  estado cerrado sin enlace de pago).
 - **SC-002**: El 100 % de los destinos peligrosos de prueba (`http`, `javascript:`, con
   credenciales, sin host) se rechazan en el servidor.
 - **SC-003**: El 100 % de los intentos de abrir sin destino válido se rechazan.
@@ -157,3 +159,7 @@ comprobar las tarjetas; cerrar y comprobar el estado cerrado.
   inscripciones abiertas, el dorsal y las pruebas muestran sus estados de «pendiente» (FR-005 y
   FR-007). No se cierran automáticamente.
 - La versión de la edición es compartida por el evento (004) y las inscripciones (005).
+- Con las inscripciones cerradas, la página `/inscripciones` aprobada muestra su estado cerrado
+  (enlaces a pruebas, noticias, Instagram y contacto) en lugar del bloque del dorsal. El «mismo
+  comportamiento» de FR-005 se refiere al bloque allí donde aparece. Corregido durante la
+  implementación al contrastar con la ficha `screens/publica/06-inscripciones.md`.
