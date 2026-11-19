@@ -78,6 +78,7 @@ repositorio.
 | `settings.edition`, `date`, `countdown` | `PUT /api/admin/evento` |
 | prueba nueva o editada | `PUT /api/admin/carreras/{id}` (con `version`) |
 | prueba borrada | `DELETE /api/admin/carreras/{id}?version=N` |
+| `settings.registrationsOpen`, `registrationMessage`, `solidarityRegistration` | `PUT /api/admin/inscripciones` (después de las pruebas y del evento) |
 | secciones aún no migradas | `PUT /api/content`, que responde 501 «Esta sección del panel todavía no guarda cambios.» |
 
 Después se relee `GET /api/content?admin=1`, así que el panel muestra lo que confirmó el
@@ -103,6 +104,21 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
   `--reemplazar` exige confirmación escrita.
 - **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
   ediciones ni pruebas (base sin inicializar), se sirve la semilla.
+
+## Inscripciones y Dorsal Solidario (feature 005)
+
+- **Datos**: columnas `inscripciones_abiertas`, `mensaje_inscripciones` (1–2000 caracteres al
+  escribir) y `url_dorsal_solidario` en `ediciones`. La versión es la misma de la edición
+  (compartida con el evento).
+- **Endpoint**: `GET` y `PUT` en `/api/admin/inscripciones`. No se pueden abrir sin un destino
+  válido: URL del dorsal válida o alguna prueba cuya ficha publicada más reciente tenga enlace.
+  En caso contrario, 400.
+- **Destinos externos** (`url_externa_segura`): vacío o `https://` con host, sin credenciales ni
+  espacios, de hasta 2200 caracteres. Se aplica a la URL del dorsal y a `races[].registration`.
+- **Web**: el componente aprobado `DorsalSolidario` aplica la matriz. Con las inscripciones
+  cerradas, `/inscripciones` muestra su estado cerrado en lugar del bloque.
+- **Importación**: `importar-inicial` rellena estos campos en la edición actual solo si siguen en
+  sus valores por defecto.
 
 ## Archivos (feature 003)
 

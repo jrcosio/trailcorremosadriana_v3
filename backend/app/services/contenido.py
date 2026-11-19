@@ -66,12 +66,19 @@ def datos_publicos(contenido: SiteData) -> dict[str, Any]:
 
 def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
     """`SiteData` con las secciones migradas leídas de la base de datos."""
-    from app.services import carreras, evento  # importación diferida: evita ciclos con los modelos
+    from app.services import carreras, evento, inscripciones  # diferida: evita ciclos
 
     data = semilla.model_dump(mode="json")
     if carreras.hay_datos(db):
         ev = evento.a_contrato(evento.actual(db))
         data["settings"].update(edition=ev["edition"], date=ev["date"], countdown=ev["countdown"])
+        if (actual := evento.actual(db)) is not None:
+            ins = inscripciones.a_contrato(actual)
+            data["settings"].update(
+                registrationsOpen=ins["registrationsOpen"],
+                registrationMessage=ins["registrationMessage"],
+                solidarityRegistration=ins["solidarityRegistration"],
+            )
         if privado:
             data["settings"]["eventVersion"] = ev["version"]
         data["races"] = carreras.listar(db, privado=privado)

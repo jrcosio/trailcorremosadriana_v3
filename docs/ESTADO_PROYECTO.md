@@ -4,33 +4,34 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 004-evento-carreras (merge local en `main`)
-- **Siguiente feature**: 005-inscripciones-dorsal
+- **Última feature cerrada**: 005-inscripciones-dorsal (merge local en `main`)
+- **Siguiente feature**: 006-clasificaciones-csv
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Feature activa en Spec Kit**: `.specify/feature.json` apunta todavía a
-  `specs/004-evento-carreras`.
-- **Siguiente acción concreta**: `git switch -c 005-inscripciones-dorsal main` y
+- **Siguiente acción concreta**: `git switch -c 006-clasificaciones-csv main` y
   `/speckit-specify`.
-  - Columnas en `ediciones` (migración 0005): `inscripciones_abiertas`,
-    `mensaje_inscripciones` y `url_dorsal_solidario`. Se importan desde la semilla.
-  - `PUT /api/admin/inscripciones`, con versión y con la regla «no abrir sin ningún destino
-    válido».
-  - Validación HTTPS sin credenciales de la URL del dorsal y de los enlaces de inscripción por
-    prueba (`carreras_edicion.url_inscripcion`).
-  - Añadir `registrationsOpen`, `registrationMessage` y `solidarityRegistration` a
-    `persistencia.ts`. La pantalla `/admin/inscripciones` también cambia
-    `races[].registration`.
-  - Comprobar la matriz 4×2 en Inicio, Solidaridad e Inscripciones.
-- **Entorno local**: `docker compose up -d` (http://localhost:8080). Esquema en
-  `0004_evento_carreras`, con los datos importados. Cuenta local `admin`.
+  - Tablas `clasificaciones` (UNIQUE `carrera_edicion_id`), `resultados` (posición > 0 o NULL;
+    dorsal y tiempo como texto; UNIQUE por clasificación y `lower(dorsal)`) e
+    `importaciones_csv` (temporal por sesión, con hash y caducidad).
+  - Lectura y validación del CSV portadas a Python desde `frontend/src/lib/classifications.ts`
+    (mismos límites; alias `meta` y `pos`).
+  - Vista previa en el servidor; confirmación transaccional que sustituye las filas.
+  - FK RESTRICT hacia `carreras_edicion` (borrar una prueba con clasificaciones → 409, R5 de la
+    004).
+  - Consulta pública paginada con búsqueda y filtros.
+  - Nueva ruta `/clasificaciones/{año}`.
+  - Importación de los CSV reales de 2026 de producción como publicados (decisión P2; asignación
+    27km → `trail-27k`, 14km → `speed-14k`, marcha → `familiar-7k`). Los CSV están en
+    `datos_iniciales/trailcorremosadriana_v2/datos/2026/` y se copiarán a
+    `backend/seed/clasificaciones/2026/` con su procedencia.
+- **Entorno local**: esquema `0005_inscripciones`, datos importados y cuenta local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001 (base), 002 (administrador), 003 (archivos), 004 (evento y carreras) |
+| Terminadas | 0, 001, 002, 003, 004, 005 (inscripciones y Dorsal Solidario) |
 | Activa | — |
-| Pendientes | 005 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 006 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -58,6 +59,8 @@
 | 2026-11-20 | El panel guarda por recursos mediante `lib/persistencia.ts` (sin `PUT` del documento completo) | 004 research R1 |
 | 2026-11-20 | Una prueba tiene una ficha por edición; la web muestra la publicada más reciente | 004 research R2 |
 | 2026-11-20 | Edición 2026 con fecha oficial 11/07/2026 09:00 (dato de producción) importada como histórico | 004 research R6 |
+| 2026-11-20 | Inscripciones por edición; abrir exige un destino válido (dorsal o prueba publicada con enlace); los destinos solo pueden ser https sin credenciales | 005 research R1–R3 |
+| 2026-11-20 | Con las inscripciones cerradas, `/inscripciones` muestra su estado aprobado en lugar del bloque del dorsal (spec corregida durante la implementación) | 005 spec Assumptions |
 
 ## Supuestos
 
@@ -127,6 +130,14 @@
 | 2026-11-20 | 004 | Regresión: `verificar-acceso` 7/7, `verificar-subida` 2/2, `verificar-admin` 2/2 | OK |
 | 2026-11-20 | 004 | Convergencia: descarga GPX en el detalle (attachment) y fecha pasada (contador a cero), restaurados | 16/16 OK en `verificar-evento-carreras.mjs` |
 | 2026-11-20 | 004 | `/speckit-converge` | 1.ª pasada: 2 tareas (T018–T019) resueltas; 2.ª pasada: Converged |
+| 2026-11-20 | 005 | Checklists `requirements` 16/16 y `seguridad` 10/10; `analyze` sin hallazgos | OK |
+| 2026-11-20 | 005 | pytest (PostgreSQL real) | **256 passed** (tras la convergencia) |
+| 2026-11-20 | 005 | vitest y typecheck | **54 passed**; OK |
+| 2026-11-20 | 005 | `alembic upgrade head` → 0005; `importar-inicial` completa la base existente | Mensaje rellenado sin tocar otros datos |
+| 2026-11-20 | 005 | `verificar-inscripciones.mjs`: matriz 4 estados × 3 páginas, tarjetas, panel (abrir sin destinos rechazado; cerrar conserva la URL), restauración | 12/12 en la matriz; 4/4 en el resto |
+| 2026-11-20 | 005 | URL del dorsal y `docker compose restart` (SC-005) | Persiste; restaurado |
+| 2026-11-20 | 005 | Regresión: `verificar-rutas` 42/42, `verificar-evento-carreras` 16/16, `verificar-acceso` 7/7 | OK |
+| 2026-11-20 | 005 | `/speckit-converge` | 1.ª pasada: T010 (URL con espacios recortada) resuelta; 2.ª pasada: Converged |
 
 ## Bloqueos
 

@@ -6,7 +6,7 @@ from typing import Annotated
 
 from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, Field
 
-from app.core.referencias import referencia_valida
+from app.core.referencias import referencia_valida, url_externa_segura
 from app.services.fechas import FechaNoValida, a_instante
 
 PATRON_EDICION = r"^20\d\d$"
@@ -24,6 +24,12 @@ def _fecha(valor: str) -> str:
 def _referencia(valor: str) -> str:
     if not referencia_valida(valor):
         raise ValueError("Referencia no válida")
+    return valor
+
+
+def _destino_externo(valor: str) -> str:
+    if not url_externa_segura(valor):
+        raise ValueError("Enlace externo no válido")
     return valor
 
 
@@ -91,6 +97,15 @@ class CarreraEntrada(BaseModel):
     route: Annotated[Texto, AfterValidator(_referencia)] = ""
     wikiloc: Texto = Field(default="", pattern=r"^\d{0,20}$")
     gpx: Annotated[Texto, AfterValidator(_gpx)] = ""
-    registration: Annotated[Texto, AfterValidator(_referencia)] = ""
+    registration: Annotated[Texto, AfterValidator(_destino_externo)] = ""
     published: bool = False
+    version: int = Field(default=0, ge=0)
+
+
+class InscripcionesEntrada(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    registrationsOpen: bool
+    registrationMessage: Texto = Field(min_length=1, max_length=2000)
+    solidarityRegistration: Annotated[Texto, AfterValidator(_destino_externo)] = ""
     version: int = Field(default=0, ge=0)

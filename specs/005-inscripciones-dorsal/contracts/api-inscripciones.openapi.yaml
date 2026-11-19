@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: Trail Peñasagra API — inscripciones (feature 005)
+  version: 0.5.0
+  description: Protección de escritura de la 002; 409 = versión de la edición obsoleta.
+components:
+  schemas:
+    Inscripciones:
+      type: object
+      required: [registrationsOpen, registrationMessage, solidarityRegistration, version]
+      properties:
+        registrationsOpen: { type: boolean }
+        registrationMessage: { type: string, minLength: 1, maxLength: 2000 }
+        solidarityRegistration: { type: string, maxLength: 2200, description: "'' o https:// con host y sin credenciales" }
+        version: { type: integer, minimum: 0 }
+paths:
+  /api/admin/inscripciones:
+    get:
+      responses:
+        "200": { description: Estado de la edición actual, content: { application/json: { schema: { $ref: "#/components/schemas/Inscripciones" } } } }
+        "401": { description: Sin sesión }
+    put:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/Inscripciones" } } } }
+      responses:
+        "200": { description: Guardado (devuelve el estado con la versión nueva) }
+        "400": { description: "Dato no válido («Revisa el campo «…».») o apertura sin destinos" }
+        "401": { description: Sin sesión }
+        "403": { description: Origin o CSRF }
+        "409": { description: Versión obsoleta }
+        "503": { description: Sin edición actual (base sin importar) }

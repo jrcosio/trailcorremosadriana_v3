@@ -9,7 +9,16 @@ from sqlalchemy.exc import OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.formparsers import MultiPartException
 
-from app.api import admin_carreras, admin_evento, archivos, contenido, media, salud, sesion
+from app.api import (
+    admin_carreras,
+    admin_evento,
+    admin_inscripciones,
+    archivos,
+    contenido,
+    media,
+    salud,
+    sesion,
+)
 from app.core.config import Settings, get_settings
 from app.core.db import crear_engine
 from app.services.contenido import cargar_contenido
@@ -36,6 +45,9 @@ ETIQUETAS = {
     "registration": "enlace de inscripción",
     "date": "fecha y hora",
     "version": "versión",
+    "registrationsOpen": "inscripciones abiertas",
+    "registrationMessage": "mensaje al participante",
+    "solidarityRegistration": "enlace de pago del dorsal solidario",
 }
 
 
@@ -120,6 +132,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(media.router)
     app.include_router(admin_evento.router)
     app.include_router(admin_carreras.router)
+    app.include_router(admin_inscripciones.router)
     return app
 
 
