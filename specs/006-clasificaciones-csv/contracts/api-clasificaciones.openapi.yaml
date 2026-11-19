@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  title: Trail Peñasagra API — clasificaciones (feature 006)
+  version: 0.6.0
+paths:
+  /api/admin/clasificaciones/vista-previa:
+    post:
+      summary: Validación autoritativa del CSV y preparación de la importación (sesión, 30 min, un solo uso)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [csv, mapping, sourceFile, raceId, year]
+              properties:
+                csv: { type: string, maxLength: 1000000, description: Texto ya decodificado }
+                mapping: { type: object, additionalProperties: { type: integer, minimum: 0 } }
+                sourceFile: { type: string, pattern: "\\.csv$", maxLength: 255 }
+                raceId: { type: string }
+                year: { type: string, pattern: "^20\\d\\d$" }
+                id: { type: string, description: "Identificador de la clasificación que se edita (opcional)" }
+      responses:
+        "200": { description: "{token, participants}" }
+        "400": { description: "Error de CSV con fila y motivo; prueba solidaria; prueba sin datos para la edición" }
+        "401": { description: Sin sesión }
+        "403": { description: Origin o CSRF }
+        "409": { description: Ya existe otra clasificación para esa prueba y edición }
+  /api/admin/clasificaciones/{id}:
+    put:
+      summary: Crear o actualizar (metadatos y, con importToken, sustitución transaccional de participantes)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, year, raceId, published]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 200 }
+                year: { type: string }
+                raceId: { type: string }
+                published: { type: boolean }
+                importToken: { type: string, format: uuid, description: "Obligatorio al crear" }
+                version: { type: integer, minimum: 0 }
+      responses:
+        "200": { description: Item de results (privado) }
+        "400": { description: Datos no válidos, importación caducada, de otra sesión o ya usada }
+        "409": { description: Versión obsoleta o prueba y edición ya clasificadas }
+    delete:
+      parameters: [{ name: version, in: query, required: true, schema: { type: integer } }]
+      responses:
+        "200": { description: Borrada con sus participantes }
+        "404": { description: No existe }
+        "409": { description: Versión obsoleta }
+  /api/clasificaciones/{id}/participantes:
+    get:
+      summary: Consulta pública paginada (solo clasificaciones publicadas)
+      parameters:
+        - { name: q, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: categoria, in: query, schema: { type: string } }
+        - { name: sexo, in: query, schema: { type: string } }
+        - { name: pagina, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+      responses:
+        "200":
+          description: >
+            {rows, total, filtered, page, pages, pageSize: 50, categories, genders,
+             columns: {category, club, gender, status}}
+        "404": { description: No existe o no está publicada }
