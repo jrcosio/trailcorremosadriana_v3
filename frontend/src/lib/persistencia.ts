@@ -8,7 +8,7 @@
  * versiones confirmados por el servidor.
  *
  * Recursos migrados: evento y pruebas (004), inscripciones y Dorsal Solidario (005), clasificaciones
- * (006), noticias (007), galería (008). Orden: pruebas → evento → inscripciones → clasificaciones → resto (un enlace o una ficha de
+ * (006), noticias (007), galería (008), patrocinadores y colaboradores (009). Orden: pruebas → evento → inscripciones → clasificaciones → resto (un enlace o una ficha de
  * prueba nueva deben existir antes de abrir inscripciones o clasificar).
  */
 import { apiFetch } from './api';
@@ -21,7 +21,7 @@ const CAMPOS_EVENTO = ['edition', 'date', 'countdown'] as const;
 const CAMPOS_INSCRIPCION = ['registrationsOpen', 'registrationMessage', 'solidarityRegistration'] as const;
 const CAMPOS_MIGRADOS = new Set<string>([...CAMPOS_EVENTO, ...CAMPOS_INSCRIPCION]);
 const CAMPOS_TECNICOS = new Set(['eventVersion']);
-const SECCIONES_SIN_PERSISTENCIA = ['sponsors', 'collaborators', 'regulation'] as const;
+const SECCIONES_SIN_PERSISTENCIA = ['regulation'] as const;
 const ERROR_GENERICO = 'No se han podido guardar los cambios. Inténtalo de nuevo.';
 
 const igual = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -108,6 +108,8 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
 
   recursoSimple(operaciones, anterior.news, siguiente.news, '/api/admin/noticias');
   recursoSimple(operaciones, anterior.albums, siguiente.albums, '/api/admin/albumes');
+  recursoSimple(operaciones, anterior.sponsors, siguiente.sponsors, '/api/admin/entidades/patrocinadores');
+  recursoSimple(operaciones, anterior.collaborators, siguiente.collaborators, '/api/admin/entidades/colaboradores');
 
   const ajustesPendientes = new Set([...Object.keys(a), ...Object.keys(s)]);
   const otrosAjustes = [...ajustesPendientes].some(

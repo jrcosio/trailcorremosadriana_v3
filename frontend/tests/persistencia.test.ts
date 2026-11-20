@@ -113,6 +113,24 @@ describe('planificar', () => {
     expect(planificar(a, vacia)).toEqual([{ metodo: 'DELETE', url: '/api/admin/albumes/al?version=2' }]);
   });
 
+  it('patrocinadores y colaboradores: secciones independientes con el mismo id', () => {
+    const logo = '/reused/logos/patrocinadores/banner_andros.png';
+    const a = base();
+    a.sponsors = [{ id: 'andros', name: 'Andros', image: logo, url: '', order: 3, published: true, version: 1 }];
+    a.collaborators = [];
+    const s = base();
+    s.sponsors = [{ ...a.sponsors[0], order: 1 }];
+    s.collaborators = [{ id: 'andros', name: 'Andros', image: logo, url: '', order: 0, published: false }];
+    expect(planificar(a, s)).toEqual([
+      { metodo: 'PUT', url: '/api/admin/entidades/patrocinadores/andros', cuerpo: { ...s.sponsors[0], version: 1 } },
+      { metodo: 'PUT', url: '/api/admin/entidades/colaboradores/andros', cuerpo: { ...s.collaborators[0], version: 0 } },
+    ]);
+    const vacia = base();
+    vacia.sponsors = [];
+    vacia.collaborators = [];
+    expect(planificar(a, vacia)).toEqual([{ metodo: 'DELETE', url: '/api/admin/entidades/patrocinadores/andros?version=1' }]);
+  });
+
   it('eventVersion no se considera un cambio de contenido', () => {
     const a = base();
     const s = base();

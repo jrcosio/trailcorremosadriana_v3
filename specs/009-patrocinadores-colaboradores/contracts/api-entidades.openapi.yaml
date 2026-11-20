@@ -1,0 +1,25 @@
+openapi: 3.1.0
+info: { title: Trail Peñasagra API — entidades (feature 009), version: 0.9.0 }
+paths:
+  /api/admin/entidades/{seccion}/{id}:
+    parameters:
+      - { name: seccion, in: path, required: true, schema: { type: string, enum: [patrocinadores, colaboradores] } }
+      - { name: id, in: path, required: true, schema: { type: string, pattern: "^[A-Za-z0-9_-]{1,100}$" } }
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, image]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 150 }
+                image: { type: string }
+                url: { type: string, description: "'' o https sin credenciales" }
+                order: { type: [integer, string], description: "entero ≥ 0" }
+                published: { type: boolean }
+                version: { type: integer, minimum: 0 }
+      responses: { "200": { description: Item privado }, "400": { description: Campo no válido }, "409": { description: Conflicto } }
+    delete:
+      parameters: [{ name: version, in: query, required: true, schema: { type: integer } }]
+      responses: { "200": { description: Borrada }, "404": { description: No existe }, "409": { description: Conflicto } }

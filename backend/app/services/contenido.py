@@ -65,6 +65,7 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
     from app.services import (
         carreras,
         clasificaciones,
+        entidades,
         evento,
         galeria,
         inscripciones,
@@ -88,6 +89,8 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
         data["results"] = clasificaciones.listar(db, privado=privado)
         data["news"] = noticias.listar(db, privado=privado)
         data["albums"] = galeria.listar(db, privado=privado)
+        data["sponsors"] = entidades.listar(db, "patrocinador", privado=privado)
+        data["collaborators"] = entidades.listar(db, "colaborador", privado=privado)
     else:
         registro.warning(
             "Base sin ediciones ni pruebas: se sirve la semilla (ejecuta importar-inicial)."
