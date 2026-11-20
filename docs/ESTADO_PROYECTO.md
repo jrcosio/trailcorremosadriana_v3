@@ -149,6 +149,7 @@
 | 2026-11-20 | 007 | vitest y typecheck | **60 passed**; OK |
 | 2026-11-20 | 007 | Migración 0007 e `importar-inicial` sobre la base existente | 2 noticias importadas en el orden esperado |
 | 2026-11-20 | 007 | `verificar-noticias.mjs` (existentes, borrador, publicación con imagen, HTML como texto, 409, retirada y borrado) | 7/7 OK |
+| 2026-11-20 | 007 | `/speckit-converge` (después del merge; corregido en la misma sesión) | 1.ª pasada: T009 (noticia sin imagen → paisaje de reserva) verificada 8/8; 2.ª pasada: Converged |
 | 2026-11-20 | 007 | Desbordamiento a 4 anchos en `/`, `/noticias` y el detalle; captura de la portada | 0 desbordamientos; cuadrícula aprobada para varias noticias |
 | 2026-11-20 | 007 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, clasificaciones 11/11, acceso 7/7 | OK (`verificar-acceso` pasa a usar `/admin/reglamento` como sección sin persistencia; se borraron 2 borradores de prueba creados por la versión anterior del script) |
 
