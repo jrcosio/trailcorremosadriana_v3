@@ -52,9 +52,9 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 **Independent Test**: `verificar-copia.sh` y ensayo en `trail-ensayo`.
 
-- [ ] T010 [P] [US3] Crear `infra/scripts/verificar-copia.sh` (research R3) y ejecutarlo: huellas por tabla y por archivo antes y después de restaurar (data-model.md `CopiaSeguridad`)
-- [ ] T011 [US3] Añadir `SITE_ADDRESS` (por defecto `:80`) a `infra/caddy/Caddyfile`, crear `compose.produccion.yaml` (80/443, `ENTORNO=produccion`, `COOKIE_SECURE=true`, `PANTALLAS=no`) y documentar las variables nuevas en `.env.example`
-- [ ] T012 [US3] Escribir `docs/operacion.md`:
+- [X] T010 [P] [US3] Crear `infra/scripts/verificar-copia.sh` (research R3) y ejecutarlo: huellas por tabla y por archivo antes y después de restaurar (data-model.md `CopiaSeguridad`)
+- [X] T011 [US3] Añadir `SITE_ADDRESS` (por defecto `:80`) a `infra/caddy/Caddyfile`, crear `compose.produccion.yaml` (80/443, `ENTORNO=produccion`, `COOKIE_SECURE=true`, `PANTALLAS=no`) y documentar las variables nuevas en `.env.example`
+- [X] T012 [US3] Escribir `docs/operacion.md`:
   - instalación, variables, dominio y HTTPS, R2 (y sus copias), administrador;
   - copias y restauración, actualización con migraciones, recuperación del acceso;
   - comprobaciones tras desplegar.

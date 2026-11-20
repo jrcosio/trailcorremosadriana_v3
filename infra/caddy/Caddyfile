@@ -4,7 +4,8 @@
 	admin off
 }
 
-:80 {
+# Dirección del sitio: `:80` en local; en producción, el dominio (HTTPS automático de Caddy).
+{$SITE_ADDRESS::80} {
 	encode zstd gzip
 
 	header {
