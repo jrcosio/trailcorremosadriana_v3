@@ -25,3 +25,9 @@ description: "Tareas de implementación de la feature 007-noticias"
 
 - [X] T007 Crear y ejecutar `frontend/scripts/verificar-noticias.mjs` (quickstart), las capturas de `/`, `/noticias` y del detalle a 4 anchos, y la regresión completa
 - [X] T008 Ejecutar ruff, pytest, vitest, `typecheck` y `build`, y actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
+
+---
+
+## Phase 5: Convergence
+
+- [X] T009 Verificar que una noticia publicada sin imagen muestra el paisaje de reserva en la lista y en el detalle, y restaurar después (`frontend/scripts/verificar-noticias.mjs`) per spec «Edge Cases» (partial)

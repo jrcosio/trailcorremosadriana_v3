@@ -93,4 +93,18 @@ await page.waitForSelector('.confirm-modal', { state: 'detached', timeout: 10000
 const final = (await privado()).news.map((n) => n.id).join(',');
 if (retirada && final === 'proxima-edicion,gracias-trail-2026') ok('retirada y borrada; quedan solo las 2 noticias existentes');
 else fallo(`retirar/borrar: ${retirada} ${final}`);
+// 6. Noticia sin imagen (casos límite): paisaje de reserva en la lista y en el detalle.
+const csrf = (await contexto.cookies()).find((c) => c.name === 'penasagra_csrf')?.value ?? '';
+const crear = await page.request.put(base + '/api/admin/noticias/verificacion-sin-imagen', {
+  headers: { 'X-CSRF-Token': csrf, Origin: base },
+  data: { title: 'Sin imagen 007', body: 'Texto.', image: '', published: true, version: 0 },
+});
+await page.goto(base + '/noticias', { waitUntil: 'networkidle' });
+const enLista = await page.getAttribute('a.news-card[href="/noticias/verificacion-sin-imagen"] img', 'src');
+await page.goto(base + '/noticias/verificacion-sin-imagen', { waitUntil: 'networkidle' });
+const enDetalle = await page.getAttribute('.article-image', 'src');
+const borrar = await page.request.delete(base + '/api/admin/noticias/verificacion-sin-imagen?version=1', { headers: { 'X-CSRF-Token': csrf, Origin: base } });
+if (crear.ok() && enLista === '/reused/fondos/fondo.webp' && enDetalle === '/reused/fondos/fondo.webp' && borrar.ok()) ok('sin imagen: paisaje de reserva en la lista y en el detalle (restaurado)');
+else fallo(`sin imagen: ${crear.status()} ${enLista} ${enDetalle} ${borrar.status()}`);
+
 await browser.close();
