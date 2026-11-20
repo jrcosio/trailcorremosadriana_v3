@@ -66,8 +66,8 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 **Independent Test**: recorrido sin violaciones; `/pantallas` según `PANTALLAS`.
 
-- [ ] T014 [US4] Añadir la CSP por defecto (`?Content-Security-Policy`, research R4) y la regla `PANTALLAS` (404 si no es `si`) en `infra/caddy/Caddyfile`. Pasar `PANTALLAS` en `compose.yaml` (`no`) y en `compose.dev.yaml` (`si`)
-- [ ] T015 [US4] Ampliar `frontend/scripts/verificar-cierre.mjs`:
+- [X] T014 [US4] Añadir la CSP por defecto (`?Content-Security-Policy`, research R4) y la regla `PANTALLAS` (404 si no es `si`) en `infra/caddy/Caddyfile`. Pasar `PANTALLAS` en `compose.yaml` (`no`) y en `compose.dev.yaml` (`si`)
+- [X] T015 [US4] Ampliar `frontend/scripts/verificar-cierre.mjs`:
   - violaciones de CSP en el recorrido público, en una prueba con Wikiloc y en el panel con subida;
   - `/media` conserva su CSP propia;
   - `/pantallas` 404 con `PANTALLAS=no` y 200 con `si`.

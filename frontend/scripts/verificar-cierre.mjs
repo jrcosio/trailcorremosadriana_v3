@@ -1,7 +1,8 @@
 // Feature 011 · Cierre: 404 reales y metadatos de detalle en el HTML inicial, respaldo con la API
-// caída y /admin intacto. Ampliado en la US4 con la CSP y /pantallas.
-// Uso (desde frontend/, con Docker Compose en marcha):
-//   node scripts/verificar-cierre.mjs [url-base]
+// caída y /admin intacto. Ampliado en la US4 con la CSP, la CSP propia de /media y /pantallas
+// (decisión P5).
+// Uso (desde frontend/, con Docker Compose en marcha; el panel solo con credenciales):
+//   [ADMIN_USUARIO=… ADMIN_PASSWORD=…] node scripts/verificar-cierre.mjs [url-base]
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { fallo, navegador, ok } from './comun.mjs';
@@ -90,4 +91,78 @@ try {
   sh('docker compose start api');
   await esperarApi();
 }
+
+// 6. CSP: ninguna violación en el recorrido público (con el mapa de Wikiloc) ni en el panel.
+const contexto = await browser.newContext();
+await contexto.addInitScript(() => {
+  window.__csp = [];
+  document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(`${e.violatedDirective} ${e.blockedURI}`));
+});
+const nav = await contexto.newPage();
+const violaciones = [];
+// Solo cuentan las violaciones de NUESTRA política. Wikiloc responde 403 (desafío anti-bots de
+// Cloudflare, con X-Frame-Options propio) a navegadores automatizados: se anota aparte.
+const terceros = new Set();
+nav.on('console', (m) => {
+  const t = m.text();
+  if (/X-Frame-Options/.test(t)) terceros.add(t.match(/'(https:\/\/[^']+)'/)?.[1] ?? 'tercero');
+  else if (/Content Security Policy/.test(t)) violaciones.push(t.slice(0, 160));
+});
+const recoger = async (ruta) => violaciones.push(...(await nav.evaluate(() => window.__csp)).map((v) => `${ruta}: ${v}`));
+const recorrido = ['/', '/carreras', '/carreras/trail-27k', '/inscripciones', '/solidaridad', '/patrocinadores', '/contacto',
+  '/noticias', '/noticias/gracias-trail-2026', '/galeria', '/galeria/edicion-2026', '/clasificaciones', '/clasificaciones/2026', '/reglamento', '/no-existe', '/admin'];
+for (const ruta of recorrido) {
+  await nav.goto(base + ruta, { waitUntil: 'networkidle' });
+  await recoger(ruta);
+}
+const cabecera = (await pedir('/')).cabeceras.get('content-security-policy') ?? '';
+// El mapa se carga a petición: se pulsa el botón y se comprueba que el iframe no se bloquea.
+await nav.goto(base + '/carreras/trail-27k', { waitUntil: 'networkidle' });
+await nav.click('text=Cargar mapa interactivo');
+const iframe = await nav.waitForSelector('iframe[src*="wikiloc.com"]', { timeout: 10000 }).catch(() => null);
+await nav.waitForTimeout(3000);
+await recoger('/carreras/trail-27k (mapa)');
+let panel = 'sin credenciales: panel no recorrido';
+const { ADMIN_USUARIO: usuario, ADMIN_PASSWORD: password } = process.env;
+if (usuario && password) {
+  await nav.goto(base + '/admin', { waitUntil: 'networkidle' });
+  await nav.fill('input[name="username"]', usuario);
+  await nav.fill('input[name="password"]', password);
+  await nav.click('button[type="submit"]');
+  await nav.waitForSelector('.admin-event h2');
+  for (const ruta of ['/admin/noticias', '/admin/galeria', '/admin/clasificaciones', '/admin/evento', '/admin/ajustes', '/admin/noticias/nuevo']) {
+    await nav.goto(base + ruta, { waitUntil: 'networkidle' });
+    await recoger(ruta);
+  }
+  await nav.locator('.upload-field input[type="file"]').first().setInputFiles(fileURLToPath(new URL('../public/reused/img/dorsal_solidario.webp', import.meta.url)));
+  await nav.waitForSelector('img.upload-preview', { timeout: 15000 });
+  const subida = await nav.getAttribute('img.upload-preview', 'src');
+  const cargada = await nav.evaluate(() => document.querySelector('img.upload-preview')?.naturalWidth > 0);
+  await recoger('/admin/noticias/nuevo (subida)');
+  const mediaCsp = (await pedir(subida)).cabeceras.get('content-security-policy');
+  panel = cargada && mediaCsp === "default-src 'none'; sandbox" ? 'panel (7 pantallas y subida) sin violaciones; /media con su CSP propia' : `panel: subida=${cargada} csp /media=${mediaCsp}`;
+}
+if (!violaciones.length && cabecera.includes('frame-src https://es.wikiloc.com') && iframe && !panel.startsWith('panel:'))
+  ok(`CSP: 0 violaciones en ${recorrido.length} páginas (frame-src de Wikiloc permitido)${terceros.size ? ` [Wikiloc rechaza el navegador automatizado: ${[...terceros].join(', ')}]` : ''}; ${panel}`);
+else fallo(`CSP: ${violaciones.slice(0, 5).join(' | ')} cabecera=${!!cabecera} iframe=${!!iframe} ${panel}`);
+await contexto.close();
+
+// 7. /pantallas: 404 por defecto (producción) y disponible con PANTALLAS=si; se deja como estaba.
+const pantallas = ['/pantallas', '/pantallas/admin', '/pantallas/admin/noticias'];
+const estadoPantallas = async () => Promise.all(pantallas.map(async (r) => (await pedir(r)).estado));
+const cambiarPantallas = async (valor) => {
+  sh(`PANTALLAS=${valor} docker compose up -d web`);
+  for (let i = 0; i < 30 && !(await fetch(base + '/').catch(() => null))?.ok; i++) await new Promise((r) => setTimeout(r, 300));
+};
+const inicial = await estadoPantallas();
+await cambiarPantallas('no');
+const produccion = await estadoPantallas();
+await page.goto(base + '/pantallas/admin/noticias/nuevo', { waitUntil: 'networkidle' });
+const retiradaEnSpa = (await page.textContent('main')).includes(NO_ENCONTRADA) && !(await page.isVisible('text=vista de diseño'));
+await cambiarPantallas('si');
+const local = await estadoPantallas();
+await cambiarPantallas(inicial[0] === 404 ? 'no' : 'si');
+if (produccion.every((e) => e === 404) && retiradaEnSpa && local.every((e) => e === 200) && (await estadoPantallas()).join() === inicial.join())
+  ok('/pantallas: 404 y página «no encontrada» con PANTALLAS=no (producción); 200 con PANTALLAS=si (revisión local); configuración restaurada');
+else fallo(`/pantallas: producción=${produccion} spa=${retiradaEnSpa} local=${local}`);
 await browser.close();

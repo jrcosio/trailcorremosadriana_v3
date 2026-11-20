@@ -27,7 +27,9 @@ export const METADATOS_404: MetadatosRuta = {
 const escapar = (valor: string) =>
   valor.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-type OpcionesMetadatos = { publicOrigin: string; ruta?: string; noindex?: boolean };
+type OpcionesMetadatos = { publicOrigin: string; ruta?: string; noindex?: boolean; noEncontrada?: boolean };
+/** Marca de `404.html`: el SPA muestra «no encontrada» aunque la ruta exista en el cliente. */
+export const MARCA_NO_ENCONTRADA = '<meta name="estado-pagina" content="404" />';
 
 /** Etiquetas Open Graph, Twitter, canonical y robots (sin título ni descripción). */
 function etiquetasExtra(meta: MetadatosRuta, opciones: OpcionesMetadatos): string[] {
@@ -52,6 +54,7 @@ function etiquetasExtra(meta: MetadatosRuta, opciones: OpcionesMetadatos): strin
     etiquetas.push(`<meta property="og:url" content="${url}" />`, `<link rel="canonical" href="${url}" />`);
   }
   if (opciones.noindex) etiquetas.push(`<meta name="robots" content="noindex, nofollow" />`);
+  if (opciones.noEncontrada) etiquetas.push(MARCA_NO_ENCONTRADA);
   return etiquetas;
 }
 
@@ -115,7 +118,7 @@ export function metadatosRutas({ publicOrigin }: { publicOrigin: string }): Plug
       this.emitFile({
         type: 'asset',
         fileName: '404.html',
-        source: htmlConMetadatos(plantilla, METADATOS_404, { publicOrigin, noindex: true }),
+        source: htmlConMetadatos(plantilla, METADATOS_404, { publicOrigin, noindex: true, noEncontrada: true }),
       });
       for (const ruta of RUTAS_NOINDEX) {
         this.emitFile({

@@ -57,4 +57,10 @@ describe('Metadatos por ruta', () => {
   it('la plantilla rechaza un index.html con «{{»', () => {
     expect(() => plantillaCaddy(plantilla.replace('</head>', '<script>{{x}}</script></head>'), { publicOrigin: origen })).toThrow();
   });
+
+  it('404.html lleva la marca que hace al SPA mostrar «no encontrada»', () => {
+    const html = htmlConMetadatos(plantilla, METADATOS_GENERICOS, { publicOrigin: origen, noindex: true, noEncontrada: true });
+    expect(html).toContain('<meta name="estado-pagina" content="404" />');
+    expect(htmlConMetadatos(plantilla, METADATOS_GENERICOS, { publicOrigin: origen })).not.toContain('estado-pagina');
+  });
 });

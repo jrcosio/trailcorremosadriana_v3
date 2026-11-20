@@ -29,11 +29,15 @@
     - ensayo de despliegue desde un clon limpio en el proyecto `trail-ensayo` (8090): web,
       panel, clasificaciones, metadatos y archivos correctos; retirado con `down -v` sin tocar
       desarrollo.
-- **Siguiente acción concreta**: US4.
-  1. T014: CSP por defecto (`?Content-Security-Policy`) y regla `PANTALLAS` en el Caddyfile;
-     `PANTALLAS=si` en `compose.dev.yaml`.
-  2. T015: ampliar `verificar-cierre.mjs` (violaciones de CSP, CSP de `/media`, `/pantallas`
-     en los dos modos) y adaptar `verificar-admin.mjs`.
+  - T014–T015 (US4):
+    - CSP por defecto en Caddy (`?Content-Security-Policy`); `/media` conserva la suya;
+    - `PANTALLAS` (`no` en `compose.yaml`, `si` en `compose.dev.yaml`): 404 real y el SPA
+      muestra «no encontrada» gracias a la marca `estado-pagina` de `404.html` (`main.tsx`);
+    - `verificar-cierre` 7/7 y `verificar-admin` (con los dos modos) 2/2;
+    - Wikiloc responde 403 (anti-bots) al navegador automatizado: no es una violación de
+      nuestra CSP.
+- **Siguiente acción concreta**: US5 (T016). Convertir las fuentes a WOFF2 real con fontTools,
+  pasar a `format('woff2')` y comparar las capturas con `capturas/despues-p4` (0 diferencias).
 - **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
   local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
   llega en T014).
