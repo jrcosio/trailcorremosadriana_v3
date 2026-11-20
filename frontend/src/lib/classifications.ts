@@ -15,7 +15,7 @@ const aliases: Record<ResultField, string[]> = {
   bib: ['dorsal', 'numdorsal', 'numerodorsal', 'bib', 'bibnumber', 'numero', 'num'],
   name: ['nombre', 'nombrecompleto', 'nombreyapellidos', 'participante', 'corredor', 'atleta', 'name', 'firstname', 'fullname'],
   surname: ['apellido', 'apellidos', 'surname', 'lastname'],
-  time: ['tiempo', 'tiempototal', 'tiempooficial', 'tiempofinal', 'tiemporeal', 'time', 'totaltime', 'finishtime', 'marca'],
+  time: ['tiempo', 'tiempototal', 'tiempooficial', 'tiempofinal', 'tiemporeal', 'time', 'totaltime', 'finishtime', 'marca', 'meta'],
   category: ['categoria', 'category', 'cat'], club: ['club', 'equipo', 'team'],
   gender: ['sexo', 'genero', 'gender', 'sex'], status: ['estado', 'status', 'situacion'],
 };
@@ -23,8 +23,8 @@ export function isSolidarityRace(value: { id?: string; title?: string; race?: st
   return [value.id, value.title, value.race, value.raceId].some(v => /solidari/.test(normalize(String(v || ''))));
 }
 export function classificationRaces<T extends { id: string; title?: string }>(races: T[]): T[] { return races.filter(r => !isSolidarityRace(r)); }
-export function visibleClassifications<T extends { id: string; published?: boolean; rows?: ClassificationRow[]; race?: string; raceId?: string }>(results: T[]): T[] {
-  return results.filter(r => r.published && !isSolidarityRace(r) && Array.isArray(r.rows) && r.rows.length > 0);
+export function visibleClassifications<T extends { id: string; published?: boolean; rows?: ClassificationRow[]; participants?: number; race?: string; raceId?: string }>(results: T[]): T[] {
+  return results.filter(r => r.published && !isSolidarityRace(r) && (r.participants ?? (Array.isArray(r.rows) ? r.rows.length : 0)) > 0);
 }
 function splitCsv(text: string, delimiter: string): string[][] {
   const rows: string[][] = []; let row: string[] = [], cell = '', quoted = false, closed = false;
@@ -81,8 +81,9 @@ export function mapClassification(table: CsvTable, mapping: ColumnMapping): Clas
     if (position === null && rawPosition && !/^(?:-|nc|dnf|dns|dsq|dq|ret|retirad[oa]|abandono|no clasificad[oa]|no presentad[oa]|descalificad[oa])$/i.test(rawPosition)) fail('posición inválida. Usa un número, NC, DNF, DNS o DSQ.');
     const bib = read('bib'), name = [read('name'), read('surname')].filter(Boolean).join(' '), time = read('time');
     const status = read('status') || (position === null ? rawPosition : '');
-    if (!bib || bib.length > 30) fail('el dorsal es obligatorio y admite hasta 30 caracteres.');
-    if (bibs.has(bib.toLowerCase())) fail(`el dorsal «${bib}» está repetido.`); bibs.add(bib.toLowerCase());
+    // Decisión del propietario (P3): el dorsal solo es obligatorio para participantes clasificados.
+    if ((position !== null && !bib) || bib.length > 30) fail('el dorsal es obligatorio para los clasificados y admite hasta 30 caracteres.');
+    if (bib && bibs.has(bib.toLowerCase())) fail(`el dorsal «${bib}» está repetido.`); if (bib) bibs.add(bib.toLowerCase());
     if (!name || name.length > 200) fail('el nombre es obligatorio y admite hasta 200 caracteres.');
     if (position !== null && !time) fail('falta el tiempo de un participante clasificado.');
     if (position === null && (!status || status === '-')) fail('indica un estado (por ejemplo, DNF) para un participante sin posición.');

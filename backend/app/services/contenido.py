@@ -42,12 +42,8 @@ def es_modalidad_solidaria(item: dict[str, Any]) -> bool:
 
 def _clasificacion_visible(item: dict[str, Any]) -> bool:
     filas = item.get("rows")
-    return (
-        item.get("published") is True
-        and not es_modalidad_solidaria(item)
-        and isinstance(filas, list)
-        and len(filas) > 0
-    )
+    participantes = item.get("participants") or (len(filas) if isinstance(filas, list) else 0)
+    return item.get("published") is True and not es_modalidad_solidaria(item) and participantes > 0
 
 
 def filtrar_publicos(data: dict[str, Any]) -> dict[str, Any]:
@@ -66,7 +62,12 @@ def datos_publicos(contenido: SiteData) -> dict[str, Any]:
 
 def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
     """`SiteData` con las secciones migradas leídas de la base de datos."""
-    from app.services import carreras, evento, inscripciones  # diferida: evita ciclos
+    from app.services import (
+        carreras,
+        clasificaciones,
+        evento,
+        inscripciones,
+    )  # diferida: evita ciclos
 
     data = semilla.model_dump(mode="json")
     if carreras.hay_datos(db):
@@ -82,6 +83,7 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
         if privado:
             data["settings"]["eventVersion"] = ev["version"]
         data["races"] = carreras.listar(db, privado=privado)
+        data["results"] = clasificaciones.listar(db, privado=privado)
     else:
         registro.warning(
             "Base sin ediciones ni pruebas: se sirve la semilla (ejecuta importar-inicial)."

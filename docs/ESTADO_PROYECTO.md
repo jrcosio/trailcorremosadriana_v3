@@ -4,34 +4,29 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 005-inscripciones-dorsal (merge local en `main`)
-- **Siguiente feature**: 006-clasificaciones-csv
+- **Última feature cerrada**: 006-clasificaciones-csv (merge local en `main`)
+- **Siguiente feature**: 007-noticias
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Siguiente acción concreta**: `git switch -c 006-clasificaciones-csv main` y
-  `/speckit-specify`.
-  - Tablas `clasificaciones` (UNIQUE `carrera_edicion_id`), `resultados` (posición > 0 o NULL;
-    dorsal y tiempo como texto; UNIQUE por clasificación y `lower(dorsal)`) e
-    `importaciones_csv` (temporal por sesión, con hash y caducidad).
-  - Lectura y validación del CSV portadas a Python desde `frontend/src/lib/classifications.ts`
-    (mismos límites; alias `meta` y `pos`).
-  - Vista previa en el servidor; confirmación transaccional que sustituye las filas.
-  - FK RESTRICT hacia `carreras_edicion` (borrar una prueba con clasificaciones → 409, R5 de la
-    004).
-  - Consulta pública paginada con búsqueda y filtros.
-  - Nueva ruta `/clasificaciones/{año}`.
-  - Importación de los CSV reales de 2026 de producción como publicados (decisión P2; asignación
-    27km → `trail-27k`, 14km → `speed-14k`, marcha → `familiar-7k`). Los CSV están en
-    `datos_iniciales/trailcorremosadriana_v2/datos/2026/` y se copiarán a
-    `backend/seed/clasificaciones/2026/` con su procedencia.
-- **Entorno local**: esquema `0005_inscripciones`, datos importados y cuenta local `admin`.
+- **Siguiente acción concreta**: `git switch -c 007-noticias main` y `/speckit-specify`.
+  - Tabla `noticias` (slug, título, categoría, fecha opcional, imagen, extracto, cuerpo de texto
+    plano, `publicada` y `version`). Las nuevas son borradores.
+  - CRUD `/api/admin/noticias/{id}` con 409, en `persistencia.ts` (sección `news`).
+  - `/api/content` sirve las noticias desde la base.
+  - Importación de `proxima-edicion` (semilla) y de la noticia de producción
+    `2026-07-13-gracias-trail-2026` (DISCREPANCIAS C3) con su imagen `gracias_2026.webp`, copiada
+    a `frontend/public/reused/noticias/` con su procedencia. Hay que revisar el texto, sin datos
+    personales.
+  - Pantallas `/noticias` y `/noticias/:id`.
+- **Entorno local**: esquema `0006_clasificaciones`, con las 3 clasificaciones reales de 2026
+  importadas (63/205/224) y la cuenta local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001, 002, 003, 004, 005 (inscripciones y Dorsal Solidario) |
+| Terminadas | 0, 001, 002, 003, 004, 005, 006 (clasificaciones CSV) |
 | Activa | — |
-| Pendientes | 006 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 007 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -61,6 +56,10 @@
 | 2026-11-20 | Edición 2026 con fecha oficial 11/07/2026 09:00 (dato de producción) importada como histórico | 004 research R6 |
 | 2026-11-20 | Inscripciones por edición; abrir exige un destino válido (dorsal o prueba publicada con enlace); los destinos solo pueden ser https sin credenciales | 005 research R1–R3 |
 | 2026-11-20 | Con las inscripciones cerradas, `/inscripciones` muestra su estado aprobado en lugar del bloque del dorsal (spec corregida durante la implementación) | 005 spec Assumptions |
+| 2026-11-20 | Dorsal obligatorio solo para clasificados (CSV real de la 27K con una participante «Sin salida» sin dorsal) | Propietario (P3) |
+| 2026-11-20 | Vista previa en el cliente y validación autoritativa en el servidor con importación temporal por sesión (30 min, un solo uso) y sustitución transaccional | 006 research R1, DISCREPANCIAS M5 |
+| 2026-11-20 | Consulta pública de participantes paginada en el servidor; el contrato público no incluye filas | 006 research R3 |
+| 2026-11-20 | Los CSV reales de 2026 no se versionan (datos personales); se importan con el comando de operador | 006 spec Assumptions |
 
 ## Supuestos
 
@@ -138,6 +137,14 @@
 | 2026-11-20 | 005 | URL del dorsal y `docker compose restart` (SC-005) | Persiste; restaurado |
 | 2026-11-20 | 005 | Regresión: `verificar-rutas` 42/42, `verificar-evento-carreras` 16/16, `verificar-acceso` 7/7 | OK |
 | 2026-11-20 | 005 | `/speckit-converge` | 1.ª pasada: T010 (URL con espacios recortada) resuelta; 2.ª pasada: Converged |
+| 2026-11-20 | 006 | Checklists `requirements` 16/16 y `datos` 15/15; `analyze` sin hallazgos (desviación justificada: lector duplicado) | OK |
+| 2026-11-20 | 006 | pytest (PostgreSQL real): lector, vista previa, transacción, fallo simulado, tokens, consulta, 5000 filas en < 1 s | **296 passed** (297 tras la convergencia) |
+| 2026-11-20 | 006 | vitest y typecheck | **59 passed**; OK |
+| 2026-11-20 | 006 | Migración 0006 (`upgrade`, `downgrade` y `upgrade`) e importación de los CSV reales | 63/205/224 (SC-001) |
+| 2026-11-20 | 006 | `verificar-clasificaciones.mjs` (2026 reales, búsqueda sin tildes, paginación, filtro, dorsal repetido, alta, sustitución, prueba clasificada no borrable, limpieza) | 11/11 OK |
+| 2026-11-20 | 006 | Capturas de `/clasificaciones/2026` a 1440 y 360 px | Estilo aprobado; sin desbordamiento |
+| 2026-11-20 | 006 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, acceso 7/7 | OK |
+| 2026-11-20 | 006 | `/speckit-converge` | 1.ª pasada: T014 (limpieza de importaciones caducadas) resuelta, 297 pytest; 2.ª pasada: Converged |
 
 ## Bloqueos
 

@@ -55,8 +55,24 @@ describe('Lectura y mapeo de CSV', () => {
     expect(() => mapClassification(parseCsv(plantilla.replace(';102;', ';101;')), mapeo)).toThrow(/repetido/));
   it('un participante clasificado necesita tiempo', () =>
     expect(() => mapClassification(parseCsv(plantilla.replace('01:42:10', '')), mapeo)).toThrow(/tiempo/));
+  it('dorsal vacío solo en participantes sin posición (decisión P3)', () => {
+    const t = parseCsv('pos;dorsal;nombre;tiempo;estado\n1;1;A;1:00;\n;;B;;Sin salida\n;;C;;Sin salida');
+    expect(mapClassification(t, guessMapping(t.headers)).map(r => r.bib)).toEqual(['1', '', '']);
+    expect(() => mapClassification(parseCsv('pos;dorsal;nombre;tiempo\n1;;A;1:00'), { position: 0, bib: 1, name: 2, time: 3 })).toThrow(/clasificados/);
+  });
   it('límite de tamaño de 1 MB', () => expect(() => parseCsv('x'.repeat(1000001))).toThrow(/1 MB/));
   it('límite de 5000 filas', () => expect(() => parseCsv('pos;dorsal\n' + '1;2\n'.repeat(5001))).toThrow(/5000/));
+});
+
+describe('Formato de producción (feature 006)', () => {
+  it('detecta «Pos» y «Meta» sin confundir «Pos Categoria» ni «Pos Genero»', () => {
+    const t = parseCsv('Pos,Dorsal,Nombre,Apellidos,Categoria,Pos Categoria,Genero,Pos Genero,Club,Meta,Estado\n1,250,Ana,Peña,Senior F,1,Femenino,1,Club,01:19:45,Finalizado');
+    expect(guessMapping(t.headers)).toEqual({ position: 0, bib: 1, name: 2, surname: 3, time: 9, category: 4, club: 8, gender: 6, status: 10 });
+  });
+  it('visibleClassifications acepta el recuento del servidor sin filas', () => {
+    expect(visibleClassifications([{ id: 'x', published: true, participants: 3, rows: [] }])).toHaveLength(1);
+    expect(visibleClassifications([{ id: 'y', published: true, participants: 0, rows: [] }])).toHaveLength(0);
+  });
 });
 
 describe('Exclusión del Dorsal Solidario y vista pública', () => {
@@ -82,9 +98,10 @@ describe('Exclusión del Dorsal Solidario y vista pública', () => {
     expect(classificationRaces(d.races)).toHaveLength(seed.races.length));
   it('la lista pública excluye la solidaria y los borradores', () => expect(visibleClassifications(d.results)).toHaveLength(1));
   it('publicData filtra la clasificación solidaria', () => expect(publicData(d).results).toHaveLength(1));
-  it('la página pública muestra la tabla sin la modalidad solidaria', () => {
+  it('la página pública muestra la clasificación (filas desde el servidor) sin la modalidad solidaria', () => {
     const html = renderToStaticMarkup(<Results d={d} />);
-    expect(html).toContain('Participante Ejemplo Uno');
+    expect(html).toContain('Clasificación de prueba');
+    expect(html).toContain('3 participantes');
     expect(html).not.toContain('Dorsal Solidario');
     expect(html).not.toContain('PDF');
   });
@@ -93,6 +110,11 @@ describe('Exclusión del Dorsal Solidario y vista pública', () => {
     expect(html).toContain('Subir CSV de clasificación');
     expect(html).not.toContain('Dorsal Solidario');
     expect(html).not.toContain('PDF');
+  });
+  it('/clasificaciones/{año} filtra por el año inicial', () => {
+    const html = renderToStaticMarkup(<Results d={d} anio="2025" />);
+    expect(html).toContain('No hay resultados para estos filtros.');
+    expect(renderToStaticMarkup(<Results d={d} anio="2026" />)).toContain('Clasificación de prueba');
   });
   it('las celdas del CSV se muestran como texto escapado', () => {
     const html = renderToStaticMarkup(<ClassificationTable rows={[{ ...filas[0], name: '<script>alert(1)</script>' }]} />);

@@ -71,6 +71,23 @@ describe('planificar', () => {
     expect(ops.map((o) => (o.cuerpo as { version: number }).version)).toEqual([3, 4]);
   });
 
+  it('clasificaciones: nueva con importToken, metadatos y borrado', () => {
+    const a = base();
+    a.results = [{ id: 'c1', title: 'C1', year: '2026', raceId: 'trail-27k', published: true, version: 2, rows: [] }];
+    const s = base();
+    s.results = [
+      { ...a.results[0], published: false },
+      { id: 'c2', title: 'C2', year: '2026', raceId: 'speed-14k', published: false, rows: [], importToken: 'tok' },
+    ];
+    expect(planificar(a, s)).toEqual([
+      { metodo: 'PUT', url: '/api/admin/clasificaciones/c1', cuerpo: { title: 'C1', year: '2026', raceId: 'trail-27k', published: false, version: 2 } },
+      { metodo: 'PUT', url: '/api/admin/clasificaciones/c2', cuerpo: { title: 'C2', year: '2026', raceId: 'speed-14k', published: false, version: 0, importToken: 'tok' } },
+    ]);
+    const borrada = base();
+    borrada.results = [];
+    expect(planificar(a, borrada)).toEqual([{ metodo: 'DELETE', url: '/api/admin/clasificaciones/c1?version=2' }]);
+  });
+
   it('eventVersion no se considera un cambio de contenido', () => {
     const a = base();
     const s = base();
