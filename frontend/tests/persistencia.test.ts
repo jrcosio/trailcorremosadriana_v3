@@ -102,6 +102,17 @@ describe('planificar', () => {
     expect(planificar(a, vacia)).toEqual([{ metodo: 'DELETE', url: '/api/admin/noticias/n1?version=4' }]);
   });
 
+  it('álbumes: edición y borrado', () => {
+    const a = base();
+    a.albums = [{ id: 'al', title: 'A', year: '2027', image: '/reused/fondos/fondo.webp', photos: [], published: true, version: 2 }];
+    const s = base();
+    s.albums = [{ ...a.albums[0], photos: ['/media/0123456789abcdef0123456789abcdef.jpg'] }];
+    expect(planificar(a, s)).toEqual([{ metodo: 'PUT', url: '/api/admin/albumes/al', cuerpo: { ...s.albums[0], version: 2 } }]);
+    const vacia = base();
+    vacia.albums = [];
+    expect(planificar(a, vacia)).toEqual([{ metodo: 'DELETE', url: '/api/admin/albumes/al?version=2' }]);
+  });
+
   it('eventVersion no se considera un cambio de contenido', () => {
     const a = base();
     const s = base();

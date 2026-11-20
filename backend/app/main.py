@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.formparsers import MultiPartException
 
 from app.api import (
+    admin_albumes,
     admin_carreras,
     admin_clasificaciones,
     admin_evento,
@@ -52,6 +53,8 @@ ETIQUETAS = {
     "registrationMessage": "mensaje al participante",
     "solidarityRegistration": "enlace de pago del dorsal solidario",
     "csv": "CSV",
+    "url": "álbum externo",
+    "photos": "fotografías del álbum",
     "category": "categoría",
     "excerpt": "resumen",
     "body": "contenido de la noticia",
@@ -146,6 +149,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_inscripciones.router)
     app.include_router(admin_clasificaciones.router)
     app.include_router(admin_noticias.router)
+    app.include_router(admin_albumes.router)
     app.include_router(clasificaciones.router)
     return app
 

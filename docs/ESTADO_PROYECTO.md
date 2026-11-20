@@ -4,28 +4,27 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 007-noticias (merge local en `main`)
-- **Siguiente feature**: 008-galeria
+- **Última feature cerrada**: 008-galeria (merge local en `main`)
+- **Siguiente feature**: 009-patrocinadores-colaboradores
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Siguiente acción concreta**: `git switch -c 008-galeria main` y `/speckit-specify`.
-  - Tablas `albumes` (slug, título, año, portada, URL externa histórica, `publicado`, orden y
-    versión) y `fotografias` (álbum, referencia `/media/…`, `alt` y orden).
-  - `PUT/DELETE /api/admin/albumes/{id}` mediante `recursoSimple` en `persistencia.ts`
-    (sección `albums`; `photos[]` del contrato = lista de URLs).
-  - Importación de los 3 álbumes de Google Photos (2024–2026) de la semilla.
-  - Lightbox accesible: revisar el foco (DOC 09).
-  - Después de la 008, el paso «sección sin persistencia» de `verificar-acceso.mjs` sigue en
-    `/admin/reglamento` hasta la 010.
-- **Entorno local**: esquema `0007_noticias`; 2 noticias, 3 clasificaciones reales y la cuenta
-  local `admin`.
+- **Siguiente acción concreta**: `git switch -c 009-patrocinadores-colaboradores main` y
+  `/speckit-specify`.
+  - Tabla única `entidades` con tipo `patrocinador` o `colaborador`, nombre, logo, web opcional
+    (https), orden, `publicada` y versión.
+  - `PUT/DELETE /api/admin/entidades/{tipo}/{id}` mediante `recursoSimple` para las secciones
+    `sponsors` y `collaborators`.
+  - Importación de los 8 patrocinadores, sin web y con logos `/reused/logos/patrocinadores/…`.
+    Colaboradores vacíos.
+  - Logos grandes (`object-fit: contain`).
+- **Entorno local**: esquema `0008_galeria`, con los datos importados y la cuenta local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001–006, 007 (noticias) |
+| Terminadas | 0, 001–007, 008 (galería) |
 | Activa | — |
-| Pendientes | 008 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 009 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -60,6 +59,7 @@
 | 2026-11-20 | Consulta pública de participantes paginada en el servidor; el contrato público no incluye filas | 006 research R3 |
 | 2026-11-20 | Los CSV reales de 2026 no se versionan (datos personales); se importan con el comando de operador | 006 spec Assumptions |
 | 2026-11-20 | Noticias ordenadas: sin fecha primero y después por fecha descendente; la noticia de producción se importa sin categoría inventada («Actualidad») | 007 research R2, spec Assumptions |
+| 2026-11-20 | Texto alternativo por foto generado desde el título del álbum (`photoAlts`); foco atrapado en el visor | 008 research R2/R5, DISCREPANCIAS M7 |
 
 ## Supuestos
 
@@ -150,6 +150,12 @@
 | 2026-11-20 | 007 | Migración 0007 e `importar-inicial` sobre la base existente | 2 noticias importadas en el orden esperado |
 | 2026-11-20 | 007 | `verificar-noticias.mjs` (existentes, borrador, publicación con imagen, HTML como texto, 409, retirada y borrado) | 7/7 OK |
 | 2026-11-20 | 007 | `/speckit-converge` (después del merge; corregido en la misma sesión) | 1.ª pasada: T009 (noticia sin imagen → paisaje de reserva) verificada 8/8; 2.ª pasada: Converged |
+| 2026-11-20 | 008 | `analyze` sin hallazgos; pytest | **320 passed** |
+| 2026-11-20 | 008 | vitest y typecheck | **61 passed**; OK |
+| 2026-11-20 | 008 | Migración 0008 e importación de los 3 álbumes | OK |
+| 2026-11-20 | 008 | `verificar-galeria.mjs` (históricos, filtro, álbum con 2 fotos, publicación con `alt`, visor con 10 Tab dentro, flechas, Escape y foco devuelto, quitar foto, borrar) | 6/6 OK |
+| 2026-11-20 | 008 | Desbordamiento a 4 anchos (`/galeria`, álbum, `/`, `/noticias`) y regresión completa | 0; rutas 42/42; 16/16/11/8/7/2 |
+| 2026-11-20 | 008 | `/speckit-converge` | Converged a la primera |
 | 2026-11-20 | 007 | Desbordamiento a 4 anchos en `/`, `/noticias` y el detalle; captura de la portada | 0 desbordamientos; cuadrícula aprobada para varias noticias |
 | 2026-11-20 | 007 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, clasificaciones 11/11, acceso 7/7 | OK (`verificar-acceso` pasa a usar `/admin/reglamento` como sección sin persistencia; se borraron 2 borradores de prueba creados por la versión anterior del script) |
 

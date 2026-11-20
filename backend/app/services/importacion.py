@@ -11,7 +11,7 @@ from pathlib import Path
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.models import Carrera, CarreraEdicion, Edicion, Noticia
+from app.models import Album, Carrera, CarreraEdicion, Edicion, Noticia
 from app.services.contenido import RUTA_SEMILLA
 from app.services.fechas import MADRID
 
@@ -134,5 +134,20 @@ def importar(db: Session, reemplazar: bool = False, ruta: Path = RUTA_SEMILLA) -
             )
             db.flush()
         acciones.append("Noticias importadas: gracias-trail-2026 (producción) y la de la semilla.")
+    if not db.scalar(select(func.count(Album.id))):
+        for orden, a in enumerate(semilla["albums"]):
+            db.add(
+                Album(
+                    slug=a["id"],
+                    titulo=a["title"],
+                    anio=int(a["year"]),
+                    portada=a["image"],
+                    url_externa=a.get("url", ""),
+                    publicado=bool(a.get("published", False)),
+                    orden=orden,
+                    version=1,
+                )
+            )
+        acciones.append("Álbumes históricos importados con sus enlaces de Google Fotos.")
     db.commit()
     return acciones

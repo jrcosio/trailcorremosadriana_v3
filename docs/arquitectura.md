@@ -80,6 +80,7 @@ repositorio.
 | prueba borrada | `DELETE /api/admin/carreras/{id}?version=N` |
 | `settings.registrationsOpen`, `registrationMessage`, `solidarityRegistration` | `PUT /api/admin/inscripciones` (después de las pruebas y del evento) |
 | `news[]` | `PUT/DELETE /api/admin/noticias/{id}` (007) |
+| `albums[]` | `PUT/DELETE /api/admin/albumes/{id}` (008) |
 | secciones aún no migradas | `PUT /api/content`, que responde 501 «Esta sección del panel todavía no guarda cambios.» |
 
 Después se relee `GET /api/content?admin=1`, así que el panel muestra lo que confirmó el
@@ -105,6 +106,20 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
   `--reemplazar` exige confirmación escrita.
 - **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
   ediciones ni pruebas (base sin inicializar), se sirve la semilla.
+
+## Galería (feature 008)
+
+- **Tablas**:
+  - `albumes`: `slug`, título, año, portada obligatoria, `url_externa` (https), `publicado`,
+    `orden` y `version`.
+  - `fotografias`: `album_id`, imagen, `alt` y `orden`.
+- **Endpoints**: `PUT` y `DELETE` en `/api/admin/albumes/{id}`. El `PUT` sustituye la lista de
+  fotos en la misma transacción. Quitar fotos o borrar álbumes no borra archivos.
+- **Contrato**: `albums[]` añade `photoAlts`, que por defecto es «{título} · fotografía N»
+  (DISCREPANCIAS M7). Orden público: año descendente y después `orden`.
+- **Visor**: el foco queda atrapado (Tab/Mayús+Tab), Escape cierra y el foco vuelve a la miniatura.
+  Sin cambios visuales.
+- **Importación**: los 3 álbumes históricos con sus enlaces de Google Fotos, si la tabla está vacía.
 
 ## Noticias (feature 007)
 
