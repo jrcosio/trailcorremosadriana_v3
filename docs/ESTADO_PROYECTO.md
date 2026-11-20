@@ -4,7 +4,8 @@
 
 ## Punto de continuidad
 
-- **Estado**: features 001–011 terminadas y fusionadas en `main` en local (sin push).
+- **Estado**: features 001–011 terminadas y fusionadas en `main`. Repositorio publicado en
+  `origin` (GitHub) el 2026-11-20 a petición del propietario: `main` y todas las ramas de feature.
 - **Feature activa**: 012-ajustes-revision (rama `012-ajustes-revision`). Recoge los ajustes que
   pide el propietario tras revisar la web.
   - Primero, **P6: las fotos se ven siempre completas**. Capturas del propietario en
@@ -24,8 +25,8 @@
 - **Siguiente acción concreta**: esperar los demás ajustes del propietario y añadirlos como
   historias nuevas (US2, US3…) de esta feature, con el mismo ciclo SDD (actualizar
   `specs/012-ajustes-revision/spec.md`, plan y tareas).
-- **Pendiente del propietario** (sin cambios): push, despliegue y datos de lanzamiento (ver
-  «Bloqueos»).
+- **Pendiente del propietario**: despliegue y datos de lanzamiento (ver «Bloqueos»). Los push
+  siguientes, solo cuando el propietario los pida.
 
 ## Features
 
