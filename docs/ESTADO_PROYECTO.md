@@ -32,8 +32,8 @@
   - El ensayo encontró y corrigió un fallo de la guía: la variable `$DC` no funciona en zsh; ahora
     se usa la función `dc`.
 - **Siguiente acción concreta**:
-  1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. Antes hay que subir a
-     GitHub los commits de esta feature (push, cuando lo pida).
+  1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
+     GitHub (`main`, push del 2026-11-20 a petición del propietario).
   2. Seguir con los demás ajustes de la revisión como historias nuevas de la 012.
 - **Pendiente del propietario**: despliegue y datos de lanzamiento (ver «Bloqueos»). Los push
   siguientes, solo cuando el propietario los pida.
