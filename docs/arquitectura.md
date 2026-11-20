@@ -79,6 +79,7 @@ repositorio.
 | prueba nueva o editada | `PUT /api/admin/carreras/{id}` (con `version`) |
 | prueba borrada | `DELETE /api/admin/carreras/{id}?version=N` |
 | `settings.registrationsOpen`, `registrationMessage`, `solidarityRegistration` | `PUT /api/admin/inscripciones` (después de las pruebas y del evento) |
+| `news[]` | `PUT/DELETE /api/admin/noticias/{id}` (007) |
 | secciones aún no migradas | `PUT /api/content`, que responde 501 «Esta sección del panel todavía no guarda cambios.» |
 
 Después se relee `GET /api/content?admin=1`, así que el panel muestra lo que confirmó el
@@ -104,6 +105,17 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
   `--reemplazar` exige confirmación escrita.
 - **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
   ediciones ni pruebas (base sin inicializar), se sirve la semilla.
+
+## Noticias (feature 007)
+
+- **Tabla**: `noticias` con `slug` (URL), título, categoría, `fecha` (día, nula), imagen, extracto,
+  cuerpo de texto plano, `publicada` y `version`.
+- **Orden**: `fecha DESC NULLS FIRST, creado_en DESC`. Las noticias sin fecha son anuncios
+  vigentes y van arriba.
+- **Endpoints**: `PUT` y `DELETE` en `/api/admin/noticias/{id}`, con versión (409), mediante
+  `persistencia.ts` (`recursoSimple`). Las nuevas son borradores.
+- **Importación**: `importar-inicial` carga la noticia de la semilla y la de producción
+  (`gracias-trail-2026`, con su imagen en `/reused/noticias/`) si la tabla está vacía.
 
 ## Clasificaciones CSV (feature 006)
 

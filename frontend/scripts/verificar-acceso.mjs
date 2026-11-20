@@ -69,9 +69,9 @@ if (!(await page.isVisible('.admin-event h2'))) fallo('la sesión no sobrevive a
 else ok('recarga: sesión mantenida');
 
 // 4. Guardar en una sección sin persistencia → aviso, sin simular éxito.
-await page.goto(base + '/admin/noticias/nuevo', { waitUntil: 'networkidle' });
-await page.fill('input[name="title"]', 'Prueba de guardado');
-await page.fill('textarea[name="body"]', 'Texto de prueba.');
+// Sección aún sin persistencia (el reglamento se migra en la feature 010).
+await page.goto(base + '/admin/reglamento', { waitUntil: 'networkidle' });
+await page.locator('textarea').first().fill((await page.locator('textarea').first().inputValue()) + '\nPrueba de guardado');
 await page.click('button[type="submit"]');
 await page.waitForSelector('.admin-error[role="alert"]', { timeout: 10000 });
 const aviso = (await page.textContent('.admin-error[role="alert"]'))?.trim();

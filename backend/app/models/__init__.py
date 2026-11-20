@@ -5,6 +5,7 @@ from app.models.archivos import Archivo
 from app.models.base import Base
 from app.models.clasificaciones import Clasificacion, ImportacionCsv, Resultado
 from app.models.evento import Carrera, CarreraEdicion, Edicion
+from app.models.noticias import Noticia
 
 __all__ = [
     "Administrador",
@@ -16,6 +17,7 @@ __all__ = [
     "Edicion",
     "ImportacionCsv",
     "LimiteLogin",
+    "Noticia",
     "Resultado",
     "Sesion",
 ]

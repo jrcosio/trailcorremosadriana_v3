@@ -67,6 +67,7 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
         clasificaciones,
         evento,
         inscripciones,
+        noticias,
     )  # diferida: evita ciclos
 
     data = semilla.model_dump(mode="json")
@@ -84,6 +85,7 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
             data["settings"]["eventVersion"] = ev["version"]
         data["races"] = carreras.listar(db, privado=privado)
         data["results"] = clasificaciones.listar(db, privado=privado)
+        data["news"] = noticias.listar(db, privado=privado)
     else:
         registro.warning(
             "Base sin ediciones ni pruebas: se sirve la semilla (ejecuta importar-inicial)."

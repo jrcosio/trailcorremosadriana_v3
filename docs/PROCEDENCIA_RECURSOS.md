@@ -17,6 +17,7 @@ Fuentes (consultadas en `datos_iniciales/`, que no se versiona):
 | `frontend/tests/{solidario,clasificaciones}.test.tsx` | PROP `scripts/check-solidarity.tsx`, `scripts/check-classifications.tsx` | Portado a vitest (partes de cliente) |
 | `frontend/src/seo/rutas.ts` (títulos de `/`, `/recorridos`, `/galeria`, `/clasificaciones`, `/reglamento`, `/contacto`) | PROD `trailcorremosadriana_v2.py` | Títulos conservados; descripciones adaptadas |
 | `backend/seed/contenido_inicial.json` | PROP `lib/data.ts` (`seed`) | Volcado a JSON (ver `backend/seed/README.md`) |
+| `backend/seed/noticias/2026-07-13-gracias-trail-2026.json` | PROD `datos/noticias/2026-07-13-gracias-trail-2026.txt` | Campos adaptados al contrato (`subtitulo` → `excerpt`); texto íntegro |
 
 ## Fuentes tipográficas
 
@@ -45,6 +46,7 @@ lanzamiento hay que confirmar las autorizaciones de publicación e imagen
 | `reused/img/{trail,speed_trail,familiar_trail}_inscripciones.webp` | PROD `assets/img/` | Fotos reales de las carreras |
 | `reused/img/dorsal_solidario.webp` | PROD `assets/img/` | Foto real de la causa |
 | `reused/logos/patrocinadores/banner_*.png` (8) | PROD `assets/logos/patrocinadores/` | Logotipos de patrocinadores |
+| `reused/noticias/gracias_2026.webp` | PROD `assets/noticias/img/gracias_2026.webp` (feature 007) | Imagen de la noticia «¡Gracias por un Trail 2026 inolvidable!» |
 | `images/adriana-silueta.png` | PROP `public/images/`, aportada por el propietario | Silueta de Adriana (máscara CSS) |
 | `templates/clasificacion.csv` | PROP `public/templates/` | Plantilla CSV con datos ficticios (nunca se importa como oficial) |
 

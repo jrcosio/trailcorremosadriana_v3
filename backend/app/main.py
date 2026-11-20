@@ -14,6 +14,7 @@ from app.api import (
     admin_clasificaciones,
     admin_evento,
     admin_inscripciones,
+    admin_noticias,
     archivos,
     clasificaciones,
     contenido,
@@ -51,6 +52,9 @@ ETIQUETAS = {
     "registrationMessage": "mensaje al participante",
     "solidarityRegistration": "enlace de pago del dorsal solidario",
     "csv": "CSV",
+    "category": "categoría",
+    "excerpt": "resumen",
+    "body": "contenido de la noticia",
     "mapping": "asignación de columnas",
     "sourceFile": "archivo CSV",
     "raceId": "carrera",
@@ -141,6 +145,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_carreras.router)
     app.include_router(admin_inscripciones.router)
     app.include_router(admin_clasificaciones.router)
+    app.include_router(admin_noticias.router)
     app.include_router(clasificaciones.router)
     return app
 
