@@ -21,11 +21,19 @@
     subrayado) y A-003 (cabecera por debajo de 360 px). axe con 0 incumplimientos y 0
     desbordamientos. Comparación de capturas en `capturas/despues-p4`: solo los botones
     naranjas, el bloque de la portada y el subrayado del pie.
-- **Siguiente acción concreta**: US3.
-  1. T010: `infra/scripts/verificar-copia.sh`.
-  2. T011: `SITE_ADDRESS` y `compose.produccion.yaml`.
-  3. T012: `docs/operacion.md`.
-  4. T013: ensayo en un clon limpio, proyecto `trail-ensayo`, puerto 8090.
+  - T010–T013 (US3):
+    - `infra/scripts/verificar-copia.sh` (copia → cambio → restauración → 16 tablas y 42
+      archivos idénticos);
+    - `SITE_ADDRESS` en el Caddyfile y `compose.produccion.yaml` (exige los secretos; 80/443);
+    - `docs/operacion.md`;
+    - ensayo de despliegue desde un clon limpio en el proyecto `trail-ensayo` (8090): web,
+      panel, clasificaciones, metadatos y archivos correctos; retirado con `down -v` sin tocar
+      desarrollo.
+- **Siguiente acción concreta**: US4.
+  1. T014: CSP por defecto (`?Content-Security-Policy`) y regla `PANTALLAS` en el Caddyfile;
+     `PANTALLAS=si` en `compose.dev.yaml`.
+  2. T015: ampliar `verificar-cierre.mjs` (violaciones de CSP, CSP de `/media`, `/pantallas`
+     en los dos modos) y adaptar `verificar-admin.mjs`.
 - **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
   local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
   llega en T014).

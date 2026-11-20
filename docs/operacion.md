@@ -38,6 +38,10 @@ DC="docker compose -f compose.yaml -f compose.produccion.yaml"
    y publica los puertos 80 y 443. Si falta una variable obligatoria, Compose se detiene con un
    error que la nombra. `.env` **nunca** se versiona ni se copia fuera del servidor.
 3. **Comprobar la configuración** sin arrancar nada: `$DC config > /dev/null`.
+4. **Varias instalaciones en el mismo servidor** (por ejemplo, un ensayo): define en `.env` un
+   `COMPOSE_PROJECT_NAME` distinto en cada una. Así cada instalación tiene sus propios
+   contenedores y volúmenes, y los scripts de copia actúan sobre la suya. Compruébalo con
+   `docker compose config --format json | grep '"name"'` antes de restaurar nada.
 
 ## 3. Dominio y HTTPS
 
@@ -172,4 +176,15 @@ El ensayo se hizo en la máquina de desarrollo, sin servidor ni dominio real:
 6. **Retirada**: `docker compose -p trail-ensayo down -v`. Solo elimina los volúmenes del ensayo;
    el entorno de desarrollo (`trail-penasagra`) no se toca.
 
-Resultado y detalle en `docs/ESTADO_PROYECTO.md` (pruebas de la 011).
+**Resultado (2026-11-20)**:
+
+| Comprobación | Valor |
+|---|---|
+| Clon limpio (sin `datos_iniciales` ni `.env`) | OK |
+| De la construcción a la restauración | 19 s |
+| `/api/ready` | `disponible` |
+| Páginas | `/` 200, `/no-existe` 404, detalle con `og:url` del ensayo |
+| Clasificaciones de 2026 | 63/205/224 |
+| Acceso al panel | Con la cuenta restaurada |
+| Archivos | 42 restaurados, servidos con bytes idénticos |
+| Entorno de desarrollo | Intacto tras la retirada |

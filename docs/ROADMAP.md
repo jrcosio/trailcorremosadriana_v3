@@ -27,8 +27,8 @@ Especificación, plan y tareas: `specs/011-cierre/` (21 tareas). Decisiones del 
 |---|---|---|
 | US1 (P1) | 404 reales y metadatos de detalle en el HTML inicial | ✅ T001–T006: `/api/meta`, `plantilla.html`/`404.html`, Caddy; `verificar-cierre` 5/5; rutas 42/42 |
 | US2 (P1) | Accesibilidad AA (P4) y cabecera a 320/340 px | ✅ T007–T009: axe 0 incumplimientos (17 rutas, 360/1440), 0 desbordamientos a 6 anchos; capturas: solo cambian los elementos de P4 |
-| US3 (P1) | Copia y restauración verificadas, ensayo de despliegue independiente, `docs/operacion.md` | 🔄 siguiente: T010–T013 |
-| US4 (P2) | CSP y `/pantallas` retirada en producción | ⏳ T014–T015 |
+| US3 (P1) | Copia y restauración verificadas, ensayo de despliegue independiente, `docs/operacion.md` | ✅ T010–T013: `verificar-copia.sh` (16 tablas y 42 archivos idénticos); `compose.produccion.yaml` y `SITE_ADDRESS`; ensayo en `trail-ensayo` desde un clon limpio, correcto y retirado |
+| US4 (P2) | CSP y `/pantallas` retirada en producción | 🔄 siguiente: T014–T015 |
 | US5 (P2) | Fuentes en WOFF2 real (−40 %) | ⏳ T016 |
 | US6 (P3) | Limpieza de archivos huérfanos, código sin uso, `httpx2` | ⏳ T017–T019 |
 | Cierre | Regresión completa, documentación, convergencia, merge | ⏳ T020–T021 |

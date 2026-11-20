@@ -58,7 +58,7 @@ description: "Tareas de implementación de la feature 011-cierre"
   - instalación, variables, dominio y HTTPS, R2 (y sus copias), administrador;
   - copias y restauración, actualización con migraciones, recuperación del acceso;
   - comprobaciones tras desplegar.
-- [ ] T013 [US3] Ensayo de despliegue: clon limpio en una carpeta temporal, proyecto `trail-ensayo` en el puerto 8090, solo con `docs/operacion.md` y la copia de T010. La copia se restaura sobre una base recién creada. Comprobar la web, el acceso al panel y un archivo restaurado. Retirar con `down -v` del proyecto `trail-ensayo` y comprobar que el entorno de desarrollo no ha cambiado
+- [X] T013 [US3] Ensayo de despliegue: clon limpio en una carpeta temporal, proyecto `trail-ensayo` en el puerto 8090, solo con `docs/operacion.md` y la copia de T010. La copia se restaura sobre una base recién creada. Comprobar la web, el acceso al panel y un archivo restaurado. Retirar con `down -v` del proyecto `trail-ensayo` y comprobar que el entorno de desarrollo no ha cambiado
 
 ## Phase 5: User Story 4 — CSP y `/pantallas` (P2)
 
