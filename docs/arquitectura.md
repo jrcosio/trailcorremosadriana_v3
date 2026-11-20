@@ -70,6 +70,12 @@ repositorio.
   - A-004: fotos siempre completas por la decisión P6 (feature 012). Cada `<img>` de foto lleva
     `style={fondoFoto(src)}` (`lib/fotos.ts`, variable `--foto`). El marco no cambia; la foto se
     muestra con `contain` y el espacio sobrante se rellena con la misma foto bajo un velo verde.
+  - A-005: logotipo nuevo de la cabecera por la decisión P7 (feature 012).
+    - `LogoCabecera` (`Site.tsx`) sirve `reused/logos/logo_cabecera-{480,720}.webp` con
+      `srcset`/`sizes`.
+    - La altura del logotipo depende del tramo de la cabecera (80/70/68/58/49 px).
+    - El enlace conserva el ancho de la marca anterior, así que nada más se mueve.
+    - El pie y la barra lateral del panel siguen con `logo1.webp` en blanco (`Brand white`).
 - **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.

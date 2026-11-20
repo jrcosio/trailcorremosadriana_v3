@@ -135,6 +135,7 @@ for (const [clave, lista] of Object.entries(medidas)) {
 }
 if (!problemas.length) ok(`${total} fotos completas a ${ANCHOS.join('/')} px${conPanel ? ' (con el panel y un álbum temporal)' : ''}; marcos idénticos a la referencia; relleno donde las proporciones difieren`);
 else fallo(`${problemas.length} problemas:\n  ${problemas.slice(0, 15).join('\n  ')}`);
-const igualesOtros = JSON.stringify(otros.logos) === JSON.stringify(ref.otros.logos) && otros.visor === ref.otros.visor && otros.vistaPrevia === ref.otros.vistaPrevia;
-if (igualesOtros && otros.sinCarga === 'rgb(23, 46, 40)') ok('logotipos, visor y vista previa sin cambios; una foto que no carga deja el marco en #172e28');
+// El visor y la vista previa solo se miden con el panel (credenciales).
+const igualesOtros = JSON.stringify(otros.logos) === JSON.stringify(ref.otros.logos) && (!conPanel || (otros.visor === ref.otros.visor && otros.vistaPrevia === ref.otros.vistaPrevia));
+if (igualesOtros && otros.sinCarga === 'rgb(23, 46, 40)') ok(`logotipos${conPanel ? ', visor y vista previa' : ''} sin cambios; una foto que no carga deja el marco en #172e28`);
 else fallo(`otros: ${JSON.stringify(otros)} (antes ${JSON.stringify(ref.otros)})`);

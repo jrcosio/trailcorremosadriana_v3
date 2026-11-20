@@ -99,3 +99,53 @@
 .race-detail-hero > img {
   object-position: right center;
 }
+
+/*
+ * A-005 (feature 012, decisión del propietario P7): logotipo nuevo en la cabecera, en lugar del
+ * icono y del texto en dos filas. La altura de la cabecera no cambia: el logotipo se ajusta a ella
+ * en cada tramo sin superar el ancho de la marca anterior (research R4). Lleva sus propios
+ * colores, así que se anula el oscurecimiento de `.brand img`. Los valores de `sizes` en
+ * `LogoCabecera` (Site.tsx) son los anchos resultantes. El enlace conserva el ancho medido de la
+ * marca anterior en cada tramo: a 360-371 px la cabecera ya iba justa y su ancho decide dónde
+ * quedan «INSCRIPCIONES» y el menú, que así no se mueven.
+ */
+.header .brand.brand-logo {
+  width: 261.2px;
+}
+.header .brand.brand-logo img {
+  width: auto;
+  height: 80px;
+  filter: none;
+}
+@media (max-width: 1200px) {
+  .header .brand.brand-logo {
+    width: 218.8px;
+  }
+  .header .brand.brand-logo img {
+    height: 70px;
+  }
+}
+@media (max-width: 1000px) {
+  .header .brand.brand-logo {
+    width: 215.7px;
+  }
+  .header .brand.brand-logo img {
+    height: 68px;
+  }
+}
+@media (max-width: 700px) {
+  .header .brand.brand-logo {
+    width: 181.8px;
+  }
+  .header .brand.brand-logo img {
+    height: 58px;
+  }
+}
+@media (max-width: 359px) {
+  .header .brand.brand-logo {
+    width: 155.2px;
+  }
+  .header .brand.brand-logo img {
+    height: 49px;
+  }
+}

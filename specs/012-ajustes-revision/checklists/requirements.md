@@ -37,3 +37,8 @@
   ampliable si el propietario lo pide.
 - Umbrales: 5 anchos (320–1440), 0 fotos recortadas, 0 incumplimientos AA y 0 px de diferencia en
   los marcos.
+- Revisión (2026-11-21, US3/P7): la instrucción del propietario fija qué se sustituye (logo y
+  texto en dos filas de la parte superior izquierda) y el objetivo («que se vea bien»). El pie y
+  la barra lateral del panel, con fondo oscuro, quedan fuera como supuesto explícito: el logotipo
+  tiene el texto oscuro. Umbrales: 0 px de diferencia en la cabecera, 0 desbordamientos, 0
+  incumplimientos AA y variantes de 50 KB como máximo. FR-009–FR-012 tienen escenarios en la US3.

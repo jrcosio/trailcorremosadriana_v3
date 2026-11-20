@@ -31,6 +31,21 @@
     con «ñ»), siguiendo la guía: correcto (ver «Pruebas»).
   - El ensayo encontró y corrigió un fallo de la guía: la variable `$DC` no funciona en zsh; ahora
     se usa la función `dc`.
+- **US3 terminada** (decisión P7: logotipo nuevo en la cabecera, desde `datos_iniciales/new_logo.png`):
+  - Cambio: la cabecera pública muestra el logotipo del propietario en lugar de la silueta y del
+    texto en dos filas.
+    - Archivos: `reused/logos/logo_cabecera-{480,720}.webp`, de 25 y 39 KB, recortados y en
+      WebP.
+    - Código: `LogoCabecera` en `Site.tsx` y `ajustes.css` A-005.
+    - La altura de la cabecera no cambia; el enlace conserva el ancho de la marca anterior.
+  - Fuera (supuesto de la spec): el pie y la barra lateral del panel, con fondo oscuro, siguen
+    con la marca blanca; el favicon no cambia.
+  - Verificación:
+    - `verificar-logo.mjs` en 90 vistas (6 rutas × 15 anchos): 0 px de diferencia, 0
+      desbordamientos y nitidez en densidad 2;
+    - axe 0;
+    - capturas: solo cambia la cabecera, más un reescalado imperceptible del icono del pie;
+    - regresión correcta.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
      GitHub (`main`, push del 2026-11-20 a petición del propietario).
@@ -85,6 +100,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Logotipo nuevo en la cabecera pública; el pie y el panel conservan la marca blanca | Propietario (P7), 012 research R4 |
 
 ## Supuestos
 
@@ -204,6 +220,10 @@
 | 2026-11-20 | 012 | US2: ensayo de producción con HTTPS desde un clon limpio siguiendo `docs/operacion.md` §12 (`trail-prod-ensayo`, `SITE_ADDRESS=trailpeñasagra.localhost`) | HTTP→HTTPS 308; `www` 301 (conserva ruta y consulta); certificados para el dominio y `www` en *punycode*; HSTS; CSP; 404 reales; `/pantallas` 404; `/api/docs` 404; clasificaciones 63/205/224 |
 | 2026-11-20 | 012 | US2: panel por HTTPS en el ensayo (Chromium) | Acceso con cookies `Secure`/`HttpOnly`/`SameSite=Strict`, guardado real (restaurado), subida, cierre de sesión, 0 violaciones de CSP; la redirección `www` también en el navegador |
 | 2026-11-20 | 012 | US2: regresión local tras el cambio del Caddyfile | Rutas 42/42, cierre 7/7, acceso 7/7, fotos 180/180 |
+| 2026-11-21 | 012 | US3 (P7): `verificar-logo.mjs` contra la referencia previa (6 rutas × 15 anchos, incluidos los dos lados de cada cambio de diseño, y la barra del panel con `/pantallas` en local) | 90/90: logotipo completo y sin deformar, sin texto de marca; cabecera, navegación, INSCRIPCIONES y menú con 0 px de diferencia; pie y panel iguales; variantes de 25 y 39 KB; densidad 2 con resolución suficiente |
+| 2026-11-21 | 012 | US3: axe y desbordamiento; capturas antes y después (44) | 0 incumplimientos; 0 desbordamientos; solo cambia la cabecera. A 1440 px, el icono del pie (mismo `logo1.webp`) se reescala distinto (máximo 36/255 en 55 × 29 px, imperceptible) porque ya no comparte la imagen decodificada con la cabecera |
+| 2026-11-21 | 012 | US3: logotipo que no carga (petición abortada, 360 y 1440 px) | Cabecera con la misma altura, INSCRIPCIONES en su sitio, enlace a la portada con su nombre accesible; favicon sin cambios (`logo1.webp`) |
+| 2026-11-21 | 012 | US3: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 75 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

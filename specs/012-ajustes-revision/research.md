@@ -74,3 +74,63 @@ hay credenciales. Para cada `<img>` de foto comprueba:
   `SITE_ADDRESS=trailpeñasagra.localhost` y `PUBLIC_ORIGIN=https://trailpeñasagra.localhost`
   (con «ñ», para probar la normalización); puertos 80/443 de esta máquina y certificado interno de
   Caddy (los `.localhost` no usan ACME).
+
+## R4 Logotipo nuevo en la cabecera (US3, P7)
+
+- **Origen**: `datos_iniciales/new_logo.png`, de 2172 × 724 px y 393 KB, RGBA con fondo
+  transparente.
+  - Contenido útil: (55, 15)–(2161, 684).
+  - Colores: texto casi negro, montañas en verde `#1b4433` y silueta en naranja.
+- **Variantes**:
+  - Recorte al contenido con 6 px de margen: 2118 × 681, proporción 3,11.
+  - Redimensionado con Lanczos a 480 × 154 y 720 × 232.
+  - WebP con calidad 90 y alfa sin pérdidas (Pillow): unos 26 KB y 40 KB. El WebP sin pérdidas
+    pesaba más (32 KB y 68 KB) sin diferencia visible.
+- **Tamaño en pantalla**: lo limita la altura de la cabecera, que no cambia. El logotipo no supera
+  el ancho de la marca anterior, medida antes del cambio:
+
+  | Tramo | Cabecera | Marca anterior (ancho) | Altura del logotipo | Ancho resultante |
+  |---|---|---|---|---|
+  | ≥ 1201 px | 92 px | 261 px | 80 px | ≈ 249 px |
+  | 1001–1200 px | 92 px | 219 px | 70 px | ≈ 218 px |
+  | 701–1000 px | 80 px | 216 px | 68 px | ≈ 212 px |
+  | 360–700 px | 75 px | 182 px | 58 px | ≈ 181 px |
+  | < 360 px | 75 px | 155 px | 49 px | ≈ 153 px |
+
+  El nombre dentro del logotipo ocupa el 22 % de su altura. Queda entre el 92 % y el 97 % del
+  tamaño del texto anterior en cada tramo.
+- **Nitidez**: `srcset` con 480w y 720w, y `sizes` igual al ancho de cada tramo. Una pantalla 2×
+  o 3× descarga la de 720 cuando hace falta. `width`/`height` en el `<img>` reservan la
+  proporción antes de la carga, así que la cabecera no salta.
+- **Filtro**: la regla aprobada `.brand img` oscurece el icono anterior
+  (`filter: brightness(.13)`). El logotipo nuevo lleva sus propios colores, así que se anula con
+  `filter: none`.
+- **Accesibilidad**: el enlace conserva `aria-label="Trail Peñasagra. Inicio"`. El `alt` del
+  `<img>` describe el logotipo («Trail Peñasagra · Corremos por Adriana»), por si se quitara la
+  etiqueta. El logotipo es texto en imagen, pero WCAG 1.4.5 exime los logotipos.
+- **Alternativas descartadas**:
+  - Servir el PNG original: 393 KB y 2172 px para mostrarse a 250 px.
+  - SVG: no hay vectorial del propietario, y vectorizar a mano alteraría el dibujo.
+  - Ampliar la cabecera para un logotipo mayor: movería todo el diseño aprobado.
+  - Poner el logotipo también en el pie y en el panel: el texto oscuro no se lee sobre el verde
+    oscuro (supuesto de la spec).
+- **Ajuste durante la implementación**:
+  - El problema: a 360–371 px la cabecera ya iba justa (el botón de menú sobresalía unos 12 px de
+    su contenedor, dentro del margen). Por eso el ancho de la marca decide dónde quedan
+    «INSCRIPCIONES» y el menú, y un logotipo 1 px más estrecho los desplazaba 1 px.
+  - La solución: el enlace conserva en cada tramo el ancho medido de la marca anterior (261,2 /
+    218,8 / 215,7 / 181,8 / 155,2 px). El logotipo va dentro, alineado a la izquierda, y la
+    posición del resto no depende de su ancho.
+- **Medida de la nitidez**: con `srcset`, `naturalWidth` y `naturalHeight` vienen en píxeles CSS
+  redondeados. El script mide los píxeles reales del archivo descargado (`currentSrc`).
+- **Verificación** (`scripts/verificar-logo.mjs`):
+  - Con `--referencia`, guarda la geometría de la cabecera antes del cambio.
+  - Con `--comparar`, comprueba a 320–1440 px y en los anchos de cambio de diseño:
+    - el logotipo cargado y completo;
+    - que no supera el ancho anterior;
+    - la cabecera con la misma altura;
+    - la navegación, «INSCRIPCIONES» y el menú en la misma posición;
+    - que no queda texto de marca en la cabecera;
+    - que no hay desbordamiento;
+    - la variante descargada (densidad 1 y 2);
+    - el pie y el panel sin cambios.

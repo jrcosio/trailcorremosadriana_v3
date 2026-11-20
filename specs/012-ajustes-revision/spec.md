@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -88,6 +88,50 @@ limpio y con un dominio con «ñ» de prueba (`.localhost`, certificado de Caddy
    indica la dirección (`https://<dominio>/admin`), cómo crear la cuenta y cómo recuperar el
    acceso.
 
+---
+
+### User Story 3 - Logotipo nuevo en la cabecera (Priority: P1)
+
+Decisión P7 del propietario: «en `datos_iniciales/new_logo.png` tienes el nuevo logo, para
+sustituir el logo de la parte superior izquierda y el texto que está en dos filas, ya que el logo
+es lo mismo y que se vea bien».
+
+En la cabecera de la web pública, el logotipo nuevo sustituye al conjunto actual: la silueta de
+Adriana más el texto en dos filas «TRAIL PEÑASAGRA / CORREMOS POR ADRIANA». El logotipo nuevo ya
+reúne las montañas de Peñasagra, el nombre, el lema y la silueta. Se ve nítido en cualquier
+pantalla y sigue llevando a la portada. El resto de la cabecera no se mueve: navegación, botón
+«INSCRIPCIONES» y botón de menú.
+
+**Why this priority**: es la imagen de la carrera en todas las páginas y es una instrucción
+directa del propietario.
+
+**Independent Test**: abrir la web a 320, 360, 768, 1024 y 1440 px y en los anchos de cambio de
+diseño. Comprobar:
+
+- que el logotipo nuevo aparece completo y nítido en la cabecera, en lugar de la silueta y el texto;
+- que lleva a la portada;
+- que el resto de la cabecera ocupa el mismo sitio que antes;
+- que no hay desbordamientos.
+
+**Acceptance Scenarios**:
+
+1. **Given** cualquier página pública, **When** se muestra a cualquier ancho entre 320 y 1440 px,
+   **Then**:
+   - la cabecera muestra el logotipo nuevo completo, sin recortes ni deformación;
+   - ya no aparecen la silueta ni el texto en dos filas.
+2. **Given** la cabecera, **When** se compara con la versión anterior, **Then**:
+   - la altura de la cabecera es la misma;
+   - la navegación, el botón «INSCRIPCIONES» y el botón de menú están en el mismo sitio;
+   - el logotipo no ocupa más ancho que la marca anterior.
+3. **Given** una pantalla de alta densidad (retina), **When** se muestra el logotipo, **Then** se
+   ve nítido, sin pixelado.
+4. **Given** un lector de pantalla o la navegación por teclado, **When** llega al logotipo,
+   **Then** lo anuncia como enlace a la portada de Trail Peñasagra, y la revisión automática de
+   accesibilidad AA da 0 incumplimientos.
+5. **Given** el pie de página y la barra lateral del panel (fondo verde oscuro), **When** se
+   muestran, **Then** conservan su marca actual en blanco, porque el logotipo nuevo tiene el texto
+   oscuro y no se leería sobre ese fondo.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -96,6 +140,10 @@ limpio y con un dominio con «ñ» de prueba (`.localhost`, certificado de Caddy
 - **Contenido sin foto propia**: la imagen de reserva (paisaje de la sierra) también se ve completa.
 - **Foto que no carga**: el marco muestra el color de fondo de la paleta, sin errores.
 - **Visor de fotos y vista previa de subida**: ya muestran la foto completa y no cambian.
+- **Logotipo que no carga**: el enlace a la portada sigue funcionando y conserva su nombre
+  accesible; la cabecera no cambia de altura.
+- **Pantallas muy estrechas (320 px)**: el logotipo se reduce lo necesario para que el botón
+  «INSCRIPCIONES» y el de menú quepan sin desbordar.
 
 ## Requirements *(mandatory)*
 
@@ -121,6 +169,16 @@ limpio y con un dominio con «ñ» de prueba (`.localhost`, certificado de Caddy
   - la migración desde la web anterior en la misma MV (parada, arranque, datos y comprobaciones);
   - la vuelta atrás;
   - el acceso al panel: dirección, creación de la cuenta y recuperación.
+- **FR-009**: La cabecera pública MUST mostrar el logotipo nuevo aportado por el propietario en
+  lugar de la silueta y del texto en dos filas. El logotipo MUST verse completo, con su
+  proporción original y sin recortes.
+- **FR-010**: El logotipo MUST caber en la cabecera sin cambiar su altura, sin superar el ancho de
+  la marca anterior y sin mover la navegación, el botón «INSCRIPCIONES» ni el botón de menú, en
+  todos los anchos entre 320 y 1440 px.
+- **FR-011**: El logotipo MUST servirse con resolución suficiente para pantallas de alta densidad
+  y en un formato ligero, sin enviar el original de 393 KB.
+- **FR-012**: El logotipo MUST seguir siendo un enlace a la portada con nombre accesible. El pie
+  de página, la barra lateral del panel y el icono del navegador MUST NOT cambiar.
 
 ## Success Criteria *(mandatory)*
 
@@ -139,6 +197,14 @@ limpio y con un dominio con «ñ» de prueba (`.localhost`, certificado de Caddy
   - HSTS;
   - el acceso al panel;
   - un guardado.
+- **SC-006**: El logotipo nuevo se ve completo en el 100 % de las páginas públicas a 320, 360,
+  768, 1024 y 1440 px y en los anchos de cambio de diseño. En ninguno queda rastro de la silueta
+  ni del texto en dos filas.
+- **SC-007**: La altura de la cabecera y la posición de la navegación, del botón «INSCRIPCIONES» y
+  del botón de menú no cambian respecto a la versión anterior (diferencia de 0 px). Hay 0
+  desbordamientos horizontales y 0 incumplimientos de accesibilidad AA.
+- **SC-008**: Ninguna variante del logotipo pesa más de 50 KB. La que se descarga mide al menos el
+  doble del tamaño en pantalla en las de alta densidad.
 
 ## Assumptions
 
@@ -148,3 +214,12 @@ limpio y con un dominio con «ñ» de prueba (`.localhost`, certificado de Caddy
 - **Relleno**: el verde oscuro de la paleta (`--forest`) ya se usa en tarjetas y cabeceras.
 - **Ampliable**: esta feature irá incorporando como historias nuevas los demás ajustes que pida el
   propietario tras su revisión.
+- **Alcance del logotipo nuevo (US3)**: el propietario habla de la parte superior izquierda, es
+  decir, la cabecera pública. El pie de página y la barra lateral del panel tienen fondo verde
+  oscuro y usan la marca en blanco. El logotipo nuevo, con el texto oscuro, no se leería allí, así
+  que conservan la marca actual. El icono del navegador también se mantiene: un logotipo
+  apaisado no se distingue a 16 px. Si el propietario quiere también una versión clara del
+  logotipo para esos fondos, se añadirá como historia.
+- **Tamaño del logotipo**: lo limita la altura de la cabecera, que no cambia. El nombre
+  «TRAIL PEÑASAGRA» dentro del logotipo queda aproximadamente del mismo tamaño que el texto
+  anterior.

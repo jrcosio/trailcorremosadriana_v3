@@ -49,8 +49,9 @@ lanzamiento hay que confirmar las autorizaciones de publicación e imagen
 | Archivo | Origen | Uso |
 |---|---|---|
 | `reused/fondos/fondo.webp` | PROD `assets/fondos/fondo.webp` | Fondo de la portada, del acceso y de reserva |
-| `reused/logos/logo1.webp` | PROD `assets/logos/logo1.webp` | Marca y favicon |
+| `reused/logos/logo1.webp` | PROD `assets/logos/logo1.webp` | Marca blanca del pie y del panel; favicon |
 | `reused/logos/nombre_desktop.webp`, `nombre_mobile.webp` | PROD `assets/logos/` | Reserva (sin uso actual) |
+| `reused/logos/logo_cabecera-{480,720}.webp` | Aportado por el propietario el 2026-11-21 (`datos_iniciales/new_logo.png`, 2172 × 724, 393 KB; feature 012, decisión P7) | Logotipo de la cabecera pública. Recortado a su contenido transparente, redimensionado con Lanczos a 480 y 720 px de ancho y convertido a WebP con calidad 90 y alfa sin pérdidas (Pillow) |
 | `reused/logos/corremos_por_adriana.webp` | PROD `assets/logos/` | Imagen para compartir (OG) |
 | `reused/img/{trail,speed_trail,familiar_trail}_inscripciones.webp` | PROD `assets/img/` | Fotos reales de las carreras |
 | `reused/img/dorsal_solidario.webp` | PROD `assets/img/` | Foto real de la causa |
