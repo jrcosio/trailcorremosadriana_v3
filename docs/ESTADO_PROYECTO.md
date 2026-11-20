@@ -4,32 +4,30 @@
 
 ## Punto de continuidad
 
-- **Estado**: **las 11 features del ROADMAP están terminadas**, verificadas y fusionadas en
-  `main` en local. No se ha hecho push, ni despliegue, ni cambios de dominio o de producción.
-- **Última feature**: 011-cierre (404 reales y metadatos, accesibilidad AA y móvil, copia y
-  restauración, ensayo de despliegue, CSP, `/pantallas` retirada en producción, fuentes WOFF2 y
-  limpieza). Detalle en `specs/011-cierre/` y en las pruebas de abajo.
-- **Siguiente acción**: ninguna de desarrollo pendiente. Lo que queda depende del propietario:
-  1. **Publicar el repositorio**: autorizar el `git push` de `main` (y de las ramas de feature,
-     si se quieren conservar). No se ha hecho, según las instrucciones.
-  2. **Desplegar**: servidor, DNS del dominio, bucket y token de R2, y `.env` de producción con
-     sus secretos, siguiendo `docs/operacion.md`. Para estrenar con los datos revisados se puede
-     restaurar una copia del entorno local (sección 7).
-  3. **Datos de lanzamiento** (ver «Bloqueos»): se introducen desde el panel; no requieren
-     desarrollo.
-- **Si se retoma el desarrollo**: cualquier cambio nuevo es una feature 012 con el mismo ciclo
-  SDD. Antes de empezar, leer este archivo, `docs/ROADMAP.md` y
-  `.specify/memory/constitution.md`.
-- **Entorno local**: esquema `0010_reglamento_contacto` (la 011 no añade migraciones), con los
-  datos importados, las clasificaciones reales de 2026, la cuenta local `admin` y
-  `PANTALLAS=no`. Para revisar `/pantallas`: `PANTALLAS=si docker compose up -d web`.
+- **Estado**: features 001–011 terminadas y fusionadas en `main` en local (sin push).
+- **Feature activa**: 012-ajustes-revision (rama `012-ajustes-revision`). Recoge los ajustes que
+  pide el propietario tras revisar la web.
+  - Primero, **P6: las fotos se ven siempre completas**. Capturas del propietario en
+    `datos_iniciales/` (ignorada por Git): la foto de Adriana sale con la cabeza cortada en la
+    portada y en `/solidaridad`.
+- **Diagnóstico**: 8 marcos públicos y 2 miniaturas del panel recortan con `object-fit: cover`.
+  Las fotos verticales (0,72) pierden hasta un 55 % y las de las noticias hasta un 25 %.
+- **Solución prevista**:
+  - Cada marco conserva su tamaño (el diseño no se mueve).
+  - La foto se muestra completa (`contain`) y las franjas sobrantes se rellenan con la misma foto
+    muy oscurecida en el verde de la paleta (variable `--foto`).
+  - Los fondos decorativos (paisaje de la portada, banner de la galería y marcador del mapa)
+    quedan fuera, salvo indicación del propietario.
+- **Fase SDD**: especificación.
+- **Pendiente del propietario** (sin cambios): push, despliegue y datos de lanzamiento (ver
+  «Bloqueos»).
 
 ## Features
 
 | Estado | Features |
 |---|---|
 | Terminadas | 0 y 001–011 (todas) |
-| Activa | — |
+| Activa | 012-ajustes-revision |
 | Pendientes | — (solo acciones del propietario; ver el punto de continuidad) |
 
 ## Decisiones tomadas
