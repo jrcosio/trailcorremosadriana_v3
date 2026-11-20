@@ -12,10 +12,11 @@ Nada de esta guía se ha ejecutado contra el dominio ni la producción real.
 > panel?** Lo explica la **sección 13**.
 
 > Todos los comandos se ejecutan en la carpeta del repositorio. En producción, añade siempre
-> `-f compose.yaml -f compose.produccion.yaml` (en esta guía, `$DC`).
+> `-f compose.yaml -f compose.produccion.yaml`. En esta guía se hace con la función `dc`, que
+> funciona igual en bash y en zsh (una variable `dc` con espacios no funciona en zsh):
 
 ```bash
-DC="docker compose -f compose.yaml -f compose.produccion.yaml"
+dc() { docker compose -f compose.yaml -f compose.produccion.yaml "$@"; }
 ```
 
 ## 1. Requisitos
@@ -44,7 +45,7 @@ DC="docker compose -f compose.yaml -f compose.produccion.yaml"
    `compose.produccion.yaml` fija `ENTORNO=produccion`, `COOKIE_SECURE=true` y `PANTALLAS=no`,
    y publica los puertos 80 y 443. Si falta una variable obligatoria, Compose se detiene con un
    error que la nombra. `.env` **nunca** se versiona ni se copia fuera del servidor.
-3. **Comprobar la configuración** sin arrancar nada: `$DC config > /dev/null`.
+3. **Comprobar la configuración** sin arrancar nada: `dc config > /dev/null`.
 4. **Varias instalaciones en el mismo servidor** (por ejemplo, un ensayo): define en `.env` un
    `COMPOSE_PROJECT_NAME` distinto en cada una. Así cada instalación tiene sus propios
    contenedores y volúmenes, y los scripts de copia actúan sobre la suya. Compruébalo con
@@ -82,16 +83,16 @@ DC="docker compose -f compose.yaml -f compose.produccion.yaml"
 ## 5. Primera puesta en marcha (base nueva)
 
 ```bash
-$DC build
-$DC up -d db
-$DC run --rm api alembic upgrade head                  # esquema (paso explícito)
-$DC run --rm api python -m app.cli importar-inicial    # datos aprobados (solo partes vacías)
-$DC run --rm api python -m app.cli crear-admin <usuario>   # pide la contraseña (12–128)
-$DC up -d
+dc build
+dc up -d db
+dc run --rm api alembic upgrade head                  # esquema (paso explícito)
+dc run --rm api python -m app.cli importar-inicial    # datos aprobados (solo partes vacías)
+dc run --rm api python -m app.cli crear-admin <usuario>   # pide la contraseña (12–128)
+dc up -d
 ```
 
 - Para cargar clasificaciones desde un CSV:
-  `$DC run --rm -T api python -m app.cli importar-clasificacion --carrera trail-27k --edicion 2026 --titulo "…" --archivo original.csv --publicar < original.csv`.
+  `dc run --rm -T api python -m app.cli importar-clasificacion --carrera trail-27k --edicion 2026 --titulo "…" --archivo original.csv --publicar < original.csv`.
 - **Alternativa**: si se parte de una copia existente (por ejemplo, la del entorno de revisión con
   las clasificaciones de 2026 ya importadas), sigue la sección 7 en lugar de `importar-inicial`.
 
@@ -109,7 +110,7 @@ $DC up -d
 | `curl -s https://<dominio>/noticias/<id>` | Título y `og:*` propios en el HTML |
 | `/admin` | Acceso con la cuenta creada; cookie `penasagra_admin` con `Secure` y `HttpOnly` |
 | Subir una imagen desde el panel | Se ve en la web (`/media/…`) |
-| `$DC run --rm api alembic current` | Revisión en la cabeza (`head`) |
+| `dc run --rm api alembic current` | Revisión en la cabeza (`head`) |
 
 ## 7. Copias de seguridad y restauración
 
@@ -126,10 +127,10 @@ infra/scripts/backup.sh /ruta/copias      # trail-AAAAMMDD-HHMMSS.dump [+ media-
 **Restauración** (sustituye la base actual; pide escribir `RESTAURAR`):
 
 ```bash
-$DC up -d db api                       # la API debe estar en marcha para restaurar archivos
+dc up -d db api                       # la API debe estar en marcha para restaurar archivos
 infra/scripts/restore.sh /ruta/trail-….dump [/ruta/media-….tgz]
-$DC run --rm api alembic upgrade head  # por si la copia es de una versión anterior
-$DC up -d
+dc run --rm api alembic upgrade head  # por si la copia es de una versión anterior
+dc up -d
 ```
 
 - La restauración funciona igual sobre una base nueva (servidor nuevo) que sobre una existente.
@@ -145,25 +146,25 @@ $DC up -d
 3. Construye y migra:
 
    ```bash
-   $DC build
-   $DC run --rm api alembic upgrade head
-   $DC up -d
+   dc build
+   dc run --rm api alembic upgrade head
+   dc up -d
    ```
 
 4. Repite las comprobaciones de la sección 6.
 
-**Volver atrás**: código anterior (`git checkout <versión>`), `$DC build` y restauración de la
+**Volver atrás**: código anterior (`git checkout <versión>`), `dc build` y restauración de la
 copia del paso 1.
 
 ## 9. Recuperar el acceso al panel
 
 | Situación | Comando |
 |---|---|
-| Contraseña olvidada | `$DC run --rm api python -m app.cli restablecer-password <usuario>` (revoca sus sesiones) |
-| Sospecha de sesión robada | `$DC run --rm api python -m app.cli revocar-sesiones <usuario>` |
-| Cuenta desactivada | `$DC run --rm api python -m app.cli activar <usuario>` |
-| Ver las cuentas | `$DC run --rm api python -m app.cli listar-admins` |
-| Nueva cuenta | `$DC run --rm api python -m app.cli crear-admin <usuario>` |
+| Contraseña olvidada | `dc run --rm api python -m app.cli restablecer-password <usuario>` (revoca sus sesiones) |
+| Sospecha de sesión robada | `dc run --rm api python -m app.cli revocar-sesiones <usuario>` |
+| Cuenta desactivada | `dc run --rm api python -m app.cli activar <usuario>` |
+| Ver las cuentas | `dc run --rm api python -m app.cli listar-admins` |
+| Nueva cuenta | `dc run --rm api python -m app.cli crear-admin <usuario>` |
 
 Tras 8 intentos fallidos en 15 minutos desde la misma IP, el acceso se bloquea hasta que pasa la
 ventana (`LOGIN_MAX_INTENTOS` y `LOGIN_VENTANA_MINUTOS`). No hay recuperación por correo: la web no
@@ -171,10 +172,10 @@ envía correo (constitución VI).
 
 ## 10. Mantenimiento
 
-- **Archivos subidos sin uso**: `$DC run --rm api python -m app.cli limpiar-archivos` lista los
+- **Archivos subidos sin uso**: `dc run --rm api python -m app.cli limpiar-archivos` lista los
   archivos sin referencias con más de 24 horas. Con `--borrar` los elimina después de escribir
   `BORRAR`. Haz antes una copia.
-- **Registros**: `$DC logs --since 24h api web`.
+- **Registros**: `dc logs --since 24h api web`.
 - **Vistas de revisión `/pantallas`**: desactivadas en producción. Para revisarlas en local,
   `PANTALLAS=si` (lo hace `compose.dev.yaml`).
 
@@ -221,24 +222,24 @@ dure solo lo que tarda Caddy en pedir los certificados (segundos).
    #   PUBLIC_ORIGIN=https://xn--trailpeasagra-okb.com
    #   SITE_ADDRESS=xn--trailpeasagra-okb.com
    #   ALMACENAMIENTO=local    (o s3 con los datos de R2, sección 4)
-   DC="docker compose -f compose.yaml -f compose.produccion.yaml"
-   $DC config > /dev/null && $DC build
+   dc() { docker compose -f compose.yaml -f compose.produccion.yaml "$@"; }
+   dc config > /dev/null && dc build
    ```
 
 2. **Base de datos y datos** (la web aún no está publicada; solo arrancan `db` y `api`):
 
    ```bash
-   $DC up -d db
-   $DC run --rm api alembic upgrade head
-   $DC run --rm api python -m app.cli importar-inicial
+   dc up -d db
+   dc run --rm api alembic upgrade head
+   dc run --rm api python -m app.cli importar-inicial
    V2=/ruta/a/trailcorremosadriana_v2/datos/2026     # los CSV ya están en la MV, en la carpeta de la v2
-   $DC run --rm -T api python -m app.cli importar-clasificacion --carrera trail-27k --edicion 2026 \
+   dc run --rm -T api python -m app.cli importar-clasificacion --carrera trail-27k --edicion 2026 \
      --titulo "Clasificación Trail Peñasagra 2026" --archivo Clasificacion_27km.csv --publicar < $V2/Clasificacion_27km.csv
-   $DC run --rm -T api python -m app.cli importar-clasificacion --carrera speed-14k --edicion 2026 \
+   dc run --rm -T api python -m app.cli importar-clasificacion --carrera speed-14k --edicion 2026 \
      --titulo "Clasificación Speed Trail 2026" --archivo Clasificacion_14km.csv --publicar < $V2/Clasificacion_14km.csv
-   $DC run --rm -T api python -m app.cli importar-clasificacion --carrera familiar-7k --edicion 2026 \
+   dc run --rm -T api python -m app.cli importar-clasificacion --carrera familiar-7k --edicion 2026 \
      --titulo "Clasificación Familiar Peñasagra 2026" --archivo Clasificacion_marcha.csv --publicar < $V2/Clasificacion_marcha.csv
-   $DC run --rm api python -m app.cli crear-admin <tu-usuario>   # pide la contraseña dos veces
+   dc run --rm api python -m app.cli crear-admin <tu-usuario>   # pide la contraseña dos veces
    ```
 
    Resultado esperado: 63, 205 y 224 participantes. Es una instalación limpia, sin los datos de
@@ -248,8 +249,8 @@ dure solo lo que tarda Caddy en pedir los certificados (segundos).
 
    ```bash
    cd /ruta/a/trailcorremosadriana_v2 && docker compose down    # SIN -v: conserva la v2 para volver
-   cd /srv/trail-v3 && $DC up -d
-   $DC logs -f web    # espera a «certificate obtained successfully» para el dominio y para www
+   cd /srv/trail-v3 && dc up -d
+   dc logs -f web    # espera a «certificate obtained successfully» para el dominio y para www
    ```
 
 4. **Comprobaciones**: las de la sección 6 y el acceso al panel (sección 13).
@@ -257,7 +258,7 @@ dure solo lo que tarda Caddy en pedir los certificados (segundos).
 5. **Vuelta atrás** si algo falla (los datos de la v3 se conservan en sus volúmenes):
 
    ```bash
-   cd /srv/trail-v3 && $DC down
+   cd /srv/trail-v3 && dc down
    cd /ruta/a/trailcorremosadriana_v2 && docker compose up -d
    ```
 
@@ -269,7 +270,7 @@ dure solo lo que tarda Caddy en pedir los certificados (segundos).
 - **Dirección**: `https://<dominio>/admin`; con el dominio actual,
   `https://trailpeñasagra.com/admin`. No hay enlace desde la web pública.
 - **Cuenta**: no hay usuario ni contraseña por defecto. La cuenta se crea en la MV con
-  `$DC run --rm api python -m app.cli crear-admin <usuario>` (sección 12, paso 2). La contraseña
+  `dc run --rm api python -m app.cli crear-admin <usuario>` (sección 12, paso 2). La contraseña
   se pide oculta, dos veces, y debe tener entre 12 y 128 caracteres y ser distinta del usuario.
   Para crear más cuentas, repite el comando con otro usuario.
 - **Sesión**: dura 8 horas (`SESSION_HOURS`) y se cierra con «Cerrar sesión». La cookie es
