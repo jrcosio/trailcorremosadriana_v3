@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info: { title: Trail Peñasagra API — reglamento y contacto (feature 010), version: 0.10.0 }
+paths:
+  /api/admin/reglamento:
+    put:
+      description: Reglamento de la edición actual. Protección Origin → sesión → CSRF.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [regulation, version]
+              properties:
+                regulation: { type: string, minLength: 1, maxLength: 200000 }
+                version: { type: integer, minimum: 0, description: versión de la edición actual }
+      responses:
+        "200": { description: "{regulation, version}" }
+        "400": { description: "«Revisa el campo «reglamento».»" }
+        "404": { description: No hay una edición actual configurada. }
+        "409": { description: Conflicto }
+  /api/admin/contacto:
+    put:
+      description: Configuración de contacto (fila única). Versión 0 crea la fila.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, phone, instagram, version]
+              properties:
+                email: { type: string, maxLength: 254 }
+                phone: { type: string, maxLength: 30 }
+                instagram: { type: string, description: "https://(www.)instagram.com/…" }
+                version: { type: integer, minimum: 0 }
+      responses:
+        "200": { description: "{email, phone, instagram, version}" }
+        "400": { description: "«Revisa el campo «correo de la organización»|«teléfono de contacto»|«Instagram».»" }
+        "409": { description: Conflicto }
+  /api/content:
+    put:
+      description: Retirado (DISCREPANCIAS M1). Responde 405.
+      responses: { "405": { description: Método no permitido } }
