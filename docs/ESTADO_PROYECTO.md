@@ -4,43 +4,38 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 010-reglamento-contacto (merge local en `main`)
-- **Siguiente feature**: 011-cierre (última)
-- **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Siguiente acción concreta**: `git switch -c 011-cierre main` y `/speckit-specify` con historias
-  separadas y priorizadas (feature amplia: evitar una spec gigante).
-  1. **404 reales y metadatos de detalle** (U4, U5):
-     - estado HTTP 404 para rutas inexistentes y para detalles que no existen (noticia, álbum,
-       carrera, clasificación);
-     - título y descripción por detalle;
-     - mensajes de error en español también para 404/405 genéricos de la API (hoy «Not Found» y
-       «Method Not Allowed»).
-  2. **Accesibilidad y móvil**:
-     - revisión automática y manual (landmarks, foco, contraste, formularios);
-     - cabecera a 320/340 px (hoy desborda a 357 px).
-  3. **Rendimiento**:
-     - fuentes `.woff2` que en realidad son TTF (C4);
-     - peso de imágenes y caché.
-  4. **Seguridad de cabeceras**: CSP completa compatible con el iframe de Wikiloc.
-  5. **Operación**:
-     - copia y restauración probadas de extremo a extremo (`infra/scripts/backup.sh` y
-       `restore.sh`);
-     - documentación de operación;
-     - preparación de un despliegue independiente con R2, secretos y dominio, sin desplegar.
-  6. **Limpieza**:
-     - decisión sobre `/pantallas` (U6);
-     - archivos sin uso;
-     - aviso de `httpx` en pytest;
-     - borrado físico de archivos huérfanos (decisión de la 003).
+- **Feature activa**: 011-cierre (la última). Rama `011-cierre`; `.specify/feature.json` →
+  `specs/011-cierre`.
+- **Fase SDD**: `/speckit-implement`. Ya hechos: spec (16/16), plan, tareas (21) y `analyze`
+  (0 críticos/HIGH; 1 MEDIUM y 2 LOW corregidos). Commit `89dbd96`.
+- **Tareas hechas**:
+  - T001: capturas de referencia en `frontend/capturas/antes-011`; fuentes 743.164 bytes.
+  - T002–T006 (US1): `GET /api/meta` (siempre 200, marcador o `no-encontrada`); errores 404/405
+    de la API en español; el build genera `plantilla.html` (plantilla de Caddy con `httpInclude`)
+    y `404.html`; el Caddyfile pasa por la plantilla las rutas sin HTML estático y en
+    `handle_errors` sirve `404.html` (404) y `app.html` (200 si la API está caída).
+    `verificar-rutas.mjs` espera 404 en las rutas inexistentes.
+  - T007: `frontend/scripts/verificar-accesibilidad.mjs` (axe y desbordamiento a 6 anchos).
+- **Siguiente acción concreta**:
+  1. T008: en `frontend/src/styles/ajustes.css`, aplicar P4 (`.button` principal `#b64b24`,
+     hover `#9a3d1c`; `.donation-eyebrow` y `.donation-copy>p` en blanco; `.footer-bottom a`
+     subrayado) y corregir la cabecera a 320/340 px. El `.menu-toggle` termina en 357 px:
+     falta reducir el ancho del logotipo o del botón de inscripción por debajo de 360 px.
+  2. Repetir `verificar-accesibilidad.mjs` hasta 0 incumplimientos.
+  3. T009: comparar capturas con `capturas/antes-011`.
+  4. Seguir con US3 (T010–T013).
+- **Sin commitear todavía** (en la rama): backend `meta`, plugin, Caddyfile, scripts y pruebas
+  de US1–US2.
 - **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
-  local `admin`.
+  local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
+  llega en T014).
 
 ## Features
 
 | Estado | Features |
 |---|---|
 | Terminadas | 0, 001–009, 010 (reglamento y contacto) |
-| Activa | — |
+| Activa | 011-cierre (implementación; ver el progreso en [ROADMAP.md](ROADMAP.md)) |
 | Pendientes | 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
