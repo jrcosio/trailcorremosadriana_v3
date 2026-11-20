@@ -1,0 +1,24 @@
+openapi: 3.1.0
+info: { title: Trail Peñasagra API — galería (feature 008), version: 0.8.0 }
+paths:
+  /api/admin/albumes/{id}:
+    put:
+      summary: Crear o actualizar un álbum y sustituir su lista de fotos (protección de la 002; 409)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, year, image]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 150 }
+                year: { type: string, pattern: "^20\\d\\d$" }
+                image: { type: string }
+                url: { type: string, description: "'' o https sin credenciales" }
+                photos: { type: array, maxItems: 500, items: { type: string } }
+                published: { type: boolean }
+                version: { type: integer, minimum: 0 }
+      responses: { "200": { description: Item privado }, "400": { description: Campo no válido }, "409": { description: Conflicto } }
+    delete:
+      parameters: [{ name: version, in: query, required: true, schema: { type: integer } }]
+      responses: { "200": { description: Borrado (los archivos se conservan) }, "404": { description: No existe }, "409": { description: Conflicto } }
