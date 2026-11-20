@@ -87,13 +87,13 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 **Independent Test**: `limpiar-archivos` en modo listado y borrado; pytest sin avisos.
 
-- [ ] T017 [P] [US6] Escribir `backend/tests/test_limpieza.py`:
+- [X] T017 [P] [US6] Escribir `backend/tests/test_limpieza.py`:
   - huérfano antiguo listado y no borrado sin `--borrar`;
   - borrado solo con «BORRAR» (fila y objeto);
   - referenciado (también desde un borrador) y reciente intactos;
   - otra respuesta → código 1 sin cambios.
-- [ ] T018 [US6] Implementar en `backend/app/services/archivos.py` y `backend/app/cli.py` el comando `limpiar-archivos` con data-model.md `ArchivoHuerfano` (`Archivo.clave` sin referencias y `Archivo.creado_en` anterior al umbral)
-- [ ] T019 [US6] Eliminar el código sin uso (`frontend/src/components/Site.tsx`, `frontend/src/components/admin/Admin.tsx`, `backend/app/api/media.py`) y pasar a `httpx2==2.16.0` en `backend/pyproject.toml` (y `uv.lock`). Comprobar `tsc --noUnusedLocals`, vulture y pytest sin avisos
+- [X] T018 [US6] Implementar en `backend/app/services/archivos.py` y `backend/app/cli.py` el comando `limpiar-archivos` con data-model.md `ArchivoHuerfano` (`Archivo.clave` sin referencias y `Archivo.creado_en` anterior al umbral)
+- [X] T019 [US6] Eliminar el código sin uso (`frontend/src/components/Site.tsx`, `frontend/src/components/admin/Admin.tsx`, `backend/app/api/media.py`) y pasar a `httpx2==2.16.0` en `backend/pyproject.toml` (y `uv.lock`). Comprobar `tsc --noUnusedLocals`, vulture y pytest sin avisos
 
 ## Phase 8: Polish
 

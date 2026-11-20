@@ -20,7 +20,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.2,<9.3",
-    "httpx>=0.28,<0.29",
+    # Cliente de pruebas de Starlette (sustituye a httpx, obsoleto para TestClient).
+    "httpx2==2.16.0",
     "ruff>=0.17,<0.18",
 ]
 

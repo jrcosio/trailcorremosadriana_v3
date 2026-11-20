@@ -39,10 +39,20 @@
   - T016 (US5): fuentes en WOFF2 real (fontTools 4.55.0), 743.164 → 250.840 bytes (−66 %),
     `format('woff2')`; 44 capturas idénticas píxel a píxel (una diferencia de carga diferida de
     logotipos y otra de remuestreo de una imagen, descartadas al repetir la captura).
-- **Siguiente acción concreta**: US6.
-  1. T017: `backend/tests/test_limpieza.py`.
-  2. T018: `limpiar-archivos` en `services/archivos.py` y `cli.py`.
-  3. T019: código sin uso y `httpx2==2.16.0`.
+  - T017–T019 (US6):
+    - `limpiar-archivos [--horas N] [--borrar]` (`services/archivos.py`, `cli.py`) busca claves
+      `/media/` en todas las tablas; borra primero la fila y después el objeto; `borrar` está en
+      los almacenamientos local y S3;
+    - eliminados los iconos, tipos y variables sin uso (`tsc --noUnusedLocals` limpio; `resto` de
+      `media.py` es un parámetro de ruta necesario);
+    - `httpx2==2.16.0`; `test_sesion` retira la cookie antes de sustituirla;
+    - **379 pytest sin avisos**.
+- **Siguiente acción concreta**:
+  1. T020: regresión completa (ruff, pytest, vitest, typecheck, build y todos los
+     `verificar-*.mjs`, con `PANTALLAS=si` donde haga falta, más el respaldo con la API
+     detenida).
+  2. T021: documentación (`arquitectura`, `desarrollo`, DISCREPANCIAS U4/U5/U6/C4).
+  3. `/speckit-converge`, commit y merge a `main`.
 - **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
   local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
   llega en T014).

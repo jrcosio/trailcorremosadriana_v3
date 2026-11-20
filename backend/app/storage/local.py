@@ -33,6 +33,12 @@ class AlmacenamientoLocal:
         except OSError as exc:
             raise AlmacenamientoNoDisponible from exc
 
+    def borrar(self, clave: str) -> None:
+        try:
+            self._ruta(clave).unlink(missing_ok=True)
+        except OSError as exc:
+            raise AlmacenamientoNoDisponible from exc
+
     def leer(self, clave: str) -> bytes | None:
         try:
             return self._ruta(clave).read_bytes()

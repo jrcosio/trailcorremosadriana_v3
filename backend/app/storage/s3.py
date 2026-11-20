@@ -45,6 +45,13 @@ class AlmacenamientoS3:
         except (BotoCoreError, ClientError) as exc:
             raise AlmacenamientoNoDisponible from exc
 
+    def borrar(self, clave: str) -> None:
+        try:
+            self._asegurar_bucket()
+            self.cliente.delete_object(Bucket=self.bucket, Key=clave)
+        except (BotoCoreError, ClientError) as exc:
+            raise AlmacenamientoNoDisponible from exc
+
     def leer(self, clave: str) -> bytes | None:
         try:
             self._asegurar_bucket()

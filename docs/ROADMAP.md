@@ -30,8 +30,8 @@ Especificación, plan y tareas: `specs/011-cierre/` (21 tareas). Decisiones del 
 | US3 (P1) | Copia y restauración verificadas, ensayo de despliegue independiente, `docs/operacion.md` | ✅ T010–T013: `verificar-copia.sh` (16 tablas y 42 archivos idénticos); `compose.produccion.yaml` y `SITE_ADDRESS`; ensayo en `trail-ensayo` desde un clon limpio, correcto y retirado |
 | US4 (P2) | CSP y `/pantallas` retirada en producción | ✅ T014–T015: CSP por defecto (0 violaciones en 16 páginas y 7 del panel con subida; `/media` conserva la suya); `/pantallas` 404 con `PANTALLAS=no` y el SPA muestra «no encontrada» |
 | US5 (P2) | Fuentes en WOFF2 real (−40 %) | ✅ T016: WOFF2 real, 743 KB → 251 KB (−66 %), `font/woff2`; capturas idénticas píxel a píxel |
-| US6 (P3) | Limpieza de archivos huérfanos, código sin uso, `httpx2` | 🔄 siguiente: T017–T019 |
-| Cierre | Regresión completa, documentación, convergencia, merge | ⏳ T020–T021 |
+| US6 (P3) | Limpieza de archivos huérfanos, código sin uso, `httpx2` | ✅ T017–T019: `limpiar-archivos` (lista; borra solo con «BORRAR»; respeta referencias y antigüedad; local y S3); sin código muerto; `httpx2`; 379 pytest sin avisos |
+| Cierre | Regresión completa, documentación, convergencia, merge | 🔄 siguiente: T020–T021 |
 
 ## Fuera de alcance (salvo nueva instrucción)
 

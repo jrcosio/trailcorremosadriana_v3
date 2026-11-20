@@ -42,6 +42,8 @@ def test_token_inventado_o_manipulado(base_con_admin):
         entrar(c)
         token = c.cookies.get("penasagra_admin")
         for falso in ("inventado", token[:-1] + ("A" if token[-1] != "A" else "B"), "x" * 500):
+            # httpx2: set() sin dominio no sustituye a la cookie del servidor; se retira antes.
+            c.cookies.clear()
             c.cookies.set("penasagra_admin", falso)
             assert c.get("/api/session").json() == {"authenticated": False}
             assert c.get("/api/content", params={"admin": "1"}).status_code == 401
