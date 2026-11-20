@@ -79,7 +79,7 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 **Independent Test**: peso, tipo de archivo y capturas.
 
-- [ ] T016 [US5] Convertir `frontend/public/fonts/*.woff2` a WOFF2 real con fontTools, cambiar a `format('woff2')` en `frontend/public/fonts/{barlow,manrope}.css` y comprobar el peso (≥ 40 % menos), el tipo, la compresión y la caché de `/fonts`. Comparar las capturas posteriores a P4 (T009) con las posteriores a la conversión: 0 diferencias de píxeles (SC-007). Actualizar `docs/PROCEDENCIA_RECURSOS.md`
+- [X] T016 [US5] Convertir `frontend/public/fonts/*.woff2` a WOFF2 real con fontTools, cambiar a `format('woff2')` en `frontend/public/fonts/{barlow,manrope}.css` y comprobar el peso (≥ 40 % menos), el tipo, la compresión y la caché de `/fonts`. Comparar las capturas posteriores a P4 (T009) con las posteriores a la conversión: 0 diferencias de píxeles (SC-007). Actualizar `docs/PROCEDENCIA_RECURSOS.md`
 
 ## Phase 7: User Story 6 — Limpieza (P3)
 

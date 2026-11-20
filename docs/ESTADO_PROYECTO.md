@@ -36,8 +36,13 @@
     - `verificar-cierre` 7/7 y `verificar-admin` (con los dos modos) 2/2;
     - Wikiloc responde 403 (anti-bots) al navegador automatizado: no es una violación de
       nuestra CSP.
-- **Siguiente acción concreta**: US5 (T016). Convertir las fuentes a WOFF2 real con fontTools,
-  pasar a `format('woff2')` y comparar las capturas con `capturas/despues-p4` (0 diferencias).
+  - T016 (US5): fuentes en WOFF2 real (fontTools 4.55.0), 743.164 → 250.840 bytes (−66 %),
+    `format('woff2')`; 44 capturas idénticas píxel a píxel (una diferencia de carga diferida de
+    logotipos y otra de remuestreo de una imagen, descartadas al repetir la captura).
+- **Siguiente acción concreta**: US6.
+  1. T017: `backend/tests/test_limpieza.py`.
+  2. T018: `limpiar-archivos` en `services/archivos.py` y `cli.py`.
+  3. T019: código sin uso y `httpx2==2.16.0`.
 - **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
   local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
   llega en T014).

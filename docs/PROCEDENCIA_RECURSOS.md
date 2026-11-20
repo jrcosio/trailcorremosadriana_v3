@@ -26,6 +26,15 @@ Fuentes (consultadas en `datos_iniciales/`, que no se versiona):
 | `frontend/public/fonts/barlow-{0,1,2}.woff2`, `barlow.css` | Barlow Condensed 600/700/800 | SIL Open Font License 1.1 (`fonts/licencias/Barlow_Condensed_OFL.txt`) |
 | `frontend/public/fonts/manrope-{0..4}.woff2`, `manrope.css` | Manrope 400–800 | SIL Open Font License 1.1 (`fonts/licencias/Manrope_OFL.txt`) |
 
+**Formato (feature 011, DISCREPANCIAS C4).** Los archivos de PROP tenían extensión `.woff2` pero
+contenían TrueType.
+
+- **Conversión**: a WOFF2 real con fontTools 4.55.0 (`fonttools ttLib.woff2 compress`), que no
+  pierde información en los contornos. Se conservan los nombres de archivo y las licencias OFL;
+  un cambio de formato no es una «Modified Version» según la FAQ de la OFL.
+- **Peso**: 743.164 → 250.840 bytes (−66 %).
+- **Aspecto**: capturas idénticas píxel a píxel a 360/768/1024/1440 px.
+
 ## Imágenes
 
 Copiadas desde PROP `public/`. Las de `reused/` son byte a byte idénticas a las de PROD `assets/`

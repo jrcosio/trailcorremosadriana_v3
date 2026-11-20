@@ -3,19 +3,19 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(/fonts/barlow-0.woff2) format('truetype');
+  src: url(/fonts/barlow-0.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Barlow Condensed';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url(/fonts/barlow-1.woff2) format('truetype');
+  src: url(/fonts/barlow-1.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Barlow Condensed';
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url(/fonts/barlow-2.woff2) format('truetype');
+  src: url(/fonts/barlow-2.woff2) format('woff2');
 }
