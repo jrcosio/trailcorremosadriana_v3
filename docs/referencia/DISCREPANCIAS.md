@@ -17,6 +17,7 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | P4 (2026-11-20) | Los botones naranjas (#dc6537, 3,52:1) y dos textos del bloque solidario no cumplen WCAG AA | **Corregir a AA**: botones en el naranja oscuro de la paleta (#b64b24, hover #9a3d1c), textos del bloque solidario en blanco y enlace del pie «JR BLANCO» subrayado. |
 | P5 (2026-11-20) | ¿`/pantallas` (índice de revisión y vistas de diseño) se conserva en el lanzamiento público? (U6) | **Retirar en producción** mediante configuración (404); disponible en desarrollo y revisión local. |
 | P6 (2026-11-20) | Capturas del propietario: la foto de Adriana sale con la cabeza cortada (portada y `/solidaridad`) | **Las fotos se ven siempre completas**: ninguna foto se recorta para rellenar su marco (feature 012). |
+| P7 (2026-11-21) | Logotipo nuevo del propietario (`datos_iniciales/new_logo.png`): «sustituir el logo de la parte superior izquierda y el texto que está en dos filas» | **La cabecera pública muestra el logotipo nuevo** en lugar de la silueta y del texto «TRAIL PEÑASAGRA / CORREMOS POR ADRIANA», sin cambiar su altura ni mover el resto. El pie y el panel, con fondo oscuro, conservan la marca blanca; el título «TRAIL PENASAGRA» de la portada no cambia (feature 012, US3). |
 
 ## Datos de prueba en la exportación (no se importan)
 

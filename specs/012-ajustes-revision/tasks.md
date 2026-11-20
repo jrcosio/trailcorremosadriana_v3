@@ -46,6 +46,21 @@ acceso.
 
   Retirarlo y comprobar que el entorno de desarrollo sigue intacto.
 
+## Phase 3b: User Story 3 — Logotipo nuevo en la cabecera (P1)
+
+**Goal**: el logotipo del propietario sustituye a la silueta y al texto en dos filas de la
+cabecera pública, sin mover nada más y nítido en cualquier pantalla.
+
+**Independent Test**: `verificar-logo.mjs --comparar` a 320–1440 px y en los anchos de cambio de
+diseño; capturas y axe.
+
+- [X] T013 [US3] Crear `frontend/scripts/verificar-logo.mjs` (research R4) y ejecutar `--referencia capturas/cabecera-antes-012.json` antes del cambio
+- [X] T014 [P] [US3] Generar `frontend/public/reused/logos/logo_cabecera-480.webp` y `logo_cabecera-720.webp` desde `datos_iniciales/new_logo.png` (recorte al contenido, Lanczos, WebP con calidad 90), y registrar su procedencia en `docs/PROCEDENCIA_RECURSOS.md`
+- [X] T015 [US3] Sustituir en `frontend/src/components/Site.tsx` la marca de la cabecera por el `<img>` del logotipo (`srcset`/`sizes`, `width`/`height`, `alt`), conservando el enlace y su `aria-label`. El pie conserva `Brand white`
+- [X] T016 [US3] Añadir A-005 a `frontend/src/styles/ajustes.css`: altura del logotipo por tramo (80/70/68/58/49 px), `width: auto` y `filter: none`; el enlace conserva el ancho de la marca anterior en cada tramo (research R4, ajuste de la implementación)
+- [X] T017 [US3] Reconstruir `web` y ejecutar `verificar-logo.mjs --comparar`, `verificar-accesibilidad.mjs` y las capturas en `frontend/capturas/despues-logo-012`. Revisión visual a 320, 360, 768, 1024 y 1440 px
+- [X] T018 [US3] Registrar la decisión P7 en `docs/referencia/DISCREPANCIAS.md` y actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -55,6 +70,7 @@ acceso.
 
 - **Orden**: T001 (referencia antes del cambio) → T002 → T003 → T004 → T005 → T006 → T007.
 - **En paralelo [P]**: T002 junto a T001 (archivos distintos).
+- **US3**: T013 (referencia antes del cambio) → T014 [P] → T015 → T016 → T017 → T018.
 
 ## Implementation Strategy
 
