@@ -17,3 +17,59 @@
     padding: 8px 4px;
   }
 }
+
+/*
+ * A-002 (feature 011, decisión del propietario P4): contraste WCAG AA.
+ * - Botones principales: texto blanco sobre el naranja oscuro de la paleta (#b64b24, 5,2:1),
+ *   y #9a3d1c al pasar por encima. Las variantes secondary y light conservan sus reglas.
+ * - Bloque del Dorsal Solidario: antetítulo, texto y nota bajo el botón en blanco sobre #ba4b2e
+ *   (5,1:1). La nota no aparecía en la muestra inicial de la auditoría; mismo criterio de P4.
+ * - Enlace del pie «JR BLANCO»: subrayado para distinguirlo sin depender del color.
+ */
+.button {
+  background: #b64b24;
+  border-color: #b64b24;
+}
+.button:hover {
+  background: #9a3d1c;
+  border-color: #9a3d1c;
+}
+/* Solo en el bloque naranja; la tarjeta verde de /solidaridad ya cumplía y no cambia. */
+.donation-banner .donation-eyebrow,
+.donation-banner .donation-copy > p,
+.donation-banner .donation-note {
+  color: #fff;
+}
+.footer-bottom a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/*
+ * A-003 (feature 011): a 320 y 340 px la cabecera necesitaba 342 px y desbordaba hasta 357 px.
+ * Solo por debajo de 360 px (fuera de los anchos aprobados): márgenes, logotipo, texto de la
+ * marca y botón de inscripción algo más compactos. «TRAIL PENASAGRA» y los textos no cambian.
+ */
+@media (max-width: 359px) {
+  .header-inner {
+    width: calc(100% - 20px);
+    gap: 4px;
+  }
+  .header .brand {
+    gap: 4px;
+  }
+  .header .brand img {
+    width: 36px;
+    height: 34px;
+  }
+  .header .brand > span {
+    font-size: 1.05rem;
+  }
+  .header .brand small {
+    font-size: 0.35rem;
+  }
+  .nav-cta {
+    font-size: 0.68rem;
+    padding: 8px 7px;
+  }
+}

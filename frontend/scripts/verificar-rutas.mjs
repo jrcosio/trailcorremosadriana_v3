@@ -1,4 +1,5 @@
-// Verifica todas las rutas de FR-001: HTTP 200 y pantalla esperada al abrir y al recargar.
+// Verifica todas las rutas de FR-001: estado HTTP y pantalla esperada al abrir y al recargar.
+// Desde la feature 011 las rutas inexistentes responden 404 real (DISCREPANCIAS U4).
 // Uso: node scripts/verificar-rutas.mjs [url-base]
 import { fallo, navegador, ok } from './comun.mjs';
 
@@ -40,7 +41,8 @@ for (const [ruta, esperado] of RUTAS) {
   const texto1 = await page.evaluate(() => document.body.innerText);
   await page.reload({ waitUntil: 'networkidle' });
   const texto2 = await page.evaluate(() => document.body.innerText);
-  if (estado !== 200) fallo(`${ruta}: HTTP ${estado}`);
+  const estadoEsperado = esperado === 'Este sendero no está en el mapa.' ? 404 : 200;
+  if (estado !== estadoEsperado) fallo(`${ruta}: HTTP ${estado} (esperado ${estadoEsperado})`);
   else if (!texto1.includes(esperado)) fallo(`${ruta}: no aparece «${esperado}» al abrir`);
   else if (!texto2.includes(esperado)) fallo(`${ruta}: no aparece «${esperado}» al recargar`);
   else ok(`${ruta} → «${esperado}»`);

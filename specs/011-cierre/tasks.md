@@ -10,7 +10,7 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 ## Phase 1: Setup
 
-- [ ] T001 Capturar la referencia visual antes de los cambios: `frontend/scripts/capturas.mjs` a 360/768/1024/1440 en `frontend/capturas/antes-011` (carpeta ignorada) y el peso de `frontend/public/fonts/*.woff2`
+- [X] T001 Capturar la referencia visual antes de los cambios: `frontend/scripts/capturas.mjs` a 360/768/1024/1440 en `frontend/capturas/antes-011` (carpeta ignorada) y el peso de `frontend/public/fonts/*.woff2`
 
 ## Phase 2: User Story 1 — 404 reales y metadatos de detalle (P1) 🎯 MVP
 
@@ -18,17 +18,17 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 **Independent Test**: `curl` de rutas inexistentes, borradores y detalles publicados; HTML inicial sin ejecutar JS.
 
-- [ ] T002 [P] [US1] Escribir `backend/tests/test_meta.py` (contrato de `contracts/meta-y-rutas.md`):
+- [X] T002 [P] [US1] Escribir `backend/tests/test_meta.py` (contrato de `contracts/meta-y-rutas.md`):
   - detalle publicado de noticia, álbum, prueba (`/carreras` y `/recorridos`) y `/clasificaciones/2026` con sus etiquetas;
   - escapado de `<`, `&` y comillas;
   - imagen absoluta y de reserva;
   - borrador, inexistente, identificador no válido y más de dos segmentos → `no-encontrada`;
   - año sin clasificaciones publicadas → `no-encontrada`;
   - 404/405 genéricos de la API en español.
-- [ ] T003 [US1] Implementar `backend/app/services/meta.py` con los campos de data-model.md `MetadatosPagina.titulo`, `MetadatosPagina.descripcion`, `MetadatosPagina.imagen`, `MetadatosPagina.canonica` y `MetadatosPagina.tipo`, y `backend/app/api/meta.py` (`GET /api/meta`, siempre 200 en texto). Registrar el router en `backend/app/main.py` y traducir allí los 404/405 genéricos
-- [ ] T004 [US1] Generar `plantilla.html` (plantilla de Caddy según research R1) y `404.html` (noindex) en `frontend/plugins/metadatos-rutas.ts`, con su prueba en `frontend/tests/metadatos.test.ts`
-- [ ] T005 [US1] Cambiar `infra/caddy/Caddyfile`: las rutas sin HTML estático pasan por la plantilla (`templates`); `handle_errors` sirve `404.html` con 404 en rutas que no son de la API y `app.html` con 200 si falla la plantilla
-- [ ] T006 [US1] Crear y ejecutar `frontend/scripts/verificar-cierre.mjs` (sección 404 y metadatos):
+- [X] T003 [US1] Implementar `backend/app/services/meta.py` con los campos de data-model.md `MetadatosPagina.titulo`, `MetadatosPagina.descripcion`, `MetadatosPagina.imagen`, `MetadatosPagina.canonica` y `MetadatosPagina.tipo`, y `backend/app/api/meta.py` (`GET /api/meta`, siempre 200 en texto). Registrar el router en `backend/app/main.py` y traducir allí los 404/405 genéricos
+- [X] T004 [US1] Generar `plantilla.html` (plantilla de Caddy según research R1) y `404.html` (noindex) en `frontend/plugins/metadatos-rutas.ts`, con su prueba en `frontend/tests/metadatos.test.ts`
+- [X] T005 [US1] Cambiar `infra/caddy/Caddyfile`: las rutas sin HTML estático pasan por la plantilla (`templates`); `handle_errors` sirve `404.html` con 404 en rutas que no son de la API y `app.html` con 200 si falla la plantilla
+- [X] T006 [US1] Crear y ejecutar `frontend/scripts/verificar-cierre.mjs` (sección 404 y metadatos):
   - estados y `og:*` en el HTML inicial;
   - el SPA muestra «Este sendero no está en el mapa.» en las 404;
   - API detenida → 200 con los metadatos genéricos;
@@ -40,11 +40,11 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 **Independent Test**: `verificar-accesibilidad.mjs` y comparación de capturas.
 
-- [ ] T007 [P] [US2] Crear `frontend/scripts/verificar-accesibilidad.mjs`:
+- [X] T007 [P] [US2] Crear `frontend/scripts/verificar-accesibilidad.mjs`:
   - axe (`@axe-core/playwright` 4.10.2, WCAG 2.1 A/AA) a 360 y 1440 px en todas las rutas públicas, un detalle de cada tipo, la 404 y el acceso al panel;
   - desbordamiento a 320, 340, 360, 768, 1024 y 1440 px.
-- [ ] T008 [US2] Aplicar P4 en `frontend/src/styles/ajustes.css` (`.button` principal `#b64b24`/`#9a3d1c`, textos del bloque solidario en blanco, enlace del pie subrayado) y corregir la cabecera a 320/340 px. Ejecutar T007 hasta 0 incumplimientos
-- [ ] T009 [US2] Comparar las capturas de T001 con las nuevas y documentar que solo cambian los elementos de P4
+- [X] T008 [US2] Aplicar P4 en `frontend/src/styles/ajustes.css` (`.button` principal `#b64b24`/`#9a3d1c`, textos del bloque solidario en blanco, enlace del pie subrayado) y corregir la cabecera a 320/340 px. Ejecutar T007 hasta 0 incumplimientos
+- [X] T009 [US2] Comparar las capturas de T001 con las nuevas y documentar que solo cambian los elementos de P4
 
 ## Phase 4: User Story 3 — Copias, restauración y despliegue independiente (P1)
 

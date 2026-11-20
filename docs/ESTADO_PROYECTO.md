@@ -16,16 +16,16 @@
     `handle_errors` sirve `404.html` (404) y `app.html` (200 si la API está caída).
     `verificar-rutas.mjs` espera 404 en las rutas inexistentes.
   - T007: `frontend/scripts/verificar-accesibilidad.mjs` (axe y desbordamiento a 6 anchos).
-- **Siguiente acción concreta**:
-  1. T008: en `frontend/src/styles/ajustes.css`, aplicar P4 (`.button` principal `#b64b24`,
-     hover `#9a3d1c`; `.donation-eyebrow` y `.donation-copy>p` en blanco; `.footer-bottom a`
-     subrayado) y corregir la cabecera a 320/340 px. El `.menu-toggle` termina en 357 px:
-     falta reducir el ancho del logotipo o del botón de inscripción por debajo de 360 px.
-  2. Repetir `verificar-accesibilidad.mjs` hasta 0 incumplimientos.
-  3. T009: comparar capturas con `capturas/antes-011`.
-  4. Seguir con US3 (T010–T013).
-- **Sin commitear todavía** (en la rama): backend `meta`, plugin, Caddyfile, scripts y pruebas
-  de US1–US2.
+  - T008–T009 (US2): `ajustes.css` A-002 (P4: botones `#b64b24`/`#9a3d1c`; antetítulo, texto y
+    nota del bloque naranja en blanco, sin tocar la tarjeta verde de `/solidaridad`; pie
+    subrayado) y A-003 (cabecera por debajo de 360 px). axe con 0 incumplimientos y 0
+    desbordamientos. Comparación de capturas en `capturas/despues-p4`: solo los botones
+    naranjas, el bloque de la portada y el subrayado del pie.
+- **Siguiente acción concreta**: US3.
+  1. T010: `infra/scripts/verificar-copia.sh`.
+  2. T011: `SITE_ADDRESS` y `compose.produccion.yaml`.
+  3. T012: `docs/operacion.md`.
+  4. T013: ensayo en un clon limpio, proyecto `trail-ensayo`, puerto 8090.
 - **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
   local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
   llega en T014).

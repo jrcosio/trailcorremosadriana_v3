@@ -41,6 +41,26 @@
 			header Cache-Control "no-store"
 			respond `{"error":"El servicio no está disponible. Inténtalo más tarde."}` 503
 		}
+		# Páginas que no existen (feature 011): 404 real con la página «no encontrada» (noindex).
+		@pagina_no_encontrada expression `{err.status_code} == 404`
+		handle @pagina_no_encontrada {
+			root * /srv
+			rewrite * /404.html
+			header Cache-Control "no-cache"
+			file_server {
+				status 404
+			}
+		}
+		# Si la plantilla de detalle falla (API caída), la web carga con los metadatos genéricos y
+		# muestra su aviso de respaldo (FR-004 de la feature 011).
+		handle {
+			root * /srv
+			rewrite * /app.html
+			header Cache-Control "no-cache"
+			file_server {
+				status 200
+			}
+		}
 	}
 
 	handle {
@@ -58,9 +78,16 @@
 		@pantallas path /pantallas /pantallas/*
 		rewrite @pantallas /pantallas/index.html
 
-		# HTML por ruta pública (sin redirección de barra final); detalles y rutas
-		# desconocidas usan app.html (404 HTTP real en la feature 011).
-		try_files {path}/index.html {path} /app.html
+		# Detalles y rutas desconocidas: plantilla que pide los metadatos a la API y responde 404
+		# si no existen (specs/011-cierre/contracts/meta-y-rutas.md).
+		@plantilla not file {path}/index.html {path}
+		rewrite @plantilla /plantilla.html
+
+		# HTML por ruta pública (sin redirección de barra final).
+		try_files {path}/index.html {path}
+
+		@es_plantilla path /plantilla.html
+		templates @es_plantilla
 
 		file_server
 	}
