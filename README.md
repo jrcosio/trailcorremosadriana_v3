@@ -27,6 +27,7 @@ docker compose up -d        # http://localhost:8080
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Features y su estado |
 | [docs/arquitectura.md](docs/arquitectura.md) | Procesos, estructura y decisiones técnicas |
 | [docs/desarrollo.md](docs/desarrollo.md) | Arranque, pruebas y comandos |
+| [docs/operacion.md](docs/operacion.md) | Despliegue independiente, HTTPS, R2, copias, restauración y recuperación del acceso |
 | [docs/PROCEDENCIA_RECURSOS.md](docs/PROCEDENCIA_RECURSOS.md) | Origen y licencias de recursos y código reutilizados |
 | [docs/referencia/](docs/referencia/README.md) | Documentación funcional aprobada y discrepancias |
 | [specs/](specs/) | Especificaciones Spec Kit por feature |

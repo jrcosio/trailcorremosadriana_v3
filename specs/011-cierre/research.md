@@ -56,11 +56,13 @@ página de error. Por eso:
   1. ejecuta `backup.sh`;
   2. calcula las huellas: `md5` de cada tabla ordenada por su texto y `sha256` de cada archivo de
      `media`;
-  3. hace un cambio controlado (fila de prueba y archivo de prueba);
+  3. hace un cambio controlado: modifica `configuracion.telefono` y **borra** un archivo
+     existente de `media`, que la restauración debe devolver (prueba más estricta que añadir un
+     archivo nuevo, porque `restore.sh` añade y sobrescribe pero no borra);
   4. ejecuta `restore.sh` con «RESTAURAR»;
   5. vuelve a calcular las huellas y las compara.
 
-  Se elimina el archivo de prueba, porque `restore.sh` añade archivos pero no borra.
+  (Implementación final: no se crean filas ni archivos de prueba que haya que limpiar después.)
 - **`restore.sh`**: se mantiene la confirmación escrita.
 - **Producción**:
   - el Caddyfile usa `{$SITE_ADDRESS::80}`; con un dominio, Caddy obtiene HTTPS automáticamente;

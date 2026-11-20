@@ -97,8 +97,8 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 ## Phase 8: Polish
 
-- [ ] T020 Ejecutar ruff, pytest, vitest, `typecheck`, `build` y la regresión completa de Playwright (con `PANTALLAS=si` donde haga falta) y la de respaldo con la API detenida
-- [ ] T021 Actualizar `docs/arquitectura.md`, `docs/desarrollo.md`, `docs/ROADMAP.md`, `docs/ESTADO_PROYECTO.md` (cierre del proyecto) y `docs/referencia/DISCREPANCIAS.md` (U4, U5, U6 y C4 resueltas)
+- [X] T020 Ejecutar ruff, pytest, vitest, `typecheck`, `build` y la regresión completa de Playwright (con `PANTALLAS=si` donde haga falta) y la de respaldo con la API detenida
+- [X] T021 Actualizar `docs/arquitectura.md`, `docs/desarrollo.md`, `docs/ROADMAP.md`, `docs/ESTADO_PROYECTO.md` (cierre del proyecto) y `docs/referencia/DISCREPANCIAS.md` (U4, U5, U6 y C4 resueltas)
 
 ## Dependencies & Execution Order
 
@@ -114,3 +114,8 @@ description: "Tareas de implementación de la feature 011-cierre"
 
 - **MVP**: US1, que da los 404 reales y los metadatos.
 - **Orden recomendado después**: US2 y US3 (requisitos de lanzamiento), luego US4 y US5 y, por último, US6.
+
+## Phase 9: Convergence
+
+- [X] T022 Dejar `docs/ROADMAP.md` (feature 11 ✅) y el punto de continuidad de `docs/ESTADO_PROYECTO.md` como proyecto completado, con las acciones que dependen del propietario, per T021 (partial)
+- [X] T023 Reflejar en `specs/011-cierre/research.md` R3 el cambio controlado real de `infra/scripts/verificar-copia.sh` (modifica `configuracion.telefono` y borra un archivo existente que la restauración devuelve) per plan: research R3 (contradicts)

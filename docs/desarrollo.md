@@ -85,7 +85,17 @@ ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-subida.mjs   # sub
 #   verificar-evento-carreras, verificar-inscripciones, verificar-clasificaciones,
 #   verificar-noticias, verificar-galeria, verificar-entidades, verificar-reglamento-contacto
 ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-reglamento-contacto.mjs
+# Cierre (011): 404 reales, metadatos, respaldo, CSP (con el panel si hay credenciales), /pantallas
+ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-cierre.mjs
+node scripts/verificar-accesibilidad.mjs   # axe WCAG 2.1 A/AA a 360/1440 y desbordamiento a 6 anchos
 ```
+
+Copia y restauración (solo en un entorno de pruebas): `infra/scripts/verificar-copia.sh`.
+
+`/pantallas` solo está activa con `PANTALLAS=si`: `compose.dev.yaml` la activa y
+`compose.yaml` la deja desactivada. `verificar-rutas.mjs` y `verificar-admin.mjs` se adaptan al
+modo activo. `verificar-cierre.mjs` cambia temporalmente `PANTALLAS` para comprobar los dos modos
+y deja el valor que había.
 
 `verificar-respaldo.mjs` se ejecuta con la API detenida (`docker compose stop api`).
 `verificar-reglamento-contacto.mjs` reinicia la API y usa `docker compose exec db` para restaurar

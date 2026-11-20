@@ -4,66 +4,33 @@
 
 ## Punto de continuidad
 
-- **Feature activa**: 011-cierre (la última). Rama `011-cierre`; `.specify/feature.json` →
-  `specs/011-cierre`.
-- **Fase SDD**: `/speckit-implement`. Ya hechos: spec (16/16), plan, tareas (21) y `analyze`
-  (0 críticos/HIGH; 1 MEDIUM y 2 LOW corregidos). Commit `89dbd96`.
-- **Tareas hechas**:
-  - T001: capturas de referencia en `frontend/capturas/antes-011`; fuentes 743.164 bytes.
-  - T002–T006 (US1): `GET /api/meta` (siempre 200, marcador o `no-encontrada`); errores 404/405
-    de la API en español; el build genera `plantilla.html` (plantilla de Caddy con `httpInclude`)
-    y `404.html`; el Caddyfile pasa por la plantilla las rutas sin HTML estático y en
-    `handle_errors` sirve `404.html` (404) y `app.html` (200 si la API está caída).
-    `verificar-rutas.mjs` espera 404 en las rutas inexistentes.
-  - T007: `frontend/scripts/verificar-accesibilidad.mjs` (axe y desbordamiento a 6 anchos).
-  - T008–T009 (US2): `ajustes.css` A-002 (P4: botones `#b64b24`/`#9a3d1c`; antetítulo, texto y
-    nota del bloque naranja en blanco, sin tocar la tarjeta verde de `/solidaridad`; pie
-    subrayado) y A-003 (cabecera por debajo de 360 px). axe con 0 incumplimientos y 0
-    desbordamientos. Comparación de capturas en `capturas/despues-p4`: solo los botones
-    naranjas, el bloque de la portada y el subrayado del pie.
-  - T010–T013 (US3):
-    - `infra/scripts/verificar-copia.sh` (copia → cambio → restauración → 16 tablas y 42
-      archivos idénticos);
-    - `SITE_ADDRESS` en el Caddyfile y `compose.produccion.yaml` (exige los secretos; 80/443);
-    - `docs/operacion.md`;
-    - ensayo de despliegue desde un clon limpio en el proyecto `trail-ensayo` (8090): web,
-      panel, clasificaciones, metadatos y archivos correctos; retirado con `down -v` sin tocar
-      desarrollo.
-  - T014–T015 (US4):
-    - CSP por defecto en Caddy (`?Content-Security-Policy`); `/media` conserva la suya;
-    - `PANTALLAS` (`no` en `compose.yaml`, `si` en `compose.dev.yaml`): 404 real y el SPA
-      muestra «no encontrada» gracias a la marca `estado-pagina` de `404.html` (`main.tsx`);
-    - `verificar-cierre` 7/7 y `verificar-admin` (con los dos modos) 2/2;
-    - Wikiloc responde 403 (anti-bots) al navegador automatizado: no es una violación de
-      nuestra CSP.
-  - T016 (US5): fuentes en WOFF2 real (fontTools 4.55.0), 743.164 → 250.840 bytes (−66 %),
-    `format('woff2')`; 44 capturas idénticas píxel a píxel (una diferencia de carga diferida de
-    logotipos y otra de remuestreo de una imagen, descartadas al repetir la captura).
-  - T017–T019 (US6):
-    - `limpiar-archivos [--horas N] [--borrar]` (`services/archivos.py`, `cli.py`) busca claves
-      `/media/` en todas las tablas; borra primero la fila y después el objeto; `borrar` está en
-      los almacenamientos local y S3;
-    - eliminados los iconos, tipos y variables sin uso (`tsc --noUnusedLocals` limpio; `resto` de
-      `media.py` es un parámetro de ruta necesario);
-    - `httpx2==2.16.0`; `test_sesion` retira la cookie antes de sustituirla;
-    - **379 pytest sin avisos**.
-- **Siguiente acción concreta**:
-  1. T020: regresión completa (ruff, pytest, vitest, typecheck, build y todos los
-     `verificar-*.mjs`, con `PANTALLAS=si` donde haga falta, más el respaldo con la API
-     detenida).
-  2. T021: documentación (`arquitectura`, `desarrollo`, DISCREPANCIAS U4/U5/U6/C4).
-  3. `/speckit-converge`, commit y merge a `main`.
-- **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
-  local `admin`. Con la API reconstruida, `/pantallas` sigue accesible (la regla `PANTALLAS`
-  llega en T014).
+- **Estado**: **las 11 features del ROADMAP están terminadas**, verificadas y fusionadas en
+  `main` en local. No se ha hecho push, ni despliegue, ni cambios de dominio o de producción.
+- **Última feature**: 011-cierre (404 reales y metadatos, accesibilidad AA y móvil, copia y
+  restauración, ensayo de despliegue, CSP, `/pantallas` retirada en producción, fuentes WOFF2 y
+  limpieza). Detalle en `specs/011-cierre/` y en las pruebas de abajo.
+- **Siguiente acción**: ninguna de desarrollo pendiente. Lo que queda depende del propietario:
+  1. **Publicar el repositorio**: autorizar el `git push` de `main` (y de las ramas de feature,
+     si se quieren conservar). No se ha hecho, según las instrucciones.
+  2. **Desplegar**: servidor, DNS del dominio, bucket y token de R2, y `.env` de producción con
+     sus secretos, siguiendo `docs/operacion.md`. Para estrenar con los datos revisados se puede
+     restaurar una copia del entorno local (sección 7).
+  3. **Datos de lanzamiento** (ver «Bloqueos»): se introducen desde el panel; no requieren
+     desarrollo.
+- **Si se retoma el desarrollo**: cualquier cambio nuevo es una feature 012 con el mismo ciclo
+  SDD. Antes de empezar, leer este archivo, `docs/ROADMAP.md` y
+  `.specify/memory/constitution.md`.
+- **Entorno local**: esquema `0010_reglamento_contacto` (la 011 no añade migraciones), con los
+  datos importados, las clasificaciones reales de 2026, la cuenta local `admin` y
+  `PANTALLAS=no`. Para revisar `/pantallas`: `PANTALLAS=si docker compose up -d web`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001–009, 010 (reglamento y contacto) |
-| Activa | 011-cierre (implementación; ver el progreso en [ROADMAP.md](ROADMAP.md)) |
-| Pendientes | 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Terminadas | 0 y 001–011 (todas) |
+| Activa | — |
+| Pendientes | — (solo acciones del propietario; ver el punto de continuidad) |
 
 ## Decisiones tomadas
 
@@ -109,9 +76,10 @@
 
 - El estado del evento se deriva de la apertura, la fecha y el contador; no hay enum (M3).
 - Los datos de carreras son referencia de 2026 y se presentan como tal.
-- `/pantallas` se mantiene como vista de revisión sin escritura hasta la feature 011.
-- A 320 y 340 px la cabecera todavía desborda (357 px). Está por debajo del mínimo de aceptación
-  (360 px) y se revisará en la 011.
+- `/pantallas` se retira en producción y sigue disponible en la revisión local (decisión P5).
+- Los ajustes de la cabecera por debajo de 360 px (A-003) quedan fuera de los anchos aprobados y
+  solo compactan espaciados y tamaños para que no haya desbordamiento a 320/340 px.
+- «Imanol» y «Plaza de Cosío» siguen fijos en la presentación (C2).
 
 ## Pruebas ejecutadas
 
@@ -205,6 +173,18 @@
 | 2026-11-20 | 009 | Migración 0009 e `importar-inicial` sobre la base existente; `restart` de la API | 8 patrocinadores sin web; persisten tras el reinicio |
 | 2026-11-20 | 009 | `verificar-entidades.mjs` (8 logos en orden, sin enlace, `object-fit: contain` y ≥150 px a 4 anchos sin desbordamiento; 2 colaboradores con orden, pestaña nueva, cambio de orden, retirada, patrocinadores intactos, borrado) | 10/10 OK |
 | 2026-11-20 | 009 | Regresión: rutas 42/42, admin 2/2, acceso 7/7, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, respaldo con la API detenida 3/3 | OK |
+| 2026-11-20 | 011 | Decisiones del propietario P4 (contraste AA) y P5 (`/pantallas` retirada en producción); `analyze`: 0 críticos/HIGH, 1 MEDIUM y 2 LOW corregidos | OK |
+| 2026-11-20 | 011 | Experimento con caddy:2.11 (`httpInclude`, `httpError` y `file_server { status }`; comportamiento con 404 y con la API caída) | Base del diseño R1 |
+| 2026-11-20 | 011 | pytest (PostgreSQL real y S3 con moto): `/api/meta`, errores en español, `limpiar-archivos`, `borrar` en S3; con `httpx2` | **379 passed, 0 avisos** |
+| 2026-11-20 | 011 | vitest (plantilla de Caddy, marca 404, metadatos), typecheck, `tsc --noUnusedLocals` y build | **72 passed**; OK |
+| 2026-11-20 | 011 | `verificar-cierre.mjs` (estados de 16 rutas, metadatos propios, SPA en 404, `/admin`, API caída, CSP en 16 páginas + 7 del panel con subida, CSP de `/media`, `/pantallas` en los dos modos) | 7/7 OK |
+| 2026-11-20 | 011 | `verificar-accesibilidad.mjs` (axe WCAG 2.1 A/AA, 17 rutas a 360/1440; desbordamiento a 320/340/360/768/1024/1440) | 0 incumplimientos; 0 desbordamientos |
+| 2026-11-20 | 011 | Capturas antes y después (44): P4 solo cambia botones, el bloque naranja de la portada y el subrayado del pie; fuentes WOFF2 sin diferencias de píxeles | OK |
+| 2026-11-20 | 011 | `infra/scripts/verificar-copia.sh` | 16 tablas y 42 archivos idénticos tras restaurar |
+| 2026-11-20 | 011 | Ensayo de despliegue independiente (clon limpio, `trail-ensayo`, 8090, restauración sobre una base nueva) | Web, panel, clasificaciones 63/205/224, metadatos y archivos correctos; retirado sin tocar desarrollo |
+| 2026-11-20 | 011 | `compose.produccion.yaml config` sin variables / con variables | Falla nombrando la variable / 80, 443, `COOKIE_SECURE=true`, `PANTALLAS=no` |
+| 2026-11-20 | 011 | Regresión: rutas 42/42 (`/pantallas` activas y retiradas), admin 2/2 (los dos modos), acceso 7/7, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, entidades 10/10, reglamento y contacto 7/7, respaldo 3/3 | OK |
+| 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |
 | 2026-11-20 | 010 | vitest (persistencia y usuario de Instagram), typecheck y build | **69 passed**; OK |
@@ -219,9 +199,15 @@
 
 ## Bloqueos
 
-Ninguno. Faltan datos de producción que debe facilitar el propietario y que no bloquean el
-trabajo: fecha 2027, enlaces de inscripción y de pago solidario, webs de patrocinadores,
-reglamento definitivo, GPX y autorizaciones de imagen para el lanzamiento.
+Ninguno para el desarrollo. Antes del lanzamiento, el propietario debe introducir desde el panel
+(o facilitar) estos datos de producción:
+
+- fecha y hora de 2027;
+- enlaces de inscripción y de pago del Dorsal Solidario;
+- webs de los patrocinadores;
+- reglamento definitivo de 2027;
+- GPX de los recorridos;
+- autorizaciones de uso de las imágenes.
 
 ## Avisos técnicos menores
 
@@ -232,5 +218,10 @@ reglamento definitivo, GPX y autorizaciones de imagen para el lanzamiento.
   Chromium deja esa petición abierta. No afecta al usuario. Las verificaciones con la API caída
   esperan al aviso en lugar de a `networkidle`.
 
-- pytest avisa de que `starlette.testclient` con `httpx` está obsoleto (recomienda `httpx2`).
-  No afecta a los resultados; se revisará al actualizar dependencias.
+- pytest ya no muestra avisos: se usa `httpx2` desde la feature 011.
+
+- Wikiloc responde 403 (desafío anti-bots de Cloudflare) a navegadores automatizados. En las
+  pruebas el mapa insertado no carga, pero la CSP no lo bloquea; en un navegador real funciona.
+
+- En local hay 43 archivos subidos por las verificaciones de hoy sin referencias. Pasadas 24 horas,
+  `limpiar-archivos --borrar` puede eliminarlos si se desea.
