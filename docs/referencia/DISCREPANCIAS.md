@@ -14,6 +14,8 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | P1 | EXP indica edición «2028» con fecha 2027-07-10 09:00; DOC dice «2027 sin fecha confirmada» | Inicializar la próxima edición como **2027 sin fecha**. El propietario la fijará desde el panel. |
 | P2 | PROD publica clasificaciones reales 2026 en CSV; DOC dice «no hay resultados publicados» | **Importar los CSV de 2026 como clasificaciones publicadas** mediante el flujo CSV de la nueva web; `/clasificaciones/2026` sigue funcionando. |
 | P3 (2026-11-20) | El CSV real de la 27K tiene una participante «Sin salida» sin dorsal; DOC 13 exige dorsal en todas las filas | **Dorsal obligatorio solo para clasificados**; los no clasificados pueden no tenerlo y la unicidad se aplica a dorsales no vacíos. Se importan los 63. |
+| P4 (2026-11-20) | Los botones naranjas (#dc6537, 3,52:1) y dos textos del bloque solidario no cumplen WCAG AA | **Corregir a AA**: botones en el naranja oscuro de la paleta (#b64b24, hover #9a3d1c), textos del bloque solidario en blanco y enlace del pie «JR BLANCO» subrayado. |
+| P5 (2026-11-20) | ¿`/pantallas` (índice de revisión y vistas de diseño) se conserva en el lanzamiento público? (U6) | **Retirar en producción** mediante configuración (404); disponible en desarrollo y revisión local. |
 
 ## Datos de prueba en la exportación (no se importan)
 
