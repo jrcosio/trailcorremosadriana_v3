@@ -14,6 +14,8 @@ class Almacenamiento(Protocol):
 
     def leer(self, clave: str) -> bytes | None: ...
 
+    def borrar(self, clave: str) -> None: ...
+
 
 def crear_almacenamiento(settings: Settings) -> Almacenamiento:
     if settings.almacenamiento == "s3":

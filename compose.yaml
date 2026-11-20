@@ -4,8 +4,8 @@
 #   docker compose up -d db
 #   docker compose run --rm api alembic upgrade head   # paso explícito de esquema
 #   docker compose up -d
-# Los valores por defecto son SOLO de desarrollo local. El despliegue de producción
-# (feature 011) exigirá variables propias sin valores por defecto.
+# Los valores por defecto son SOLO de desarrollo local. Producción: añadir
+# compose.produccion.yaml, que exige las variables sin valores por defecto (docs/operacion.md).
 name: trail-penasagra
 
 x-postgres-env: &postgres-env
@@ -74,6 +74,11 @@ services:
       context: ./frontend
       args:
         PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+    environment:
+      # `:80` en local; dominio en producción (compose.produccion.yaml).
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      # Vistas de revisión /pantallas (decisión P5): `si` solo en revisión local.
+      PANTALLAS: ${PANTALLAS:-no}
     ports:
       - "${WEB_PORT:-8080}:80"
     volumes:

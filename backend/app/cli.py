@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.db import crear_engine
 from app.core.seguridad import CredencialInvalida
-from app.services import administradores, clasificaciones, importacion
+from app.services import administradores, archivos, clasificaciones, importacion
 from app.services.administradores import AdminNoEncontrado, AdminYaExiste
 from app.services.csv_clasificaciones import (
     CsvNoValido,
@@ -24,8 +24,16 @@ from app.services.csv_clasificaciones import (
     leer_csv,
     mapear,
 )
+from app.storage import Almacenamiento, crear_almacenamiento
 
 OK, ERROR, INVALIDO = 0, 1, 2
+
+
+def _horas(valor: str) -> int:
+    horas = int(valor)
+    if horas < 1:
+        raise argparse.ArgumentTypeError("la antigüedad mínima es 1 hora")
+    return horas
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -62,6 +70,19 @@ def _parser() -> argparse.ArgumentParser:
     clas.add_argument(
         "--sustituir", action="store_true", help="Sustituye una clasificación existente"
     )
+    lim = sub.add_parser(
+        "limpiar-archivos",
+        help="Lista los archivos subidos sin referencias (y los borra con --borrar)",
+    )
+    lim.add_argument(
+        "--horas",
+        type=_horas,
+        default=24,
+        help="Antigüedad mínima en horas (por defecto 24; mínimo 1)",
+    )
+    lim.add_argument(
+        "--borrar", action="store_true", help="Elimina los archivos listados (pide confirmación)"
+    )
     imp = sub.add_parser(
         "importar-inicial", help="Importa los datos aprobados en las partes vacías"
     )
@@ -92,6 +113,7 @@ def main(
     database_url: str | None = None,
     entrada: TextIO | None = None,
     salida: TextIO | None = None,
+    almacenamiento: Almacenamiento | None = None,
 ) -> int:
     args = _parser().parse_args(argv)
     entrada = entrada or sys.stdin
@@ -151,6 +173,24 @@ def main(
                     args.sustituir,
                 )
                 decir(f"Clasificación {accion}: {n} participantes.")
+            elif args.orden == "limpiar-archivos":
+                lista = archivos.huerfanos(db, args.horas)
+                if not lista:
+                    decir(f"No hay archivos sin referencias con más de {args.horas} horas.")
+                    return OK
+                for a in lista:
+                    decir(f"{a.clave}\t{a.tamano} bytes\t{a.creado_en:%Y-%m-%d %H:%M}")
+                total = sum(a.tamano for a in lista)
+                plural = "archivo" if len(lista) == 1 else "archivos"
+                decir(f"{len(lista)} {plural} sin referencias ({total} bytes).")
+                if args.borrar:
+                    decir(f"Esto eliminará {len(lista)} {plural}. Escribe BORRAR para continuar:")
+                    if entrada.readline().strip() != "BORRAR":
+                        decir("Cancelado. No se ha borrado nada.")
+                        return ERROR
+                    almacen = almacenamiento or crear_almacenamiento(get_settings())
+                    n = archivos.borrar_huerfanos(db, almacen, lista)
+                    decir(f"{n} {'archivo eliminado' if n == 1 else 'archivos eliminados'}.")
             elif args.orden == "listar-admins":
                 cuentas = administradores.listar(db)
                 if not cuentas:

@@ -1,0 +1,35 @@
+# Trail Peñasagra — ajustes de producción (feature 011). NO contiene secretos: todos los valores
+# se leen de `.env`, que no se versiona. Uso (ver docs/operacion.md):
+#   docker compose -f compose.yaml -f compose.produccion.yaml config   # comprobar
+#   docker compose -f compose.yaml -f compose.produccion.yaml up -d
+# Exige las variables sin valores por defecto: si falta alguna, Compose se detiene con un error.
+
+x-postgres-prod: &postgres-prod
+  POSTGRES_DB: ${POSTGRES_DB:?Define POSTGRES_DB}
+  POSTGRES_USER: ${POSTGRES_USER:?Define POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD (secreto)}
+
+services:
+  db:
+    environment:
+      <<: *postgres-prod
+
+  api:
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Define PUBLIC_ORIGIN (https://dominio)}
+      ENTORNO: produccion
+      COOKIE_SECURE: "true"
+      ORIGENES_PERMITIDOS: ""
+
+  web:
+    build:
+      args:
+        PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Define PUBLIC_ORIGIN (https://dominio)}
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?Define SITE_ADDRESS (dominio, sin https://)}
+      PANTALLAS: "no"
+    ports: !override
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"

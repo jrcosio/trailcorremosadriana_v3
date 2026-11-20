@@ -41,6 +41,18 @@ def test_ida_y_vuelta_identica(bucket):
     assert s3.leer(f"{uuid.uuid4().hex}.jpg") is None
 
 
+def test_borrar_objeto(bucket):
+    # Feature 011 (limpiar-archivos): borrar elimina el objeto; borrar uno inexistente no falla.
+    s3 = AlmacenamientoS3(
+        ENDPOINT, bucket, "us-east-1", CLAVE_ACCESO, CLAVE_SECRETA, crear_bucket=True
+    )
+    clave = f"{uuid.uuid4().hex}.png"
+    s3.guardar(clave, PNG, "image/png")
+    s3.borrar(clave)
+    assert s3.leer(clave) is None
+    s3.borrar(clave)
+
+
 @pytest.mark.parametrize("datos", [JPEG, PNG, WEBP, PDF, GPX])
 def test_subida_y_entrega_por_la_api_con_s3(base_con_admin, bucket, datos):
     with crear_cliente(base_con_admin, **_ajustes_s3(bucket)) as c:

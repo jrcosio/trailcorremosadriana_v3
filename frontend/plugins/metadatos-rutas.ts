@@ -1,7 +1,11 @@
 /**
  * Plugin de Vite: genera un HTML por ruta pública estática con sus metadatos
  * (título, descripción, Open Graph, Twitter y canonical), además de `app.html`
- * (genérico para rutas dinámicas) y los HTML con `noindex` de /admin y /pantallas.
+ * (genérico), los HTML con `noindex` de /admin y /pantallas y, desde la feature 011:
+ * - `plantilla.html`: plantilla de Caddy para detalles y rutas desconocidas. Pide a la API los
+ *   metadatos del detalle (`/api/meta`), responde 404 si no existe y usa los genéricos si la API
+ *   no responde (specs/011-cierre/research.md R1).
+ * - `404.html`: página «no encontrada» (noindex) que Caddy sirve con estado 404.
  * Caddy elige el archivo según la ruta (infra/caddy/Caddyfile).
  */
 import type { Plugin } from 'vite';
@@ -14,15 +18,21 @@ import {
 } from '../src/seo/rutas';
 
 const MARCA = '<!-- metadatos-ruta -->';
+export const MARCADOR_META = '<!-- meta -->';
+export const METADATOS_404: MetadatosRuta = {
+  titulo: 'Página no encontrada | Trail Peñasagra',
+  descripcion: 'La página no existe o todavía no está publicada.',
+};
 
 const escapar = (valor: string) =>
   valor.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-export function htmlConMetadatos(
-  plantilla: string,
-  meta: MetadatosRuta,
-  opciones: { publicOrigin: string; ruta?: string; noindex?: boolean },
-): string {
+type OpcionesMetadatos = { publicOrigin: string; ruta?: string; noindex?: boolean; noEncontrada?: boolean };
+/** Marca de `404.html`: el SPA muestra «no encontrada» aunque la ruta exista en el cliente. */
+export const MARCA_NO_ENCONTRADA = '<meta name="estado-pagina" content="404" />';
+
+/** Etiquetas Open Graph, Twitter, canonical y robots (sin título ni descripción). */
+function etiquetasExtra(meta: MetadatosRuta, opciones: OpcionesMetadatos): string[] {
   const origen = opciones.publicOrigin.replace(/\/+$/, '');
   const titulo = escapar(meta.titulo);
   const descripcion = escapar(meta.descripcion);
@@ -44,12 +54,44 @@ export function htmlConMetadatos(
     etiquetas.push(`<meta property="og:url" content="${url}" />`, `<link rel="canonical" href="${url}" />`);
   }
   if (opciones.noindex) etiquetas.push(`<meta name="robots" content="noindex, nofollow" />`);
+  if (opciones.noEncontrada) etiquetas.push(MARCA_NO_ENCONTRADA);
+  return etiquetas;
+}
 
+const TITULO = /<title>[^<]*<\/title>/;
+const DESCRIPCION = /<meta name="description" content="[^"]*" \/>/;
+
+export function htmlConMetadatos(plantilla: string, meta: MetadatosRuta, opciones: OpcionesMetadatos): string {
   if (!plantilla.includes(MARCA)) throw new Error(`index.html no contiene la marca ${MARCA}`);
   return plantilla
-    .replace(/<title>[^<]*<\/title>/, `<title>${titulo}</title>`)
-    .replace(/<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${descripcion}" />`)
-    .replace(MARCA, etiquetas.join('\n    '));
+    .replace(TITULO, `<title>${escapar(meta.titulo)}</title>`)
+    .replace(DESCRIPCION, `<meta name="description" content="${escapar(meta.descripcion)}" />`)
+    .replace(MARCA, etiquetasExtra(meta, opciones).join('\n    '));
+}
+
+/**
+ * Plantilla de Caddy (`templates`, specs/011-cierre/research.md R1). Pide los metadatos a
+ * `/api/meta`: «no-encontrada» → 404 real; respuesta con el marcador → se inserta; cualquier otra
+ * (API caída) → metadatos genéricos.
+ */
+export function plantillaCaddy(plantilla: string, opciones: { publicOrigin: string }): string {
+  if (!plantilla.includes(MARCA)) throw new Error(`index.html no contiene la marca ${MARCA}`);
+  if (!TITULO.test(plantilla) || !DESCRIPCION.test(plantilla)) throw new Error('index.html sin título o descripción');
+  const base = plantilla.replace(new RegExp(TITULO.source + '\\s*'), '').replace(new RegExp(DESCRIPCION.source + '\\s*'), '');
+  if (base.includes('{{')) throw new Error('index.html no puede contener «{{» (plantillas de Caddy)');
+  const generico = [
+    `<title>${escapar(METADATOS_GENERICOS.titulo)}</title>`,
+    `<meta name="description" content="${escapar(METADATOS_GENERICOS.descripcion)}" />`,
+    ...etiquetasExtra(METADATOS_GENERICOS, opciones),
+  ].join('\n    ');
+  const bloque = [
+    '{{- $meta := httpInclude (printf "/api/meta?ruta=%s" (.OriginalReq.URL.Path | urlquery)) -}}',
+    '{{- if eq $meta "no-encontrada" }}{{ httpError 404 }}{{ end -}}',
+    `{{ if hasPrefix "${MARCADOR_META}" $meta }}{{ $meta }}{{ else }}`,
+    generico,
+    '{{ end }}',
+  ].join('\n    ');
+  return base.replace(MARCA, bloque);
 }
 
 export function metadatosRutas({ publicOrigin }: { publicOrigin: string }): Plugin {
@@ -71,6 +113,12 @@ export function metadatosRutas({ publicOrigin }: { publicOrigin: string }): Plug
         type: 'asset',
         fileName: 'app.html',
         source: htmlConMetadatos(plantilla, METADATOS_GENERICOS, { publicOrigin }),
+      });
+      this.emitFile({ type: 'asset', fileName: 'plantilla.html', source: plantillaCaddy(plantilla, { publicOrigin }) });
+      this.emitFile({
+        type: 'asset',
+        fileName: '404.html',
+        source: htmlConMetadatos(plantilla, METADATOS_404, { publicOrigin, noindex: true, noEncontrada: true }),
       });
       for (const ruta of RUTAS_NOINDEX) {
         this.emitFile({

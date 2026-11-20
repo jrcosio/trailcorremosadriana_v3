@@ -24,9 +24,17 @@ else if (!sigueEnLogin) fallo('/admin: el formulario desapareció (¿acceso conc
 else if (cookies.length) fallo('/admin: se emitieron cookies');
 else ok('/admin: mensaje genérico, sin acceso y sin cookies');
 
-// 2. Vista de diseño: guardar no envía escrituras.
+// 2. Vista de diseño: guardar no envía escrituras. Con PANTALLAS≠si (producción, decisión P5) la
+// vista está retirada y responde 404.
 escrituras.length = 0;
-await page.goto(base + '/pantallas/admin/noticias/nuevo', { waitUntil: 'networkidle' });
+const vista = await page.goto(base + '/pantallas/admin/noticias/nuevo', { waitUntil: 'networkidle' });
+if (vista?.status() === 404) {
+  const retirada = (await page.textContent('main')).includes('Este sendero no está en el mapa.');
+  if (retirada && !escrituras.length) ok('vista de diseño retirada (PANTALLAS≠si): 404 y sin escrituras');
+  else fallo('vista de diseño: 404 sin la página «no encontrada»');
+  await browser.close();
+  process.exit();
+}
 await page.fill('input[name="title"]', 'Noticia de prueba de diseño').catch(() => {});
 await page.fill('textarea[name="body"]', 'Texto de prueba.').catch(() => {});
 await page.click('button[type="submit"]');

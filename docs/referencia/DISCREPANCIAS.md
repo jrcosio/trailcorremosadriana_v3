@@ -14,6 +14,8 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | P1 | EXP indica edición «2028» con fecha 2027-07-10 09:00; DOC dice «2027 sin fecha confirmada» | Inicializar la próxima edición como **2027 sin fecha**. El propietario la fijará desde el panel. |
 | P2 | PROD publica clasificaciones reales 2026 en CSV; DOC dice «no hay resultados publicados» | **Importar los CSV de 2026 como clasificaciones publicadas** mediante el flujo CSV de la nueva web; `/clasificaciones/2026` sigue funcionando. |
 | P3 (2026-11-20) | El CSV real de la 27K tiene una participante «Sin salida» sin dorsal; DOC 13 exige dorsal en todas las filas | **Dorsal obligatorio solo para clasificados**; los no clasificados pueden no tenerlo y la unicidad se aplica a dorsales no vacíos. Se importan los 63. |
+| P4 (2026-11-20) | Los botones naranjas (#dc6537, 3,52:1) y dos textos del bloque solidario no cumplen WCAG AA | **Corregir a AA**: botones en el naranja oscuro de la paleta (#b64b24, hover #9a3d1c), textos del bloque solidario en blanco y enlace del pie «JR BLANCO» subrayado. |
+| P5 (2026-11-20) | ¿`/pantallas` (índice de revisión y vistas de diseño) se conserva en el lanzamiento público? (U6) | **Retirar en producción** mediante configuración (404); disponible en desarrollo y revisión local. |
 
 ## Datos de prueba en la exportación (no se importan)
 
@@ -44,9 +46,9 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | U1 | PROD usa `/recorridos`; PROP usa `/carreras` con alias `/recorridos` | Se conservan ambos (alias). |
 | U2 | PROD usa `/clasificaciones/{año}`; PROP solo `/clasificaciones` con filtros | Se añade `/clasificaciones/{año}` como vista prefiltrada (feature 006). |
 | U3 | Navegación de PROD (Inicio, Carreras, Reglamento, Galería, Clasificaciones, Contacto) frente a PROP (Carreras, Noticias, Galería, Clasificaciones, Contacto + INSCRIPCIONES) | Prevalece PROP (decisiones aprobadas). |
-| U4 | Rutas inexistentes devuelven NotFound con HTTP 200 en PROP | 404 HTTP real en la feature 011. |
-| U5 | PROD tiene títulos y metadatos OG por página; PROP solo metadatos genéricos | El build genera metadatos por ruta pública estática con los títulos de PROD; los de detalle se completan en la feature 011. |
-| U6 | `/pantallas` y `/pantallas/admin` (vistas de diseño) | Se conservan sin escritura y fuera de la navegación (robots `Disallow`). Decisión final de lanzamiento en la feature 011. |
+| U4 | Rutas inexistentes devuelven NotFound con HTTP 200 en PROP | **Resuelta (011)**: 404 HTTP real para rutas inexistentes y para detalles inexistentes o no publicados (plantilla de Caddy + `/api/meta`). |
+| U5 | PROD tiene títulos y metadatos OG por página; PROP solo metadatos genéricos | **Resuelta (011)**: los detalles publicados (noticias, álbumes, pruebas y clasificaciones por año) llevan título, descripción, imagen y canónica propios en el HTML inicial. |
+| U6 | `/pantallas` y `/pantallas/admin` (vistas de diseño) | **Resuelta (011, decisión P5)**: retiradas en producción (`PANTALLAS=no` → 404); disponibles en la revisión local (`PANTALLAS=si`). |
 
 ## Contenido
 
@@ -55,5 +57,5 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | C1 | Precio infantil: «5 € / Gratis» (PROD recorridos) frente a «Niños < 8 años gratis» (PROD reglamento) y «12 € / 5 €» (PROP) | Se conserva el valor de la semilla de PROP («12 € / 5 €»), que es dato de referencia 2026 editable. |
 | C2 | Contacto «Imanol» y «Plaza de Cosío» fijos en PROP | **Resuelta (010)**: siguen fijos, como en PROP, porque no hay decisión que los convierta en campos y añadirlos cambiaría el panel aprobado. Correo, teléfono e Instagram son editables; el usuario de Instagram se deriva del enlace. |
 | C3 | Noticia «gracias-trail-2026» existe en PROD y no en EXP | Se importa en la feature 007 con su imagen real (PROD, MIT). |
-| C4 | Fuentes con extensión `.woff2` y datos TTF | Se corrige en la feature 011 (rendimiento) sin cambiar el aspecto. |
+| C4 | Fuentes con extensión `.woff2` y datos TTF | **Resuelta (011)**: conversión a WOFF2 real con fontTools; −66 % de peso y capturas idénticas píxel a píxel. |
 | C5 | CSV de PROD con cabeceras `Pos, Meta, Genero, Pos Categoria, Pos Genero` | **Resuelta (006)**: alias `meta` → tiempo en el cliente y en el servidor; `Pos Categoria` y `Pos Genero` no se importan. Los CSV reales no se versionan (datos personales): se importan con `importar-clasificacion` desde el archivo original. |

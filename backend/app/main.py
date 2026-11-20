@@ -23,6 +23,7 @@ from app.api import (
     clasificaciones,
     contenido,
     media,
+    meta,
     salud,
     sesion,
 )
@@ -31,6 +32,11 @@ from app.core.db import crear_engine
 from app.services.contenido import cargar_contenido
 from app.services.errores import Conflicto, NoEncontrado
 from app.storage import AlmacenamientoNoDisponible, crear_almacenamiento
+
+GENERICOS = {
+    (404, "Not Found"): "No encontrado.",
+    (405, "Method Not Allowed"): "Método no permitido.",
+}
 
 # Nombres legibles de los campos de los formularios del panel (mensajes de validación).
 ETIQUETAS = {
@@ -113,6 +119,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def error_http(_: Request, exc: HTTPException) -> JSONResponse:
         # Formato de error que ya consume el frontend: {"error": "..."}
         detalle = exc.detail if isinstance(exc.detail, str) else "Error"
+        # Errores genéricos de Starlette (frase estándar en inglés) en español (feature 011).
+        detalle = GENERICOS.get((exc.status_code, detalle), detalle)
         return JSONResponse({"error": detalle}, status_code=exc.status_code, headers=exc.headers)
 
     @app.exception_handler(RequestValidationError)
@@ -161,6 +169,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(sesion.router)
     app.include_router(archivos.router)
     app.include_router(media.router)
+    app.include_router(meta.router)
     app.include_router(admin_evento.router)
     app.include_router(admin_carreras.router)
     app.include_router(admin_inscripciones.router)

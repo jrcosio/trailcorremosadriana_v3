@@ -1,7 +1,7 @@
 # Arquitectura
 
-Estado a 2026-11-19 (feature 001). Las decisiones detalladas y sus alternativas están en
-`specs/001-base-proyecto/research.md`.
+Estado a 2026-11-20 (features 001–011). Las decisiones detalladas y sus alternativas están en el
+`research.md` de cada feature (`specs/NNN-*/`). Operación y despliegue: `docs/operacion.md`.
 
 ## Procesos
 
@@ -18,8 +18,11 @@ Navegador ──► web (Caddy 2.11, :80 → publicado en WEB_PORT)
 | `api` | `backend/Dockerfile` (`python:3.13-slim` + uv) | API, validación, permisos, contenidos | ninguno (solo red interna) |
 | `db` | `postgres:17-alpine` | Persistencia relacional | ninguno (solo red interna) |
 
-`compose.dev.yaml` publica `api` y `db` solo en `127.0.0.1` para desarrollo local y define
-`api-test` (pytest contra PostgreSQL real).
+`compose.dev.yaml` publica `api` y `db` solo en `127.0.0.1` para desarrollo local, activa
+`/pantallas` (`PANTALLAS=si`) y define `api-test` (pytest contra PostgreSQL real).
+`compose.produccion.yaml` publica 80/443 con HTTPS automático para `SITE_ADDRESS`, fija
+`COOKIE_SECURE=true`, `ENTORNO=produccion` y `PANTALLAS=no`, y exige los secretos sin valores
+por defecto (feature 011).
 
 ## Repositorio
 
@@ -43,11 +46,19 @@ repositorio.
   router interno de la propuesta, por `path` y con enlaces `<a>` de recarga completa.
 - Se eliminó todo lo ligado a Vinext/Cloudflare Workers: `vinext`, `wrangler`, `@cloudflare/*`,
   `worker/`, route handlers, D1/drizzle, conectores Sites, shadcn/ui sin uso y Tailwind sin uso.
-- **Metadatos**: el plugin `plugins/metadatos-rutas.ts` genera en el build un HTML por cada ruta
-  pública estática (`dist/<ruta>/index.html`). Las rutas de detalle y las desconocidas usan
-  `app.html` con metadatos genéricos. `/admin` y `/pantallas` usan HTML con `noindex`.
+- **Metadatos**: el plugin `plugins/metadatos-rutas.ts` genera en el build:
+  - un HTML por cada ruta pública estática (`dist/<ruta>/index.html`);
+  - `plantilla.html` (plantilla de Caddy para los detalles y las rutas desconocidas; ver «404 y
+    metadatos de detalle»);
+  - `404.html` (noindex, con la marca `estado-pagina`);
+  - `app.html` (genérico, respaldo con la API caída);
+  - HTML con `noindex` para `/admin` y `/pantallas`.
 - **Estilos**: `globals.css` se conserva idéntica a la propuesta. Los arreglos verificados van en
-  `ajustes.css`, cada uno con su referencia (A-001: desbordamiento de la cabecera a 360 px).
+  `ajustes.css`, cada uno con su referencia:
+  - A-001: cabecera a 360 px;
+  - A-002: contraste AA por la decisión P4;
+  - A-003: cabecera por debajo de 360 px.
+- **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.
 
@@ -68,6 +79,35 @@ repositorio.
   la API llevan `Cache-Control: no-store` y `X-Content-Type-Options: nosniff`.
 - OpenAPI en `/api/docs` solo con `ENTORNO=desarrollo`. Los contratos versionados están en
   `specs/*/contracts/`.
+
+## Cierre para el lanzamiento (feature 011)
+
+- **404 y metadatos de detalle**:
+  - Las rutas con HTML estático no cambian. El resto se reescribe a `plantilla.html` con
+    `templates`, que pide `GET /api/meta?ruta=…` mediante `httpInclude`.
+  - La API responde siempre 200 (`text/plain`): el marcador `<!-- meta -->` seguido de las
+    etiquetas escapadas (título, descripción, `og:*`, `twitter:*` y canónica), o `no-encontrada`.
+  - Con `no-encontrada`, la plantilla llama a `httpError 404` y `handle_errors` sirve `404.html`
+    con estado 404. El SPA ve la marca `estado-pagina` y muestra «Este sendero no está en el
+    mapa.».
+  - Si la plantilla falla (API caída), `handle_errors` sirve `app.html` con 200 y el SPA muestra
+    su aviso de respaldo. En ese caso tampoco se puede distinguir una ruta inexistente.
+  - Detalles con metadatos propios: noticias, álbumes, pruebas (`/carreras` y `/recorridos`) y
+    `/clasificaciones/{año}` con clasificaciones publicadas.
+  - Los 404 y 405 genéricos de la API salen en español.
+- **Cabeceras**:
+  - Caddy añade una CSP por defecto (`?Content-Security-Policy`): solo `self`, imágenes `https:`
+    y `data:`, y `frame-src` de Wikiloc. `/media` conserva su CSP propia (`default-src 'none';
+    sandbox`).
+  - `X-Frame-Options`, `Referrer-Policy` y `nosniff` siguen igual.
+- **`/pantallas`** (decisión P5): `PANTALLAS=si|no` en el servicio `web`; con `no` (producción y
+  valor por defecto), `error 404`.
+- **Operación**:
+  - `infra/scripts/verificar-copia.sh` comprueba la restauración tabla a tabla y archivo a archivo.
+  - `python -m app.cli limpiar-archivos [--horas N] [--borrar]` lista o borra (tras escribir
+    «BORRAR») los archivos sin referencias `/media/<clave>` en ninguna tabla con más de N horas.
+  - El almacenamiento tiene `borrar` (local y S3).
+- **Pruebas**: pytest usa `httpx2` (sin avisos).
 
 ## Persistencia del panel por recursos (desde la feature 004)
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { htmlConMetadatos } from '../plugins/metadatos-rutas';
+import { htmlConMetadatos, plantillaCaddy } from '../plugins/metadatos-rutas';
 import { METADATOS_GENERICOS, RUTAS_PUBLICAS } from '@/seo/rutas';
 
 const plantilla =
@@ -39,5 +39,28 @@ describe('Metadatos por ruta', () => {
     const html = htmlConMetadatos(plantilla, { titulo: 'A "B" <C>', descripcion: 'x & y' }, { publicOrigin: origen });
     expect(html).toContain('<title>A &quot;B&quot; &lt;C&gt;</title>');
     expect(html).toContain('content="x &amp; y"');
+  });
+
+  it('plantilla de Caddy: metadatos de la API, 404 y respaldo genérico', () => {
+    const html = plantillaCaddy(plantilla, { publicOrigin: origen });
+    expect(html).toContain('httpInclude (printf "/api/meta?ruta=%s" (.OriginalReq.URL.Path | urlquery))');
+    expect(html).toContain('{{- if eq $meta "no-encontrada" }}{{ httpError 404 }}{{ end -}}');
+    expect(html).toContain('{{ if hasPrefix "<!-- meta -->" $meta }}{{ $meta }}{{ else }}');
+    // Un solo título y una sola descripción, dentro del respaldo genérico.
+    expect(html.match(/<title>/g)).toHaveLength(1);
+    expect(html.match(/name="description"/g)).toHaveLength(1);
+    const respaldo = html.slice(html.indexOf('{{ else }}'), html.indexOf('{{ end }}'));
+    expect(respaldo).toContain(`<title>${METADATOS_GENERICOS.titulo}</title>`);
+    expect(respaldo).not.toContain('canonical');
+  });
+
+  it('la plantilla rechaza un index.html con «{{»', () => {
+    expect(() => plantillaCaddy(plantilla.replace('</head>', '<script>{{x}}</script></head>'), { publicOrigin: origen })).toThrow();
+  });
+
+  it('404.html lleva la marca que hace al SPA mostrar «no encontrada»', () => {
+    const html = htmlConMetadatos(plantilla, METADATOS_GENERICOS, { publicOrigin: origen, noindex: true, noEncontrada: true });
+    expect(html).toContain('<meta name="estado-pagina" content="404" />');
+    expect(htmlConMetadatos(plantilla, METADATOS_GENERICOS, { publicOrigin: origen })).not.toContain('estado-pagina');
   });
 });

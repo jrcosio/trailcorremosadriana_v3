@@ -3,6 +3,11 @@
 # Publica la API y PostgreSQL únicamente en 127.0.0.1 (para `npm run dev` y herramientas
 # locales) y define el servicio de pruebas `api-test` (perfil `test`).
 services:
+  web:
+    environment:
+      # Vistas de revisión /pantallas disponibles solo en local (decisión P5).
+      PANTALLAS: "si"
+
   db:
     ports:
       - "127.0.0.1:${DB_PORT_LOCAL:-5432}:5432"
