@@ -68,16 +68,18 @@ await page.reload({ waitUntil: 'networkidle' });
 if (!(await page.isVisible('.admin-event h2'))) fallo('la sesión no sobrevive a la recarga');
 else ok('recarga: sesión mantenida');
 
-// 4. Guardar en una sección sin persistencia → aviso, sin simular éxito.
-// Sección aún sin persistencia (el reglamento se migra en la feature 010).
-await page.goto(base + '/admin/reglamento', { waitUntil: 'networkidle' });
-await page.locator('textarea').first().fill((await page.locator('textarea').first().inputValue()) + '\nPrueba de guardado');
+// 4. Un guardado que el servidor rechaza → aviso claro, sin simular éxito ni cambiar datos.
+// Desde la feature 010 todas las secciones persisten: se usa un dato no válido en /admin/ajustes.
+await page.goto(base + '/admin/ajustes', { waitUntil: 'networkidle' });
+const instagramAntes = await page.getByLabel('Instagram').inputValue();
+await page.getByLabel('Instagram').fill('http://www.instagram.com/no-valido/');
 await page.click('button[type="submit"]');
 await page.waitForSelector('.admin-error[role="alert"]', { timeout: 10000 });
 const aviso = (await page.textContent('.admin-error[role="alert"]'))?.trim();
-const exito = await page.isVisible('text=Guardado correctamente');
-if (!aviso?.includes('Esta sección del panel todavía no guarda cambios.') || exito) fallo(`sección sin persistencia: «${aviso}»`);
-else ok('sección sin persistencia: aviso claro y sin éxito simulado');
+const exito = await page.isVisible('text=Cambios guardados');
+const guardado = (await (await page.request.get(base + '/api/content')).json()).data.settings.instagram;
+if (aviso !== 'Revisa el campo «Instagram».' || exito || guardado !== instagramAntes) fallo(`error del servidor: «${aviso}» éxito=${exito}`);
+else ok('error del servidor: aviso claro, sin éxito simulado ni cambios');
 
 // 5. Cerrar sesión → formulario; la cookie anterior ya no sirve.
 await page.goto(base + '/admin', { waitUntil: 'networkidle' });

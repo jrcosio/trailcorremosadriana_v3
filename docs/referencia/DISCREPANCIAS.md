@@ -28,7 +28,7 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 
 | # | Diferencia | Resolución |
 |---|---|---|
-| M1 | PROP guarda todo en un documento JSON; DOC 14 exige tablas relacionadas | Tablas PostgreSQL por recurso. `GET /api/content` se mantiene como adaptador de solo lectura durante la transición. No se implementa `PUT /api/content`. |
+| M1 | PROP guarda todo en un documento JSON; DOC 14 exige tablas relacionadas | Tablas PostgreSQL por recurso. `GET /api/content` se mantiene como adaptador de solo lectura. **Transición completada (010)**: todas las secciones guardan por recurso, el 501 transitorio se retira y `PUT /api/content` no existe (405). |
 | M2 | PROP tiene `settings` globales; DOC 14 asocia contador, apertura, mensaje y URL del dorsal a la edición | Se guardan en `ediciones`. Una edición se marca como actual. |
 | M3 | DOC 14 menciona «estado del evento» sin valores | No se crea un enum: la fase se deriva de apertura, fecha (vacía/futura/pasada) y contador, como en DOC 06. Se documenta como supuesto. |
 | M4 | Exclusión del Dorsal Solidario por heurística `/solidari/` | El dorsal es configuración de la edición, no una carrera. El servidor rechaza además cualquier carrera cuyo slug/título coincida con la heurística en clasificaciones. |
@@ -53,7 +53,7 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | # | Diferencia | Resolución |
 |---|---|---|
 | C1 | Precio infantil: «5 € / Gratis» (PROD recorridos) frente a «Niños < 8 años gratis» (PROD reglamento) y «12 € / 5 €» (PROP) | Se conserva el valor de la semilla de PROP («12 € / 5 €»), que es dato de referencia 2026 editable. |
-| C2 | Contacto «Imanol» y «Plaza de Cosío» fijos en PROP | Se mantienen como en PROP; la posibilidad de editarlos se decide en la feature 010. |
+| C2 | Contacto «Imanol» y «Plaza de Cosío» fijos en PROP | **Resuelta (010)**: siguen fijos, como en PROP, porque no hay decisión que los convierta en campos y añadirlos cambiaría el panel aprobado. Correo, teléfono e Instagram son editables; el usuario de Instagram se deriva del enlace. |
 | C3 | Noticia «gracias-trail-2026» existe en PROD y no en EXP | Se importa en la feature 007 con su imagen real (PROD, MIT). |
 | C4 | Fuentes con extensión `.woff2` y datos TTF | Se corrige en la feature 011 (rendimiento) sin cambiar el aspecto. |
 | C5 | CSV de PROD con cabeceras `Pos, Meta, Genero, Pos Categoria, Pos Genero` | **Resuelta (006)**: alias `meta` → tiempo en el cliente y en el servidor; `Pos Categoria` y `Pos Genero` no se importan. Los CSV reales no se versionan (datos personales): se importan con `importar-clasificacion` desde el archivo original. |
