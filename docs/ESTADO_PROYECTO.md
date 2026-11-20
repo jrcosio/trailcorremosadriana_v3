@@ -4,28 +4,44 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 009-patrocinadores-colaboradores (merge local en `main`)
-- **Siguiente feature**: 010-reglamento-contacto
+- **Última feature cerrada**: 010-reglamento-contacto (merge local en `main`)
+- **Siguiente feature**: 011-cierre (última)
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Siguiente acción concreta**: `git switch -c 010-reglamento-contacto main` y `/speckit-specify`.
-  - Reglamento por edición (DOC 14): columna o tabla ligada a `ediciones`; se importa el resumen
-    de 2026 de la semilla (sin el párrafo «PRUEBA», D4) para la edición actual.
-  - Contacto: `settings.email`, `phone` e `instagram` (semilla) en una tabla `configuracion` con
-    versión; formulario `/contacto` sigue con `mailto` (constitución VI). Decidir en la spec si
-    «Imanol» y «Plaza de Cosío» (C2) pasan a ser editables o siguen fijos.
-  - `persistencia.ts`: quitar `regulation` de `SECCIONES_SIN_PERSISTENCIA` y llevar los ajustes
-    de contacto (hoy `otrosAjustes` → `PUT /api/content` 501) a su recurso. Si no queda ninguna
-    sección sin persistencia, retirar el 501 y actualizar la comprobación «sección sin
-    persistencia» de `verificar-acceso.mjs` (hoy usa `/admin/reglamento`).
-- **Entorno local**: esquema `0009_entidades`, con los datos importados y la cuenta local `admin`.
+- **Siguiente acción concreta**: `git switch -c 011-cierre main` y `/speckit-specify` con historias
+  separadas y priorizadas (feature amplia: evitar una spec gigante).
+  1. **404 reales y metadatos de detalle** (U4, U5):
+     - estado HTTP 404 para rutas inexistentes y para detalles que no existen (noticia, álbum,
+       carrera, clasificación);
+     - título y descripción por detalle;
+     - mensajes de error en español también para 404/405 genéricos de la API (hoy «Not Found» y
+       «Method Not Allowed»).
+  2. **Accesibilidad y móvil**:
+     - revisión automática y manual (landmarks, foco, contraste, formularios);
+     - cabecera a 320/340 px (hoy desborda a 357 px).
+  3. **Rendimiento**:
+     - fuentes `.woff2` que en realidad son TTF (C4);
+     - peso de imágenes y caché.
+  4. **Seguridad de cabeceras**: CSP completa compatible con el iframe de Wikiloc.
+  5. **Operación**:
+     - copia y restauración probadas de extremo a extremo (`infra/scripts/backup.sh` y
+       `restore.sh`);
+     - documentación de operación;
+     - preparación de un despliegue independiente con R2, secretos y dominio, sin desplegar.
+  6. **Limpieza**:
+     - decisión sobre `/pantallas` (U6);
+     - archivos sin uso;
+     - aviso de `httpx` en pytest;
+     - borrado físico de archivos huérfanos (decisión de la 003).
+- **Entorno local**: esquema `0010_reglamento_contacto`, con los datos importados y la cuenta
+  local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001–008, 009 (patrocinadores y colaboradores) |
+| Terminadas | 0, 001–009, 010 (reglamento y contacto) |
 | Activa | — |
-| Pendientes | 010 y 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -63,6 +79,9 @@
 | 2026-11-20 | Texto alternativo por foto generado desde el título del álbum (`photoAlts`); foco atrapado en el visor | 008 research R2/R5, DISCREPANCIAS M7 |
 | 2026-11-20 | Patrocinadores y colaboradores en una tabla `entidades` por tipo; secciones independientes; los 8 patrocinadores sin web | 009 research, DOC 08 |
 | 2026-11-20 | Mensajes de validación con el nombre del campo en el formulario de cada sección (`ETIQUETAS_POR_RUTA`) | 009 implementación |
+| 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
+| 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
+| 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
 
 ## Supuestos
 
@@ -164,6 +183,14 @@
 | 2026-11-20 | 009 | Migración 0009 e `importar-inicial` sobre la base existente; `restart` de la API | 8 patrocinadores sin web; persisten tras el reinicio |
 | 2026-11-20 | 009 | `verificar-entidades.mjs` (8 logos en orden, sin enlace, `object-fit: contain` y ≥150 px a 4 anchos sin desbordamiento; 2 colaboradores con orden, pestaña nueva, cambio de orden, retirada, patrocinadores intactos, borrado) | 10/10 OK |
 | 2026-11-20 | 009 | Regresión: rutas 42/42, admin 2/2, acceso 7/7, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, respaldo con la API detenida 3/3 | OK |
+| 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
+| 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |
+| 2026-11-20 | 010 | vitest (persistencia y usuario de Instagram), typecheck y build | **69 passed**; OK |
+| 2026-11-20 | 010 | Migración 0010 e `importar-inicial` sobre la base existente | Reglamento 2026 y contacto importados |
+| 2026-11-20 | 010 | SC-005: texto de `/reglamento`, `/contacto`, `/inscripciones` y `/` (contenido, pie y enlaces) antes y después | Idéntico |
+| 2026-11-20 | 010 | `verificar-reglamento-contacto.mjs` (referencia 2026, edición en la edición actual sin tocar 2026, validación sin éxito simulado, contacto en todas las ubicaciones, `mailto`, reinicio, restauración) | 7/7 OK |
+| 2026-11-20 | 010 | `/speckit-converge` | 1.ª pasada: T019 (respaldo a la semilla sin reglamento en ninguna edición, con prueba y documentado); 2.ª pasada: Converged |
+| 2026-11-20 | 010 | `verificar-acceso.mjs` (paso 4: error real del servidor en `/admin/ajustes`) y regresión: rutas 42/42, admin 2/2, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, entidades 10/10, respaldo 3/3 | OK |
 | 2026-11-20 | 009 | Revisión durante la verificación: el error de la web de una entidad decía «álbum externo» | Corregido (`logotipo`, `web de la entidad`) con prueba |
 | 2026-11-20 | 007 | Desbordamiento a 4 anchos en `/`, `/noticias` y el detalle; captura de la portada | 0 desbordamientos; cuadrícula aprobada para varias noticias |
 | 2026-11-20 | 007 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, clasificaciones 11/11, acceso 7/7 | OK (`verificar-acceso` pasa a usar `/admin/reglamento` como sección sin persistencia; se borraron 2 borradores de prueba creados por la versión anterior del script) |

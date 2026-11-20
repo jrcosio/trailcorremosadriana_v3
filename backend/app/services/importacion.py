@@ -11,7 +11,8 @@ from pathlib import Path
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.models import Album, Carrera, CarreraEdicion, Edicion, Entidad, Noticia
+from app.models import Album, Carrera, CarreraEdicion, Configuracion, Edicion, Entidad, Noticia
+from app.schemas.reglamento import normalizar
 from app.services.contenido import RUTA_SEMILLA
 from app.services.fechas import MADRID
 
@@ -71,6 +72,29 @@ def importar(db: Session, reemplazar: bool = False, ruta: Path = RUTA_SEMILLA) -
             acciones.append(
                 "Inscripciones de la edición actual: cerradas, con el mensaje de la semilla."
             )
+
+    # Reglamento (feature 010): la referencia de 2026 de la semilla (sin D4), si ninguna edición
+    # tiene reglamento.
+    con_reglamento = select(func.count(Edicion.id)).where(Edicion.reglamento != "")
+    edicion_2026 = db.scalar(select(Edicion).where(Edicion.anio == 2026))
+    if edicion_2026 is not None and semilla.get("regulation") and not db.scalar(con_reglamento):
+        edicion_2026.reglamento = normalizar(semilla["regulation"])
+        acciones.append("Reglamento de referencia 2026 asociado a la edición 2026.")
+
+    # Contacto (feature 010): solo si no hay configuración.
+    if db.get(Configuracion, 1) is None:
+        ajustes = semilla["settings"]
+        db.add(
+            Configuracion(
+                id=1,
+                correo=ajustes["email"],
+                telefono=ajustes["phone"],
+                instagram=ajustes["instagram"],
+                version=1,
+            )
+        )
+        db.flush()
+        acciones.append("Datos de contacto importados (correo, teléfono e Instagram).")
 
     if not db.scalar(select(func.count(Carrera.id))):
         ediciones = {e.anio: e for e in db.scalars(select(Edicion))}

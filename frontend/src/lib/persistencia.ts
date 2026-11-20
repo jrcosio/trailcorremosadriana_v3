@@ -2,14 +2,16 @@
  * Persistencia del panel por recursos (transición desde el documento único de la propuesta).
  *
  * `Admin.tsx` guarda siempre un `SiteData` completo. Este módulo compara el estado anterior con el
- * siguiente y envía cada cambio a su recurso en la API. Las secciones que aún no tienen
- * persistencia propia van a `PUT /api/content`, que responde «Esta sección del panel todavía no
- * guarda cambios.» Tras guardar se vuelve a leer la vista privada para mostrar los datos y las
+ * siguiente y envía cada cambio a su recurso en la API; nunca envía el documento completo
+ * (DISCREPANCIAS M1). Un cambio sin recurso conocido se rechaza aquí, sin llamar al servidor y sin
+ * simular éxito. Tras guardar se vuelve a leer la vista privada para mostrar los datos y las
  * versiones confirmados por el servidor.
  *
- * Recursos migrados: evento y pruebas (004), inscripciones y Dorsal Solidario (005), clasificaciones
- * (006), noticias (007), galería (008), patrocinadores y colaboradores (009). Orden: pruebas → evento → inscripciones → clasificaciones → resto (un enlace o una ficha de
- * prueba nueva deben existir antes de abrir inscripciones o clasificar).
+ * Recursos: evento y pruebas (004), inscripciones y Dorsal Solidario (005), clasificaciones (006),
+ * noticias (007), galería (008), patrocinadores y colaboradores (009), reglamento y contacto (010).
+ * Orden: pruebas → evento → inscripciones → reglamento → clasificaciones → resto (un enlace o una
+ * ficha de prueba nueva deben existir antes de abrir inscripciones o clasificar). Evento,
+ * inscripciones y reglamento comparten la versión de la edición actual.
  */
 import { apiFetch } from './api';
 import type { Item, SiteData } from './data';
@@ -19,10 +21,11 @@ export type Resultado = { ok: true; datos: SiteData } | { ok: false; estado: num
 
 const CAMPOS_EVENTO = ['edition', 'date', 'countdown'] as const;
 const CAMPOS_INSCRIPCION = ['registrationsOpen', 'registrationMessage', 'solidarityRegistration'] as const;
-const CAMPOS_MIGRADOS = new Set<string>([...CAMPOS_EVENTO, ...CAMPOS_INSCRIPCION]);
-const CAMPOS_TECNICOS = new Set(['eventVersion']);
-const SECCIONES_SIN_PERSISTENCIA = ['regulation'] as const;
+const CAMPOS_CONTACTO = ['email', 'phone', 'instagram'] as const;
+const CAMPOS_MIGRADOS = new Set<string>([...CAMPOS_EVENTO, ...CAMPOS_INSCRIPCION, ...CAMPOS_CONTACTO]);
+const CAMPOS_TECNICOS = new Set(['eventVersion', 'contactVersion']);
 const ERROR_GENERICO = 'No se han podido guardar los cambios. Inténtalo de nuevo.';
+export const SIN_RECURSO = 'Esta sección del panel todavía no guarda cambios.';
 
 const igual = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 const porId = (items: Item[]) => new Map(items.map((i) => [i.id, i]));
@@ -88,6 +91,10 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
         version,
       },
     });
+    version += 1;
+  }
+  if (!igual(anterior.regulation, siguiente.regulation)) {
+    operaciones.push({ metodo: 'PUT', url: '/api/admin/reglamento', cuerpo: { regulation: siguiente.regulation, version } });
   }
 
   const clasificacionesPrevias = porId(anterior.results);
@@ -111,14 +118,22 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
   recursoSimple(operaciones, anterior.sponsors, siguiente.sponsors, '/api/admin/entidades/patrocinadores');
   recursoSimple(operaciones, anterior.collaborators, siguiente.collaborators, '/api/admin/entidades/colaboradores');
 
-  const ajustesPendientes = new Set([...Object.keys(a), ...Object.keys(s)]);
-  const otrosAjustes = [...ajustesPendientes].some(
-    (k) => !CAMPOS_MIGRADOS.has(k) && !CAMPOS_TECNICOS.has(k) && !igual(a[k], s[k]),
-  );
-  if (otrosAjustes || SECCIONES_SIN_PERSISTENCIA.some((k) => !igual(anterior[k], siguiente[k]))) {
-    operaciones.push({ metodo: 'PUT', url: '/api/content', cuerpo: { data: siguiente, revision: 0 } });
+  if (CAMPOS_CONTACTO.some((k) => !igual(a[k], s[k]))) {
+    operaciones.push({
+      metodo: 'PUT',
+      url: '/api/admin/contacto',
+      cuerpo: { email: s.email ?? '', phone: s.phone ?? '', instagram: s.instagram ?? '', version: a.contactVersion ?? 0 },
+    });
   }
   return operaciones;
+}
+
+/** Ajustes modificados que no pertenecen a ningún recurso (FR-011 de la feature 010). */
+export function cambiosSinRecurso(anterior: SiteData, siguiente: SiteData): string[] {
+  const a = anterior.settings;
+  const s = siguiente.settings;
+  const claves = new Set([...Object.keys(a), ...Object.keys(s)]);
+  return [...claves].filter((k) => !CAMPOS_MIGRADOS.has(k) && !CAMPOS_TECNICOS.has(k) && !igual(a[k], s[k]));
 }
 
 async function error(respuesta: Response): Promise<Resultado> {
@@ -127,6 +142,7 @@ async function error(respuesta: Response): Promise<Resultado> {
 }
 
 export async function guardarCambios(anterior: SiteData, siguiente: SiteData): Promise<Resultado> {
+  if (cambiosSinRecurso(anterior, siguiente).length) return { ok: false, estado: 400, error: SIN_RECURSO };
   try {
     for (const op of planificar(anterior, siguiente)) {
       const respuesta = await apiFetch(op.url, {

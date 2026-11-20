@@ -59,10 +59,11 @@ repositorio.
   (timeout de conexión).
 - Las migraciones se aplican solo con un paso explícito:
   `docker compose run --rm api alembic upgrade head`. El servicio nunca migra al arrancar.
-- **Contrato transitorio**: `GET /api/content` es un adaptador de solo lectura que devuelve el
-  `SiteData` publicado. Hoy procede de `backend/seed/contenido_inicial.json`, validado al arrancar.
-  Las features 004–010 sustituyen cada sección por tablas de PostgreSQL manteniendo el contrato.
-  No existe `PUT /api/content`: las escrituras serán por recurso (`/api/admin/...`).
+- **Contrato de lectura**: `GET /api/content` es un adaptador de solo lectura que devuelve el
+  `SiteData` publicado (o el privado con `?admin=1`). Desde la feature 010 todas las secciones
+  proceden de PostgreSQL. `backend/seed/contenido_inicial.json` (validado al arrancar) solo se
+  usa como respaldo de lo que falte en una base sin inicializar. No existe `PUT /api/content`
+  (405): las escrituras son por recurso (`/api/admin/...`).
 - Errores en formato `{"error": "..."}`, que es el que ya consume el frontend. Las respuestas de
   la API llevan `Cache-Control: no-store` y `X-Content-Type-Options: nosniff`.
 - OpenAPI en `/api/docs` solo con `ENTORNO=desarrollo`. Los contratos versionados están en
@@ -82,7 +83,9 @@ repositorio.
 | `news[]` | `PUT/DELETE /api/admin/noticias/{id}` (007) |
 | `albums[]` | `PUT/DELETE /api/admin/albumes/{id}` (008) |
 | `sponsors[]` y `collaborators[]` | `PUT/DELETE /api/admin/entidades/patrocinadores/{id}` y `…/colaboradores/{id}` (009) |
-| secciones aún no migradas | `PUT /api/content`, que responde 501 «Esta sección del panel todavía no guarda cambios.» |
+| `regulation` | `PUT /api/admin/reglamento` (010; después de las inscripciones, con la versión de la edición) |
+| `settings.email`, `phone`, `instagram` | `PUT /api/admin/contacto` (010; con `contactVersion`) |
+| cualquier otro cambio | Se rechaza en el cliente con «Esta sección del panel todavía no guarda cambios.», sin llamar al servidor |
 
 Después se relee `GET /api/content?admin=1`, así que el panel muestra lo que confirmó el
 servidor, con sus versiones. Cada feature siguiente añade su recurso a este módulo.
@@ -107,6 +110,26 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
   `--reemplazar` exige confirmación escrita.
 - **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
   ediciones ni pruebas (base sin inicializar), se sirve la semilla.
+
+## Reglamento y contacto (feature 010)
+
+- **Reglamento**:
+  - Columna `ediciones.reglamento` (hasta 200 000 caracteres). Comparte la versión de la edición
+    con el evento y las inscripciones.
+  - La web y el editor muestran el de la edición actual o, si no tiene, el de la edición más
+    reciente que lo tenga (hoy, la referencia de 2026). Si ninguna edición tiene reglamento, se
+    sirve el de la semilla, como en una base sin inicializar, para que `/reglamento` nunca quede
+    vacío.
+  - Se normalizan los saltos de línea y se recortan los espacios exteriores; el resto se guarda
+    íntegro.
+- **Contacto**: tabla `configuracion` de fila única (`id = 1`), con correo, teléfono, Instagram
+  (`https://` en `instagram.com`) y `version`. `/contacto` deriva el usuario de Instagram del
+  enlace (`lib/contacto.ts`). «Imanol» y «Plaza de Cosío» siguen fijos (DISCREPANCIAS C2).
+- **Formulario de contacto**: sigue preparando un `mailto` al correo configurado, sin envío por
+  servidor.
+- **Importación**:
+  - El reglamento de la semilla se asocia a la edición 2026 si ninguna edición tiene reglamento.
+  - El contacto se importa si no hay configuración.
 
 ## Patrocinadores y colaboradores (feature 009)
 
@@ -255,8 +278,9 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
   - Tiempo igualado con un hash ficticio.
   - Con la base caída: 503 genérico. Si la API no responde, Caddy devuelve 503 en JSON
     (`handle_errors`).
-- **Transitorio**: `PUT /api/content` y `POST /api/upload` aplican toda la protección y
-  responden 501 («Esta sección del panel todavía no guarda cambios.») hasta sus features.
+- **Escrituras**: todas son recursos reales con la protección completa. `PUT /api/content` y el
+  501 transitorio se retiraron en la feature 010; las pruebas de protección usan
+  `PUT /api/admin/contacto`.
 - **Otras cabeceras**: Caddy añade `nosniff`, `Referrer-Policy` y `X-Frame-Options: SAMEORIGIN`.
   La CSP completa se define en la feature 011 (iframe de Wikiloc).
 - **Sin secretos en el repositorio**: `.env` está ignorado y `.env.example` solo contiene valores

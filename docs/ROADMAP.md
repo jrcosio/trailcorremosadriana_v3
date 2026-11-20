@@ -15,8 +15,8 @@ corresponde. Estado: ⏳ pendiente · 🔄 activa · ✅ terminada.
 | 7 | Noticias: borradores, publicación, imágenes, detalle | 3 | ✅ | `007-noticias` |
 | 8 | Galería: álbumes, fotografías, orden, enlaces históricos | 3 | ✅ | `008-galeria` |
 | 9 | Patrocinadores y colaboradores | 3 | ✅ | `009-patrocinadores-colaboradores` |
-| 10 | Reglamento y contacto | 4 | ⏳ siguiente | `010-reglamento-contacto` |
-| 11 | Cierre: accesibilidad, móvil, rendimiento, 404/metadatos, copias, despliegue independiente | 1–10 | ⏳ | `011-cierre` |
+| 10 | Reglamento y contacto | 4 | ✅ | `010-reglamento-contacto` |
+| 11 | Cierre: accesibilidad, móvil, rendimiento, 404/metadatos, copias, despliegue independiente | 1–10 | ⏳ siguiente | `011-cierre` |
 
 ## Fuera de alcance (salvo nueva instrucción)
 

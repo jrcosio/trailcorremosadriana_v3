@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { guardarCambios, planificar } from '@/lib/persistencia';
+import { cambiosSinRecurso, guardarCambios, planificar, SIN_RECURSO } from '@/lib/persistencia';
 import { seed, type SiteData } from '@/lib/data';
 
 function base(): SiteData {
   const d = structuredClone(seed);
   d.settings.eventVersion = 3;
+  d.settings.contactVersion = 2;
   d.races = d.races.map((r, i) => ({ ...r, version: i + 1 }));
   return d;
 }
@@ -37,11 +38,51 @@ describe('planificar', () => {
     ]);
   });
 
-  it('secciones sin persistencia → PUT /api/content (501 en el servidor)', () => {
+  it('reglamento → recurso propio con la versión de la edición', () => {
     const a = base();
     const s = base();
-    s.regulation += '\nNuevo';
-    expect(planificar(a, s)).toEqual([{ metodo: 'PUT', url: '/api/content', cuerpo: { data: s, revision: 0 } }]);
+    s.regulation += '\n\nNUEVO\nApartado.';
+    expect(planificar(a, s)).toEqual([{ metodo: 'PUT', url: '/api/admin/reglamento', cuerpo: { regulation: s.regulation, version: 3 } }]);
+  });
+
+  it('evento, inscripciones y reglamento encadenan la versión compartida', () => {
+    const a = base();
+    const s = base();
+    s.settings.countdown = false;
+    s.settings.registrationMessage = 'Pronto.';
+    s.regulation = 'Nuevo';
+    expect(planificar(a, s).map((o) => [o.url, (o.cuerpo as { version: number }).version])).toEqual([
+      ['/api/admin/evento', 3],
+      ['/api/admin/inscripciones', 4],
+      ['/api/admin/reglamento', 5],
+    ]);
+  });
+
+  it('contacto → recurso propio con contactVersion; contactVersion no es un cambio', () => {
+    const a = base();
+    const s = base();
+    s.settings.email = 'organizacion@example.com';
+    expect(planificar(a, s)).toEqual([
+      {
+        metodo: 'PUT',
+        url: '/api/admin/contacto',
+        cuerpo: { email: 'organizacion@example.com', phone: a.settings.phone, instagram: a.settings.instagram, version: 2 },
+      },
+    ]);
+    const v = base();
+    v.settings.contactVersion = 3;
+    expect(planificar(a, v)).toEqual([]);
+    expect(cambiosSinRecurso(a, v)).toEqual([]);
+  });
+
+  it('nunca envía el documento completo', () => {
+    const a = base();
+    const s = base();
+    s.settings.countdown = false;
+    s.settings.email = 'otra@example.com';
+    s.regulation = 'Otro';
+    s.sponsors = [];
+    expect(planificar(a, s).some((o) => o.url.startsWith('/api/content'))).toBe(false);
   });
 
   it('inscripciones: enlaces de prueba primero y apertura después', () => {
@@ -175,6 +216,16 @@ describe('guardarCambios', () => {
     });
     expect(await guardarCambios(a, s)).toEqual({ ok: false, estado: 409, error: 'Otra persona ha modificado estos datos.' });
     expect(llamadas).toEqual(['PUT /api/admin/carreras/trail-27k']);
+  });
+
+  it('cambio sin recurso: aviso local sin llamar al servidor', async () => {
+    const a = base();
+    const s = base();
+    s.settings.desconocido = 'x';
+    const llamadas = servidor({});
+    expect(cambiosSinRecurso(a, s)).toEqual(['desconocido']);
+    expect(await guardarCambios(a, s)).toEqual({ ok: false, estado: 400, error: SIN_RECURSO });
+    expect(llamadas).toEqual([]);
   });
 
   it('sin conexión', async () => {

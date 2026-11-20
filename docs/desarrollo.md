@@ -81,9 +81,15 @@ node scripts/verificar-admin.mjs          # acceso erróneo genérico; vistas de
 ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-acceso.mjs --bloqueo   # acceso real de extremo a extremo
 node scripts/capturas.mjs http://localhost:8080 capturas/local   # 360/768/1024/1440 + desbordamiento
 ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-subida.mjs   # subida real desde el panel
+# Una verificación por feature (cada una restaura los datos al terminar):
+#   verificar-evento-carreras, verificar-inscripciones, verificar-clasificaciones,
+#   verificar-noticias, verificar-galeria, verificar-entidades, verificar-reglamento-contacto
+ADMIN_USUARIO=admin ADMIN_PASSWORD=… node scripts/verificar-reglamento-contacto.mjs
 ```
 
 `verificar-respaldo.mjs` se ejecuta con la API detenida (`docker compose stop api`).
+`verificar-reglamento-contacto.mjs` reinicia la API y usa `docker compose exec db` para restaurar
+el reglamento, así que se lanza desde `frontend/` con Compose en marcha.
 
 ## Comandos útiles
 

@@ -13,10 +13,12 @@ from app.api import (
     admin_albumes,
     admin_carreras,
     admin_clasificaciones,
+    admin_contacto,
     admin_entidades,
     admin_evento,
     admin_inscripciones,
     admin_noticias,
+    admin_reglamento,
     archivos,
     clasificaciones,
     contenido,
@@ -65,6 +67,10 @@ ETIQUETAS = {
     "sourceFile": "archivo CSV",
     "raceId": "carrera",
     "year": "edición",
+    "regulation": "reglamento",
+    "email": "correo de la organización",
+    "phone": "teléfono de contacto",
+    "instagram": "Instagram",
 }
 # Mismo campo con otro nombre en el formulario de una sección concreta (prefijo de la ruta).
 ETIQUETAS_POR_RUTA = {
@@ -162,6 +168,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_noticias.router)
     app.include_router(admin_albumes.router)
     app.include_router(admin_entidades.router)
+    app.include_router(admin_reglamento.router)
+    app.include_router(admin_contacto.router)
     app.include_router(clasificaciones.router)
     return app
 

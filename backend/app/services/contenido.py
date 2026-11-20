@@ -1,8 +1,7 @@
 """Contrato transitorio `SiteData` (GET /api/content).
 
-Desde la feature 004, la edición, la fecha, el contador y las pruebas proceden de PostgreSQL. El
-resto de secciones sigue saliendo de la semilla curada hasta su feature. En una base sin
-inicializar (sin ediciones ni pruebas) se usa la semilla completa (comportamiento transitorio).
+Todas las secciones proceden de PostgreSQL (features 004–010). En una base sin inicializar (sin
+ediciones ni pruebas, o sin configuración de contacto) se usa la semilla curada para lo que falte.
 """
 
 import json
@@ -65,11 +64,13 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
     from app.services import (
         carreras,
         clasificaciones,
+        contacto,
         entidades,
         evento,
         galeria,
         inscripciones,
         noticias,
+        reglamento,
     )  # diferida: evita ciclos
 
     data = semilla.model_dump(mode="json")
@@ -91,8 +92,16 @@ def construir(db: Session, semilla: SiteData, privado: bool) -> dict[str, Any]:
         data["albums"] = galeria.listar(db, privado=privado)
         data["sponsors"] = entidades.listar(db, "patrocinador", privado=privado)
         data["collaborators"] = entidades.listar(db, "colaborador", privado=privado)
+        # Sin reglamento en ninguna edición se mantiene el de la semilla (como en base vacía).
+        data["regulation"] = reglamento.mostrado(db) or data["regulation"]
     else:
         registro.warning(
             "Base sin ediciones ni pruebas: se sirve la semilla (ejecuta importar-inicial)."
         )
+    conf = contacto.obtener(db)
+    if conf is not None:
+        c = contacto.a_contrato(conf)
+        data["settings"].update(email=c["email"], phone=c["phone"], instagram=c["instagram"])
+    if privado:
+        data["settings"]["contactVersion"] = conf.version if conf else 0
     return data if privado else filtrar_publicos(data)
