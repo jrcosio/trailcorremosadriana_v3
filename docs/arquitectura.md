@@ -57,7 +57,10 @@ repositorio.
   `ajustes.css`, cada uno con su referencia:
   - A-001: cabecera a 360 px;
   - A-002: contraste AA por la decisión P4;
-  - A-003: cabecera por debajo de 360 px.
+  - A-003: cabecera por debajo de 360 px;
+  - A-004: fotos siempre completas por la decisión P6 (feature 012). Cada `<img>` de foto lleva
+    `style={fondoFoto(src)}` (`lib/fotos.ts`, variable `--foto`). El marco no cambia; la foto se
+    muestra con `contain` y el espacio sobrante se rellena con la misma foto bajo un velo verde.
 - **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.

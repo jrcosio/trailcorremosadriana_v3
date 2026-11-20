@@ -4,32 +4,35 @@
 
 ## Punto de continuidad
 
-- **Estado**: **las 11 features del ROADMAP están terminadas**, verificadas y fusionadas en
-  `main` en local. No se ha hecho push, ni despliegue, ni cambios de dominio o de producción.
-- **Última feature**: 011-cierre (404 reales y metadatos, accesibilidad AA y móvil, copia y
-  restauración, ensayo de despliegue, CSP, `/pantallas` retirada en producción, fuentes WOFF2 y
-  limpieza). Detalle en `specs/011-cierre/` y en las pruebas de abajo.
-- **Siguiente acción**: ninguna de desarrollo pendiente. Lo que queda depende del propietario:
-  1. **Publicar el repositorio**: autorizar el `git push` de `main` (y de las ramas de feature,
-     si se quieren conservar). No se ha hecho, según las instrucciones.
-  2. **Desplegar**: servidor, DNS del dominio, bucket y token de R2, y `.env` de producción con
-     sus secretos, siguiendo `docs/operacion.md`. Para estrenar con los datos revisados se puede
-     restaurar una copia del entorno local (sección 7).
-  3. **Datos de lanzamiento** (ver «Bloqueos»): se introducen desde el panel; no requieren
-     desarrollo.
-- **Si se retoma el desarrollo**: cualquier cambio nuevo es una feature 012 con el mismo ciclo
-  SDD. Antes de empezar, leer este archivo, `docs/ROADMAP.md` y
-  `.specify/memory/constitution.md`.
-- **Entorno local**: esquema `0010_reglamento_contacto` (la 011 no añade migraciones), con los
-  datos importados, las clasificaciones reales de 2026, la cuenta local `admin` y
-  `PANTALLAS=no`. Para revisar `/pantallas`: `PANTALLAS=si docker compose up -d web`.
+- **Estado**: features 001–011 terminadas y fusionadas en `main` en local (sin push).
+- **Feature activa**: 012-ajustes-revision (rama `012-ajustes-revision`). Recoge los ajustes que
+  pide el propietario tras revisar la web.
+  - Primero, **P6: las fotos se ven siempre completas**. Capturas del propietario en
+    `datos_iniciales/` (ignorada por Git): la foto de Adriana sale con la cabeza cortada en la
+    portada y en `/solidaridad`.
+- **US1 (P6) terminada**:
+  - Diagnóstico: 166 de 180 apariciones de fotos se recortaban (8 marcos públicos y 2
+    miniaturas del panel, a 5 anchos), con pérdidas de hasta el 55 %.
+  - Solución: `lib/fotos.ts` (`fondoFoto`, variable `--foto`) y `ajustes.css` A-004. Marcos
+    iguales; foto completa (`contain`); relleno con la propia foto bajo un velo verde. La cabecera
+    del detalle de prueba coloca la foto a la derecha, fuera del degradado.
+  - Verificación: `verificar-fotos.mjs` (180/180 completas y marcos con 0 px de diferencia;
+    logotipos, visor y vista previa sin cambios); axe 0; sin desbordamientos; capturas: solo
+    cambian las 6 páginas con fotos; regresión correcta.
+  - Fuera de alcance (supuesto de la spec): fondos decorativos de la portada, del banner de la
+    galería y del marcador del mapa.
+- **Siguiente acción concreta**: esperar los demás ajustes del propietario y añadirlos como
+  historias nuevas (US2, US3…) de esta feature, con el mismo ciclo SDD (actualizar
+  `specs/012-ajustes-revision/spec.md`, plan y tareas).
+- **Pendiente del propietario** (sin cambios): push, despliegue y datos de lanzamiento (ver
+  «Bloqueos»).
 
 ## Features
 
 | Estado | Features |
 |---|---|
 | Terminadas | 0 y 001–011 (todas) |
-| Activa | — |
+| Activa | 012-ajustes-revision |
 | Pendientes | — (solo acciones del propietario; ver el punto de continuidad) |
 
 ## Decisiones tomadas
@@ -184,6 +187,8 @@
 | 2026-11-20 | 011 | Ensayo de despliegue independiente (clon limpio, `trail-ensayo`, 8090, restauración sobre una base nueva) | Web, panel, clasificaciones 63/205/224, metadatos y archivos correctos; retirado sin tocar desarrollo |
 | 2026-11-20 | 011 | `compose.produccion.yaml config` sin variables / con variables | Falla nombrando la variable / 80, 443, `COOKIE_SECURE=true`, `PANTALLAS=no` |
 | 2026-11-20 | 011 | Regresión: rutas 42/42 (`/pantallas` activas y retiradas), admin 2/2 (los dos modos), acceso 7/7, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, entidades 10/10, reglamento y contacto 7/7, respaldo 3/3 | OK |
+| 2026-11-20 | 012 | US1 (P6): `verificar-fotos.mjs` contra la referencia previa (180 fotos, 5 anchos, públicas, panel y álbum temporal) | 180/180 completas; marcos idénticos; relleno donde procede; logotipos, visor y vista previa sin cambios |
+| 2026-11-20 | 012 | vitest (`fondoFoto`), axe y desbordamiento, capturas y regresión (rutas, cierre, galería, noticias, subida) | 75 passed; 0 incumplimientos; 0 desbordamientos; 42/42, 7/7, 6/6, 8/8, 2/2 |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

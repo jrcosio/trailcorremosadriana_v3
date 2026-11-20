@@ -73,3 +73,29 @@
     padding: 8px 7px;
   }
 }
+
+/*
+ * A-004 (feature 012, decisión del propietario P6): las fotos se ven siempre completas.
+ * Cada marco conserva su tamaño y su posición; la foto se muestra entera (contain) y el espacio
+ * sobrante se rellena con la propia foto (`--foto`, fijada por `fondoFoto`) bajo un velo del verde
+ * de la paleta, sin barras vacías. Si la foto no carga, queda el verde de base.
+ */
+.race-card > img,
+.cause-photo > img,
+.news-image img,
+.race-detail-hero > img,
+.article-image,
+.album-card > img,
+.album-archive > img,
+.photo-grid img,
+.admin-row-name img,
+.admin-photo-grid img {
+  object-fit: contain;
+  object-position: center;
+  background: linear-gradient(rgb(23 46 40 / 0.82), rgb(23 46 40 / 0.82)),
+    var(--foto, none) center / cover no-repeat #172e28;
+}
+/* Cabecera del detalle: la foto, a la derecha, fuera del degradado decorativo de la izquierda. */
+.race-detail-hero > img {
+  object-position: right center;
+}
