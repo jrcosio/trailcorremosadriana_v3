@@ -1,0 +1,5 @@
+# Solo producción (lo monta compose.produccion.yaml): www.<dominio> → dominio principal, con la
+# misma ruta, como hacía la web anterior. Caddy obtiene también el certificado de www.
+www.{$SITE_ADDRESS} {
+	redir {$PUBLIC_ORIGIN}{uri} permanent
+}

@@ -28,7 +28,11 @@ services:
         PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Define PUBLIC_ORIGIN (https://dominio)}
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:?Define SITE_ADDRESS (dominio, sin https://)}
+      # Destino de la redirección de www.<dominio> (infra/caddy/redireccion-www.caddy).
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Define PUBLIC_ORIGIN (https://dominio)}
       PANTALLAS: "no"
+    volumes:
+      - ./infra/caddy/redireccion-www.caddy:/etc/caddy/sitios/redireccion-www.caddy:ro
     ports: !override
       - "80:80"
       - "443:443"

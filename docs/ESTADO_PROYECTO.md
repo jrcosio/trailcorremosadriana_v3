@@ -22,9 +22,19 @@
     cambian las 6 páginas con fotos; regresión correcta.
   - Fuera de alcance (supuesto de la spec): fondos decorativos de la portada, del banner de la
     galería y del marcador del mapa.
-- **Siguiente acción concreta**: esperar los demás ajustes del propietario y añadirlos como
-  historias nuevas (US2, US3…) de esta feature, con el mismo ciclo SDD (actualizar
-  `specs/012-ajustes-revision/spec.md`, plan y tareas).
+- **US2 terminada** (despliegue en la MV de la web anterior):
+  - Situación en la MV (v2): un Caddy propio ocupa 80/443 y redirige `www`.
+  - Cambios: redirección `www` solo en producción (`infra/caddy/redireccion-www.caddy`), HSTS y
+    orígenes en *punycode* (dominio con «ñ»).
+  - Guía (`docs/operacion.md`): migración con vuelta atrás (§12) y acceso al panel (§13).
+  - Ensayo de producción con HTTPS desde un clon limpio (`trail-prod-ensayo`, dominio de prueba
+    con «ñ»), siguiendo la guía: correcto (ver «Pruebas»).
+  - El ensayo encontró y corrigió un fallo de la guía: la variable `$DC` no funciona en zsh; ahora
+    se usa la función `dc`.
+- **Siguiente acción concreta**:
+  1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. Antes hay que subir a
+     GitHub los commits de esta feature (push, cuando lo pida).
+  2. Seguir con los demás ajustes de la revisión como historias nuevas de la 012.
 - **Pendiente del propietario**: despliegue y datos de lanzamiento (ver «Bloqueos»). Los push
   siguientes, solo cuando el propietario los pida.
 
@@ -190,6 +200,10 @@
 | 2026-11-20 | 011 | Regresión: rutas 42/42 (`/pantallas` activas y retiradas), admin 2/2 (los dos modos), acceso 7/7, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, entidades 10/10, reglamento y contacto 7/7, respaldo 3/3 | OK |
 | 2026-11-20 | 012 | US1 (P6): `verificar-fotos.mjs` contra la referencia previa (180 fotos, 5 anchos, públicas, panel y álbum temporal) | 180/180 completas; marcos idénticos; relleno donde procede; logotipos, visor y vista previa sin cambios |
 | 2026-11-20 | 012 | vitest (`fondoFoto`), axe y desbordamiento, capturas y regresión (rutas, cierre, galería, noticias, subida) | 75 passed; 0 incumplimientos; 0 desbordamientos; 42/42, 7/7, 6/6, 8/8, 2/2 |
+| 2026-11-20 | 012 | US2: pytest (orígenes IDN; acceso con dominio escrito con «ñ») | 389 passed |
+| 2026-11-20 | 012 | US2: ensayo de producción con HTTPS desde un clon limpio siguiendo `docs/operacion.md` §12 (`trail-prod-ensayo`, `SITE_ADDRESS=trailpeñasagra.localhost`) | HTTP→HTTPS 308; `www` 301 (conserva ruta y consulta); certificados para el dominio y `www` en *punycode*; HSTS; CSP; 404 reales; `/pantallas` 404; `/api/docs` 404; clasificaciones 63/205/224 |
+| 2026-11-20 | 012 | US2: panel por HTTPS en el ensayo (Chromium) | Acceso con cookies `Secure`/`HttpOnly`/`SameSite=Strict`, guardado real (restaurado), subida, cierre de sesión, 0 violaciones de CSP; la redirección `www` también en el navegador |
+| 2026-11-20 | 012 | US2: regresión local tras el cambio del Caddyfile | Rutas 42/42, cierre 7/7, acceso 7/7, fotos 180/180 |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

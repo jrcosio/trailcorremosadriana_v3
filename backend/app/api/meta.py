@@ -15,5 +15,5 @@ def metadatos(
     request: Request, ruta: str = Query(max_length=300), db: Session = Depends(get_db)
 ) -> str:
     # Siempre 200: `httpInclude` de Caddy trata cualquier otro estado como un fallo de plantilla.
-    datos = meta.resolver(db, ruta, request.app.state.settings.public_origin)
+    datos = meta.resolver(db, ruta, request.app.state.settings.origen_publico)
     return meta.NO_ENCONTRADA if datos is None else meta.renderizar(datos)

@@ -20,9 +20,18 @@ Navegador ──► web (Caddy 2.11, :80 → publicado en WEB_PORT)
 
 `compose.dev.yaml` publica `api` y `db` solo en `127.0.0.1` para desarrollo local, activa
 `/pantallas` (`PANTALLAS=si`) y define `api-test` (pytest contra PostgreSQL real).
-`compose.produccion.yaml` publica 80/443 con HTTPS automático para `SITE_ADDRESS`, fija
-`COOKIE_SECURE=true`, `ENTORNO=produccion` y `PANTALLAS=no`, y exige los secretos sin valores
-por defecto (feature 011).
+`compose.produccion.yaml` (features 011 y 012):
+
+- publica 80/443 con HTTPS automático para `SITE_ADDRESS`;
+- fija `COOKIE_SECURE=true`, `ENTORNO=produccion` y `PANTALLAS=no`;
+- exige los secretos sin valores por defecto;
+- monta `infra/caddy/redireccion-www.caddy`, que el Caddyfile importa desde
+  `/etc/caddy/sitios/*.caddy`: `www.<dominio>` → dominio principal con 301.
+
+Todas las respuestas llevan `Strict-Transport-Security`. Los orígenes del panel se normalizan a
+*punycode* (`normalizar_origen`), así que un dominio con «ñ» funciona aunque la configuración lo
+escriba con «ñ». Guía de despliegue y migración desde la web anterior: `docs/operacion.md`,
+secciones 12 y 13.
 
 ## Repositorio
 

@@ -8,11 +8,21 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def normalizar_origen(valor: str) -> str:
-    """`Esquema://host[:puerto]` en minúsculas y sin barra final; vacío si no es válido."""
-    partes = urlsplit(valor.strip())
-    if partes.scheme not in ("http", "https") or not partes.netloc:
+    """`Esquema://host[:puerto]` en minúsculas, host en *punycode* y sin barra final.
+
+    Los navegadores envían el origen de un dominio con «ñ» en *punycode*
+    (`https://xn--trailpeasagra-okb.com`); así coincide aunque la configuración lo escriba con «ñ»
+    (feature 012). Vacío si no es válido.
+    """
+    try:
+        partes = urlsplit(valor.strip())
+        if partes.scheme not in ("http", "https") or not partes.hostname:
+            return ""
+        host = partes.hostname.encode("idna").decode("ascii")
+        puerto = f":{partes.port}" if partes.port else ""
+    except (UnicodeError, ValueError):
         return ""
-    return f"{partes.scheme.lower()}://{partes.netloc.lower()}"
+    return f"{partes.scheme.lower()}://{host}{puerto}"
 
 
 class Settings(BaseSettings):
@@ -46,6 +56,11 @@ class Settings(BaseSettings):
     @property
     def es_desarrollo(self) -> bool:
         return self.entorno == "desarrollo"
+
+    @property
+    def origen_publico(self) -> str:
+        """`PUBLIC_ORIGIN` normalizado (*punycode*), para URL absolutas y canónicas."""
+        return normalizar_origen(self.public_origin) or self.public_origin.rstrip("/")
 
     @property
     def origenes_validos(self) -> frozenset[str]:
