@@ -81,6 +81,7 @@ repositorio.
 | `settings.registrationsOpen`, `registrationMessage`, `solidarityRegistration` | `PUT /api/admin/inscripciones` (después de las pruebas y del evento) |
 | `news[]` | `PUT/DELETE /api/admin/noticias/{id}` (007) |
 | `albums[]` | `PUT/DELETE /api/admin/albumes/{id}` (008) |
+| `sponsors[]` y `collaborators[]` | `PUT/DELETE /api/admin/entidades/patrocinadores/{id}` y `…/colaboradores/{id}` (009) |
 | secciones aún no migradas | `PUT /api/content`, que responde 501 «Esta sección del panel todavía no guarda cambios.» |
 
 Después se relee `GET /api/content?admin=1`, así que el panel muestra lo que confirmó el
@@ -106,6 +107,20 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
   `--reemplazar` exige confirmación escrita.
 - **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
   ediciones ni pruebas (base sin inicializar), se sirve la semilla.
+
+## Patrocinadores y colaboradores (feature 009)
+
+- **Tabla** `entidades`: `tipo` (`patrocinador` o `colaborador`), `slug` único dentro del tipo,
+  nombre, logotipo obligatorio, `web` (vacía o https sin credenciales), `orden`, `publicada` y
+  `version`. El mismo identificador en las dos secciones son dos entidades distintas.
+- **Endpoints**: `PUT` y `DELETE` en `/api/admin/entidades/{seccion}/{id}`, con `seccion` =
+  `patrocinadores` o `colaboradores`. Borrar no borra el archivo del logotipo.
+- **Orden público**: `orden` y, en caso de empate, fecha de alta. Solo se publican las visibles.
+  Con web, el logo se enlaza en una pestaña nueva; sin web, es informativo.
+- **Mensajes**: los errores de validación usan los nombres del formulario de la sección
+  («logotipo», «web de la entidad»; `ETIQUETAS_POR_RUTA` en `app/main.py`).
+- **Importación**: los 8 patrocinadores aprobados, sin web, si la tabla está vacía. Colaboradores
+  vacíos (D3).
 
 ## Galería (feature 008)
 

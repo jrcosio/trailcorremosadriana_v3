@@ -11,7 +11,7 @@ from pathlib import Path
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.models import Album, Carrera, CarreraEdicion, Edicion, Noticia
+from app.models import Album, Carrera, CarreraEdicion, Edicion, Entidad, Noticia
 from app.services.contenido import RUTA_SEMILLA
 from app.services.fechas import MADRID
 
@@ -149,5 +149,22 @@ def importar(db: Session, reemplazar: bool = False, ruta: Path = RUTA_SEMILLA) -
                 )
             )
         acciones.append("Álbumes históricos importados con sus enlaces de Google Fotos.")
+    if not db.scalar(select(func.count(Entidad.id))):
+        # Solo patrocinadores aprobados, sin web (no confirmadas); los colaboradores, vacíos (D3).
+        for p in semilla["sponsors"]:
+            db.add(
+                Entidad(
+                    tipo="patrocinador",
+                    slug=p["id"],
+                    nombre=p["name"],
+                    logo=p["image"],
+                    web=p.get("url", ""),
+                    orden=int(p.get("order", 0)),
+                    publicada=bool(p.get("published", False)),
+                    version=1,
+                )
+            )
+            db.flush()
+        acciones.append(f"Patrocinadores importados: {len(semilla['sponsors'])} (sin web).")
     db.commit()
     return acciones

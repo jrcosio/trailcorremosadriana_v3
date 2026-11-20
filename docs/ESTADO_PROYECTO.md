@@ -1,30 +1,31 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-19
+Última actualización: 2026-11-20
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 008-galeria (merge local en `main`)
-- **Siguiente feature**: 009-patrocinadores-colaboradores
+- **Última feature cerrada**: 009-patrocinadores-colaboradores (merge local en `main`)
+- **Siguiente feature**: 010-reglamento-contacto
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Siguiente acción concreta**: `git switch -c 009-patrocinadores-colaboradores main` y
-  `/speckit-specify`.
-  - Tabla única `entidades` con tipo `patrocinador` o `colaborador`, nombre, logo, web opcional
-    (https), orden, `publicada` y versión.
-  - `PUT/DELETE /api/admin/entidades/{tipo}/{id}` mediante `recursoSimple` para las secciones
-    `sponsors` y `collaborators`.
-  - Importación de los 8 patrocinadores, sin web y con logos `/reused/logos/patrocinadores/…`.
-    Colaboradores vacíos.
-  - Logos grandes (`object-fit: contain`).
-- **Entorno local**: esquema `0008_galeria`, con los datos importados y la cuenta local `admin`.
+- **Siguiente acción concreta**: `git switch -c 010-reglamento-contacto main` y `/speckit-specify`.
+  - Reglamento por edición (DOC 14): columna o tabla ligada a `ediciones`; se importa el resumen
+    de 2026 de la semilla (sin el párrafo «PRUEBA», D4) para la edición actual.
+  - Contacto: `settings.email`, `phone` e `instagram` (semilla) en una tabla `configuracion` con
+    versión; formulario `/contacto` sigue con `mailto` (constitución VI). Decidir en la spec si
+    «Imanol» y «Plaza de Cosío» (C2) pasan a ser editables o siguen fijos.
+  - `persistencia.ts`: quitar `regulation` de `SECCIONES_SIN_PERSISTENCIA` y llevar los ajustes
+    de contacto (hoy `otrosAjustes` → `PUT /api/content` 501) a su recurso. Si no queda ninguna
+    sección sin persistencia, retirar el 501 y actualizar la comprobación «sección sin
+    persistencia» de `verificar-acceso.mjs` (hoy usa `/admin/reglamento`).
+- **Entorno local**: esquema `0009_entidades`, con los datos importados y la cuenta local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001–007, 008 (galería) |
+| Terminadas | 0, 001–008, 009 (patrocinadores y colaboradores) |
 | Activa | — |
-| Pendientes | 009 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 010 y 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -60,6 +61,8 @@
 | 2026-11-20 | Los CSV reales de 2026 no se versionan (datos personales); se importan con el comando de operador | 006 spec Assumptions |
 | 2026-11-20 | Noticias ordenadas: sin fecha primero y después por fecha descendente; la noticia de producción se importa sin categoría inventada («Actualidad») | 007 research R2, spec Assumptions |
 | 2026-11-20 | Texto alternativo por foto generado desde el título del álbum (`photoAlts`); foco atrapado en el visor | 008 research R2/R5, DISCREPANCIAS M7 |
+| 2026-11-20 | Patrocinadores y colaboradores en una tabla `entidades` por tipo; secciones independientes; los 8 patrocinadores sin web | 009 research, DOC 08 |
+| 2026-11-20 | Mensajes de validación con el nombre del campo en el formulario de cada sección (`ETIQUETAS_POR_RUTA`) | 009 implementación |
 
 ## Supuestos
 
@@ -156,6 +159,12 @@
 | 2026-11-20 | 008 | `verificar-galeria.mjs` (históricos, filtro, álbum con 2 fotos, publicación con `alt`, visor con 10 Tab dentro, flechas, Escape y foco devuelto, quitar foto, borrar) | 6/6 OK |
 | 2026-11-20 | 008 | Desbordamiento a 4 anchos (`/galeria`, álbum, `/`, `/noticias`) y regresión completa | 0; rutas 42/42; 16/16/11/8/7/2 |
 | 2026-11-20 | 008 | `/speckit-converge` | Converged a la primera |
+| 2026-11-20 | 009 | `analyze` sin hallazgos; ruff; pytest (PostgreSQL real) | **329 passed** |
+| 2026-11-20 | 009 | vitest, typecheck y build | **62 passed**; OK |
+| 2026-11-20 | 009 | Migración 0009 e `importar-inicial` sobre la base existente; `restart` de la API | 8 patrocinadores sin web; persisten tras el reinicio |
+| 2026-11-20 | 009 | `verificar-entidades.mjs` (8 logos en orden, sin enlace, `object-fit: contain` y ≥150 px a 4 anchos sin desbordamiento; 2 colaboradores con orden, pestaña nueva, cambio de orden, retirada, patrocinadores intactos, borrado) | 10/10 OK |
+| 2026-11-20 | 009 | Regresión: rutas 42/42, admin 2/2, acceso 7/7, subida 2/2, evento 16/16, inscripciones 16/16, clasificaciones 11/11, noticias 8/8, galería 6/6, respaldo con la API detenida 3/3 | OK |
+| 2026-11-20 | 009 | Revisión durante la verificación: el error de la web de una entidad decía «álbum externo» | Corregido (`logotipo`, `web de la entidad`) con prueba |
 | 2026-11-20 | 007 | Desbordamiento a 4 anchos en `/`, `/noticias` y el detalle; captura de la portada | 0 desbordamientos; cuadrícula aprobada para varias noticias |
 | 2026-11-20 | 007 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, clasificaciones 11/11, acceso 7/7 | OK (`verificar-acceso` pasa a usar `/admin/reglamento` como sección sin persistencia; se borraron 2 borradores de prueba creados por la versión anterior del script) |
 

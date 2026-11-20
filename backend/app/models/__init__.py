@@ -4,6 +4,7 @@ from app.models.administracion import Administrador, LimiteLogin, Sesion
 from app.models.archivos import Archivo
 from app.models.base import Base
 from app.models.clasificaciones import Clasificacion, ImportacionCsv, Resultado
+from app.models.entidades import Entidad
 from app.models.evento import Carrera, CarreraEdicion, Edicion
 from app.models.galeria import Album, Fotografia
 from app.models.noticias import Noticia
@@ -17,6 +18,7 @@ __all__ = [
     "Clasificacion",
     "CarreraEdicion",
     "Edicion",
+    "Entidad",
     "Fotografia",
     "ImportacionCsv",
     "LimiteLogin",

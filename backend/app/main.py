@@ -13,6 +13,7 @@ from app.api import (
     admin_albumes,
     admin_carreras,
     admin_clasificaciones,
+    admin_entidades,
     admin_evento,
     admin_inscripciones,
     admin_noticias,
@@ -53,6 +54,8 @@ ETIQUETAS = {
     "registrationMessage": "mensaje al participante",
     "solidarityRegistration": "enlace de pago del dorsal solidario",
     "csv": "CSV",
+    "name": "nombre de la entidad",
+    "order": "orden de aparición",
     "url": "álbum externo",
     "photos": "fotografías del álbum",
     "category": "categoría",
@@ -62,6 +65,10 @@ ETIQUETAS = {
     "sourceFile": "archivo CSV",
     "raceId": "carrera",
     "year": "edición",
+}
+# Mismo campo con otro nombre en el formulario de una sección concreta (prefijo de la ruta).
+ETIQUETAS_POR_RUTA = {
+    "/api/admin/entidades/": {"image": "logotipo", "url": "web de la entidad"},
 }
 
 
@@ -103,13 +110,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return JSONResponse({"error": detalle}, status_code=exc.status_code, headers=exc.headers)
 
     @app.exception_handler(RequestValidationError)
-    async def error_validacion(_: Request, exc: RequestValidationError) -> JSONResponse:
+    async def error_validacion(request: Request, exc: RequestValidationError) -> JSONResponse:
         # Mensaje claro con el campo afectado, sin detalles internos del esquema (002 FR-021).
+        etiquetas = dict(ETIQUETAS)
+        for prefijo, propias in ETIQUETAS_POR_RUTA.items():
+            if request.url.path.startswith(prefijo):
+                etiquetas.update(propias)
         for error in exc.errors():
             campo = str(error.get("loc", ("",))[-1])
-            if campo in ETIQUETAS:
+            if campo in etiquetas:
                 return JSONResponse(
-                    {"error": f"Revisa el campo «{ETIQUETAS[campo]}»."}, status_code=400
+                    {"error": f"Revisa el campo «{etiquetas[campo]}»."}, status_code=400
                 )
         return JSONResponse({"error": "Datos no válidos."}, status_code=400)
 
@@ -150,6 +161,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_clasificaciones.router)
     app.include_router(admin_noticias.router)
     app.include_router(admin_albumes.router)
+    app.include_router(admin_entidades.router)
     app.include_router(clasificaciones.router)
     return app
 
