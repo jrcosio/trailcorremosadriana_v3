@@ -8,7 +8,7 @@
  * versiones confirmados por el servidor.
  *
  * Recursos migrados: evento y pruebas (004), inscripciones y Dorsal Solidario (005), clasificaciones
- * (006). Orden: pruebas → evento → inscripciones → clasificaciones → resto (un enlace o una ficha de
+ * (006), noticias (007). Orden: pruebas → evento → inscripciones → clasificaciones → resto (un enlace o una ficha de
  * prueba nueva deben existir antes de abrir inscripciones o clasificar).
  */
 import { apiFetch } from './api';
@@ -21,11 +21,26 @@ const CAMPOS_EVENTO = ['edition', 'date', 'countdown'] as const;
 const CAMPOS_INSCRIPCION = ['registrationsOpen', 'registrationMessage', 'solidarityRegistration'] as const;
 const CAMPOS_MIGRADOS = new Set<string>([...CAMPOS_EVENTO, ...CAMPOS_INSCRIPCION]);
 const CAMPOS_TECNICOS = new Set(['eventVersion']);
-const SECCIONES_SIN_PERSISTENCIA = ['news', 'albums', 'sponsors', 'collaborators', 'regulation'] as const;
+const SECCIONES_SIN_PERSISTENCIA = ['albums', 'sponsors', 'collaborators', 'regulation'] as const;
 const ERROR_GENERICO = 'No se han podido guardar los cambios. Inténtalo de nuevo.';
 
 const igual = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 const porId = (items: Item[]) => new Map(items.map((i) => [i.id, i]));
+
+/** Colección con PUT/DELETE por id y control de versión (noticias y siguientes features). */
+function recursoSimple(operaciones: Operacion[], anteriores: Item[], siguientes: Item[], url: string) {
+  const previas = porId(anteriores);
+  for (const item of siguientes) {
+    const previa = previas.get(item.id);
+    if (!previa || !igual(previa, item)) {
+      operaciones.push({ metodo: 'PUT', url: `${url}/${encodeURIComponent(item.id)}`, cuerpo: { ...item, version: previa?.version ?? 0 } });
+    }
+  }
+  const ids = new Set(siguientes.map((i) => i.id));
+  for (const previa of anteriores) {
+    if (!ids.has(previa.id)) operaciones.push({ metodo: 'DELETE', url: `${url}/${encodeURIComponent(previa.id)}?version=${previa.version ?? 0}` });
+  }
+}
 
 export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[] {
   const operaciones: Operacion[] = [];
@@ -90,6 +105,8 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
       operaciones.push({ metodo: 'DELETE', url: `/api/admin/clasificaciones/${encodeURIComponent(previa.id)}?version=${previa.version ?? 0}` });
     }
   }
+
+  recursoSimple(operaciones, anterior.news, siguiente.news, '/api/admin/noticias');
 
   const ajustesPendientes = new Set([...Object.keys(a), ...Object.keys(s)]);
   const otrosAjustes = [...ajustesPendientes].some(

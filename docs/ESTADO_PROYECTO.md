@@ -4,29 +4,28 @@
 
 ## Punto de continuidad
 
-- **Última feature cerrada**: 006-clasificaciones-csv (merge local en `main`)
-- **Siguiente feature**: 007-noticias
+- **Última feature cerrada**: 007-noticias (merge local en `main`)
+- **Siguiente feature**: 008-galeria
 - **Fase SDD**: por iniciar (`/speckit-specify`)
-- **Siguiente acción concreta**: `git switch -c 007-noticias main` y `/speckit-specify`.
-  - Tabla `noticias` (slug, título, categoría, fecha opcional, imagen, extracto, cuerpo de texto
-    plano, `publicada` y `version`). Las nuevas son borradores.
-  - CRUD `/api/admin/noticias/{id}` con 409, en `persistencia.ts` (sección `news`).
-  - `/api/content` sirve las noticias desde la base.
-  - Importación de `proxima-edicion` (semilla) y de la noticia de producción
-    `2026-07-13-gracias-trail-2026` (DISCREPANCIAS C3) con su imagen `gracias_2026.webp`, copiada
-    a `frontend/public/reused/noticias/` con su procedencia. Hay que revisar el texto, sin datos
-    personales.
-  - Pantallas `/noticias` y `/noticias/:id`.
-- **Entorno local**: esquema `0006_clasificaciones`, con las 3 clasificaciones reales de 2026
-  importadas (63/205/224) y la cuenta local `admin`.
+- **Siguiente acción concreta**: `git switch -c 008-galeria main` y `/speckit-specify`.
+  - Tablas `albumes` (slug, título, año, portada, URL externa histórica, `publicado`, orden y
+    versión) y `fotografias` (álbum, referencia `/media/…`, `alt` y orden).
+  - `PUT/DELETE /api/admin/albumes/{id}` mediante `recursoSimple` en `persistencia.ts`
+    (sección `albums`; `photos[]` del contrato = lista de URLs).
+  - Importación de los 3 álbumes de Google Photos (2024–2026) de la semilla.
+  - Lightbox accesible: revisar el foco (DOC 09).
+  - Después de la 008, el paso «sección sin persistencia» de `verificar-acceso.mjs` sigue en
+    `/admin/reglamento` hasta la 010.
+- **Entorno local**: esquema `0007_noticias`; 2 noticias, 3 clasificaciones reales y la cuenta
+  local `admin`.
 
 ## Features
 
 | Estado | Features |
 |---|---|
-| Terminadas | 0, 001, 002, 003, 004, 005, 006 (clasificaciones CSV) |
+| Terminadas | 0, 001–006, 007 (noticias) |
 | Activa | — |
-| Pendientes | 007 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
+| Pendientes | 008 a 011 (ver [ROADMAP.md](ROADMAP.md)) |
 
 ## Decisiones tomadas
 
@@ -60,6 +59,7 @@
 | 2026-11-20 | Vista previa en el cliente y validación autoritativa en el servidor con importación temporal por sesión (30 min, un solo uso) y sustitución transaccional | 006 research R1, DISCREPANCIAS M5 |
 | 2026-11-20 | Consulta pública de participantes paginada en el servidor; el contrato público no incluye filas | 006 research R3 |
 | 2026-11-20 | Los CSV reales de 2026 no se versionan (datos personales); se importan con el comando de operador | 006 spec Assumptions |
+| 2026-11-20 | Noticias ordenadas: sin fecha primero y después por fecha descendente; la noticia de producción se importa sin categoría inventada («Actualidad») | 007 research R2, spec Assumptions |
 
 ## Supuestos
 
@@ -145,6 +145,12 @@
 | 2026-11-20 | 006 | Capturas de `/clasificaciones/2026` a 1440 y 360 px | Estilo aprobado; sin desbordamiento |
 | 2026-11-20 | 006 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, acceso 7/7 | OK |
 | 2026-11-20 | 006 | `/speckit-converge` | 1.ª pasada: T014 (limpieza de importaciones caducadas) resuelta, 297 pytest; 2.ª pasada: Converged |
+| 2026-11-20 | 007 | `analyze` sin hallazgos; pytest | **310 passed** |
+| 2026-11-20 | 007 | vitest y typecheck | **60 passed**; OK |
+| 2026-11-20 | 007 | Migración 0007 e `importar-inicial` sobre la base existente | 2 noticias importadas en el orden esperado |
+| 2026-11-20 | 007 | `verificar-noticias.mjs` (existentes, borrador, publicación con imagen, HTML como texto, 409, retirada y borrado) | 7/7 OK |
+| 2026-11-20 | 007 | Desbordamiento a 4 anchos en `/`, `/noticias` y el detalle; captura de la portada | 0 desbordamientos; cuadrícula aprobada para varias noticias |
+| 2026-11-20 | 007 | Regresión: rutas 42/42, evento y carreras 16/16, inscripciones 16/16, clasificaciones 11/11, acceso 7/7 | OK (`verificar-acceso` pasa a usar `/admin/reglamento` como sección sin persistencia; se borraron 2 borradores de prueba creados por la versión anterior del script) |
 
 ## Bloqueos
 

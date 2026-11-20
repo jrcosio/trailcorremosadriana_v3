@@ -88,6 +88,20 @@ describe('planificar', () => {
     expect(planificar(a, borrada)).toEqual([{ metodo: 'DELETE', url: '/api/admin/clasificaciones/c1?version=2' }]);
   });
 
+  it('noticias: nueva, editada y borrada', () => {
+    const a = base();
+    a.news = [{ id: 'n1', title: 'N1', body: 'x', published: true, version: 4 }];
+    const s = base();
+    s.news = [{ ...a.news[0], title: 'N1 bis' }, { id: 'n2', title: 'N2', body: 'y', published: false }];
+    expect(planificar(a, s)).toEqual([
+      { metodo: 'PUT', url: '/api/admin/noticias/n1', cuerpo: { ...s.news[0], version: 4 } },
+      { metodo: 'PUT', url: '/api/admin/noticias/n2', cuerpo: { ...s.news[1], version: 0 } },
+    ]);
+    const vacia = base();
+    vacia.news = [];
+    expect(planificar(a, vacia)).toEqual([{ metodo: 'DELETE', url: '/api/admin/noticias/n1?version=4' }]);
+  });
+
   it('eventVersion no se considera un cambio de contenido', () => {
     const a = base();
     const s = base();

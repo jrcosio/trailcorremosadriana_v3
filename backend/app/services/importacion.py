@@ -4,19 +4,20 @@ Solo actúa sobre las partes vacías y nunca sobrescribe datos existentes sin `r
 """
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.models import Carrera, CarreraEdicion, Edicion
+from app.models import Carrera, CarreraEdicion, Edicion, Noticia
 from app.services.contenido import RUTA_SEMILLA
 from app.services.fechas import MADRID
 
 # Fecha oficial de la edición 2026 (web de producción): sábado 11/07/2026, salida a las 09:00.
 FECHA_2026 = datetime(2026, 7, 11, 9, 0, tzinfo=MADRID)
+RUTA_NOTICIAS = RUTA_SEMILLA.parent / "noticias"
 
 
 def _semilla(ruta: Path = RUTA_SEMILLA) -> dict:
@@ -112,5 +113,26 @@ def importar(db: Session, reemplazar: bool = False, ruta: Path = RUTA_SEMILLA) -
             + ", ".join(r["id"] for r in semilla["races"])
             + "."
         )
+    if not db.scalar(select(func.count(Noticia.id))):
+        # Orden de alta: primero la de producción y después la de la semilla (misma fecha de orden).
+        produccion = json.loads(
+            (RUTA_NOTICIAS / "2026-07-13-gracias-trail-2026.json").read_text("utf-8")
+        )
+        for n in [produccion, *semilla["news"]]:
+            db.add(
+                Noticia(
+                    slug=n["id"],
+                    titulo=n["title"],
+                    categoria=n.get("category", ""),
+                    fecha=date.fromisoformat(n["date"]) if n.get("date") else None,
+                    imagen=n.get("image", ""),
+                    extracto=n.get("excerpt", ""),
+                    cuerpo=n["body"],
+                    publicada=bool(n.get("published", False)),
+                    version=1,
+                )
+            )
+            db.flush()
+        acciones.append("Noticias importadas: gracias-trail-2026 (producción) y la de la semilla.")
     db.commit()
     return acciones
