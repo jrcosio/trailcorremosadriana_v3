@@ -105,6 +105,29 @@ servidor, con sus versiones. Cada feature siguiente añade su recurso a este mó
 - **`/api/content`**: `settings.edition`, `date`, `countdown` y `races` salen de PostgreSQL. Sin
   ediciones ni pruebas (base sin inicializar), se sirve la semilla.
 
+## Clasificaciones CSV (feature 006)
+
+- **Tablas**:
+  - `clasificaciones`: `identificador` único y `carrera_edicion_id` UNIQUE con FK RESTRICT, que
+    impide borrar una prueba clasificada.
+  - `resultados`: `orden`, `posicion` (NULL o 1–100000), dorsal y tiempo como texto, `busqueda`
+    sin tildes, e índice único `(clasificacion_id, lower(dorsal)) WHERE dorsal <> ''`.
+  - `importaciones_csv`: importación temporal por sesión.
+- **Lector**: `app/services/csv_clasificaciones.py` adapta el lector TS de la propuesta con los
+  mismos límites, alias (incluido `meta`) y mensajes por fila.
+- **Flujo del panel**: lectura, mapeo y vista previa en el cliente. Después:
+  1. `POST /api/admin/clasificaciones/vista-previa` valida en el servidor y guarda la importación
+     temporal; devuelve un token.
+  2. `PUT /api/admin/clasificaciones/{id}` con `importToken` sustituye las filas en una
+     transacción. Cualquier fallo deja la clasificación anterior.
+- **Web**: `GET /api/clasificaciones/{id}/participantes?q=&categoria=&sexo=&pagina=` (páginas de
+  50; solo clasificaciones publicadas). `/api/content` público solo envía metadatos y
+  `participants`. `ClassificationTable` consulta al servidor con el mismo marcado.
+  `/clasificaciones/{año}` fija el año.
+- **Operador**: `python -m app.cli importar-clasificacion --carrera … --edicion … --titulo …
+  [--publicar] [--sustituir] < archivo.csv` (UTF-8 o Windows-1252).
+- **Dorsal**: obligatorio solo para clasificados (decisión P3).
+
 ## Inscripciones y Dorsal Solidario (feature 005)
 
 - **Datos**: columnas `inscripciones_abiertas`, `mensaje_inscripciones` (1–2000 caracteres al

@@ -7,9 +7,9 @@
  * guarda cambios.» Tras guardar se vuelve a leer la vista privada para mostrar los datos y las
  * versiones confirmados por el servidor.
  *
- * Recursos migrados: evento y pruebas (feature 004), inscripciones y Dorsal Solidario (005).
- * Orden: pruebas → evento → inscripciones → resto (un enlace de prueba nuevo debe existir antes de
- * abrir las inscripciones).
+ * Recursos migrados: evento y pruebas (004), inscripciones y Dorsal Solidario (005), clasificaciones
+ * (006). Orden: pruebas → evento → inscripciones → clasificaciones → resto (un enlace o una ficha de
+ * prueba nueva deben existir antes de abrir inscripciones o clasificar).
  */
 import { apiFetch } from './api';
 import type { Item, SiteData } from './data';
@@ -21,7 +21,7 @@ const CAMPOS_EVENTO = ['edition', 'date', 'countdown'] as const;
 const CAMPOS_INSCRIPCION = ['registrationsOpen', 'registrationMessage', 'solidarityRegistration'] as const;
 const CAMPOS_MIGRADOS = new Set<string>([...CAMPOS_EVENTO, ...CAMPOS_INSCRIPCION]);
 const CAMPOS_TECNICOS = new Set(['eventVersion']);
-const SECCIONES_SIN_PERSISTENCIA = ['news', 'albums', 'results', 'sponsors', 'collaborators', 'regulation'] as const;
+const SECCIONES_SIN_PERSISTENCIA = ['news', 'albums', 'sponsors', 'collaborators', 'regulation'] as const;
 const ERROR_GENERICO = 'No se han podido guardar los cambios. Inténtalo de nuevo.';
 
 const igual = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -73,6 +73,22 @@ export function planificar(anterior: SiteData, siguiente: SiteData): Operacion[]
         version,
       },
     });
+  }
+
+  const clasificacionesPrevias = porId(anterior.results);
+  for (const c of siguiente.results) {
+    const previa = clasificacionesPrevias.get(c.id);
+    if (!previa || !igual(previa, c)) {
+      const cuerpo: Record<string, unknown> = { title: c.title, year: c.year, raceId: c.raceId, published: !!c.published, version: previa?.version ?? 0 };
+      if (c.importToken) cuerpo.importToken = c.importToken;
+      operaciones.push({ metodo: 'PUT', url: `/api/admin/clasificaciones/${encodeURIComponent(c.id)}`, cuerpo });
+    }
+  }
+  const clasificacionesSiguientes = new Set(siguiente.results.map((c) => c.id));
+  for (const previa of anterior.results) {
+    if (!clasificacionesSiguientes.has(previa.id)) {
+      operaciones.push({ metodo: 'DELETE', url: `/api/admin/clasificaciones/${encodeURIComponent(previa.id)}?version=${previa.version ?? 0}` });
+    }
   }
 
   const ajustesPendientes = new Set([...Object.keys(a), ...Object.keys(s)]);

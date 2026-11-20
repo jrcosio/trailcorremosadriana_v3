@@ -15,8 +15,15 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.db import crear_engine
 from app.core.seguridad import CredencialInvalida
-from app.services import administradores, importacion
+from app.services import administradores, clasificaciones, importacion
 from app.services.administradores import AdminNoEncontrado, AdminYaExiste
+from app.services.csv_clasificaciones import (
+    CsvNoValido,
+    adivinar_mapeo,
+    decodificar,
+    leer_csv,
+    mapear,
+)
 
 OK, ERROR, INVALIDO = 0, 1, 2
 
@@ -42,6 +49,19 @@ def _parser() -> argparse.ArgumentParser:
     ):
         sub.add_parser(nombre, help=ayuda).add_argument("usuario")
     sub.add_parser("listar-admins", help="Lista las cuentas (sin datos sensibles)")
+    clas = sub.add_parser(
+        "importar-clasificacion", help="Importa un CSV (por stdin) como clasificación"
+    )
+    clas.add_argument(
+        "--carrera", required=True, help="Identificador de la prueba (p. ej. trail-27k)"
+    )
+    clas.add_argument("--edicion", required=True, help="Año de la edición (p. ej. 2026)")
+    clas.add_argument("--titulo", required=True)
+    clas.add_argument("--archivo", default="clasificacion.csv", help="Nombre del archivo de origen")
+    clas.add_argument("--publicar", action="store_true")
+    clas.add_argument(
+        "--sustituir", action="store_true", help="Sustituye una clasificación existente"
+    )
     imp = sub.add_parser(
         "importar-inicial", help="Importa los datos aprobados en las partes vacías"
     )
@@ -114,6 +134,23 @@ def main(
                     if acciones
                     else "Sin cambios: los datos ya estaban importados."
                 )
+            elif args.orden == "importar-clasificacion":
+                datos = (
+                    entrada.buffer.read() if hasattr(entrada, "buffer") else entrada.read().encode()
+                )
+                tabla = leer_csv(decodificar(datos))
+                filas = mapear(tabla, adivinar_mapeo(tabla.cabeceras))
+                accion, n = clasificaciones.importar_directo(
+                    db,
+                    args.carrera,
+                    args.edicion,
+                    args.titulo,
+                    args.archivo,
+                    filas,
+                    args.publicar,
+                    args.sustituir,
+                )
+                decir(f"Clasificación {accion}: {n} participantes.")
             elif args.orden == "listar-admins":
                 cuentas = administradores.listar(db)
                 if not cuentas:
@@ -129,6 +166,9 @@ def main(
                         f"último acceso: {acceso}"
                     )
         return OK
+    except (CsvNoValido, clasificaciones.ClasificacionRechazada) as e:
+        decir(str(e))
+        return INVALIDO
     except _NoCoinciden:
         decir("Las contraseñas no coinciden.")
         return INVALIDO

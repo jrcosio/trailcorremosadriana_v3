@@ -11,9 +11,11 @@ from starlette.formparsers import MultiPartException
 
 from app.api import (
     admin_carreras,
+    admin_clasificaciones,
     admin_evento,
     admin_inscripciones,
     archivos,
+    clasificaciones,
     contenido,
     media,
     salud,
@@ -48,6 +50,11 @@ ETIQUETAS = {
     "registrationsOpen": "inscripciones abiertas",
     "registrationMessage": "mensaje al participante",
     "solidarityRegistration": "enlace de pago del dorsal solidario",
+    "csv": "CSV",
+    "mapping": "asignación de columnas",
+    "sourceFile": "archivo CSV",
+    "raceId": "carrera",
+    "year": "edición",
 }
 
 
@@ -133,6 +140,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_evento.router)
     app.include_router(admin_carreras.router)
     app.include_router(admin_inscripciones.router)
+    app.include_router(admin_clasificaciones.router)
+    app.include_router(clasificaciones.router)
     return app
 
 

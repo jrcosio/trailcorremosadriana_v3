@@ -27,7 +27,7 @@ from app.core.seguridad import (
     normalizar_usuario,
     verificar_password,
 )
-from app.services import administradores, limites, sesiones
+from app.services import administradores, clasificaciones, limites, sesiones
 from app.services.sesiones import SesionValida
 
 router = APIRouter(prefix="/api", tags=["sesion"])
@@ -103,6 +103,7 @@ def login(
     limites.reiniciar(db, clave)
     limites.limpiar_caducados(db, ventana)
     sesiones.limpiar_antiguas(db)
+    clasificaciones.limpiar_caducadas(db)
     token, csrf, _ = sesiones.crear(db, admin, s.session_hours)
     db.commit()
 

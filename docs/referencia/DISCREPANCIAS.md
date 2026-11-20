@@ -13,6 +13,7 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 |---|---|---|
 | P1 | EXP indica edición «2028» con fecha 2027-07-10 09:00; DOC dice «2027 sin fecha confirmada» | Inicializar la próxima edición como **2027 sin fecha**. El propietario la fijará desde el panel. |
 | P2 | PROD publica clasificaciones reales 2026 en CSV; DOC dice «no hay resultados publicados» | **Importar los CSV de 2026 como clasificaciones publicadas** mediante el flujo CSV de la nueva web; `/clasificaciones/2026` sigue funcionando. |
+| P3 (2026-11-20) | El CSV real de la 27K tiene una participante «Sin salida» sin dorsal; DOC 13 exige dorsal en todas las filas | **Dorsal obligatorio solo para clasificados**; los no clasificados pueden no tenerlo y la unicidad se aplica a dorsales no vacíos. Se importan los 63. |
 
 ## Datos de prueba en la exportación (no se importan)
 
@@ -31,7 +32,7 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | M2 | PROP tiene `settings` globales; DOC 14 asocia contador, apertura, mensaje y URL del dorsal a la edición | Se guardan en `ediciones`. Una edición se marca como actual. |
 | M3 | DOC 14 menciona «estado del evento» sin valores | No se crea un enum: la fase se deriva de apertura, fecha (vacía/futura/pasada) y contador, como en DOC 06. Se documenta como supuesto. |
 | M4 | Exclusión del Dorsal Solidario por heurística `/solidari/` | El dorsal es configuración de la edición, no una carrera. El servidor rechaza además cualquier carrera cuyo slug/título coincida con la heurística en clasificaciones. |
-| M5 | Vista previa/confirmación CSV: huella o importación temporal | Importación temporal en servidor ligada a la sesión, con hash del contenido y caducidad (se detalla en la feature 006). |
+| M5 | Vista previa/confirmación CSV: huella o importación temporal | **Resuelta (006)**: importación temporal en `importaciones_csv`, ligada a la sesión, con huella SHA-256 de las filas, caducidad de 30 min y un solo uso. La confirmación sustituye las filas en una transacción. |
 | M6 | `color` de carrera existe en datos pero no en formularios | Se conserva como dato de carrera; su edición se decide en la feature 004. |
 | M7 | `fotografias.alt` y `entidades.tipo` son nuevos | Se añaden; `alt` vacío por defecto se completa con el título del álbum. |
 | M8 | Credenciales PBKDF2 del prototipo | No se migran: Argon2id y CLI de creación/recuperación del administrador. |
@@ -55,4 +56,4 @@ Fuentes: **DOC** = esta carpeta; **PROP** = código de la propuesta
 | C2 | Contacto «Imanol» y «Plaza de Cosío» fijos en PROP | Se mantienen como en PROP; la posibilidad de editarlos se decide en la feature 010. |
 | C3 | Noticia «gracias-trail-2026» existe en PROD y no en EXP | Se importa en la feature 007 con su imagen real (PROD, MIT). |
 | C4 | Fuentes con extensión `.woff2` y datos TTF | Se corrige en la feature 011 (rendimiento) sin cambiar el aspecto. |
-| C5 | CSV de PROD con cabeceras `Pos, Meta, Genero, Pos Categoria, Pos Genero` | Se añaden alias (`meta` → tiempo); `Pos Categoria`/`Pos Genero` se descartan según DOC 13 (no se recalculan posiciones). |
+| C5 | CSV de PROD con cabeceras `Pos, Meta, Genero, Pos Categoria, Pos Genero` | **Resuelta (006)**: alias `meta` → tiempo en el cliente y en el servidor; `Pos Categoria` y `Pos Genero` no se importan. Los CSV reales no se versionan (datos personales): se importan con `importar-clasificacion` desde el archivo original. |

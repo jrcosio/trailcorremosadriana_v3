@@ -156,7 +156,8 @@ archivos originales.
   puede usarse una vez.
 - **FR-004**: Las filas MUST validarse con las reglas de `13_CLASIFICACIONES_CSV.md`:
   - posición entera positiva (admite `1.`, `1º`, `1ª`) o un estado de no clasificado;
-  - dorsal obligatorio, de hasta 30 caracteres y único sin distinguir mayúsculas;
+  - dorsal de hasta 30 caracteres, obligatorio para los clasificados y único entre los no vacíos
+    sin distinguir mayúsculas (decisión P3 del propietario);
   - nombre (más apellidos) de hasta 200 caracteres;
   - tiempo obligatorio para los clasificados;
   - estado obligatorio para los no clasificados;

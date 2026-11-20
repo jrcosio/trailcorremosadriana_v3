@@ -34,6 +34,17 @@ Para desbloquear el acceso en local tras 8 intentos fallidos:
 Cada vez que una feature añada migraciones hay que repetir `alembic upgrade head`. Mientras
 falten, `/api/ready` responde `migraciones_pendientes`.
 
+## Clasificaciones reales de 2026 (una vez, en local)
+
+Los CSV contienen datos personales y no se versionan. Se importan desde los archivos originales:
+
+```bash
+D=datos_iniciales/trailcorremosadriana_v2/datos/2026
+docker compose run --rm -T api python -m app.cli importar-clasificacion --carrera trail-27k --edicion 2026 \
+  --titulo "Clasificación Trail Peñasagra 2026" --archivo Clasificacion_27km.csv --publicar < $D/Clasificacion_27km.csv
+# Igual para speed-14k (Clasificacion_14km.csv) y familiar-7k (Clasificacion_marcha.csv)
+```
+
 ## Almacenamiento S3 en desarrollo
 
 ```bash
