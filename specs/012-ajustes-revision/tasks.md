@@ -38,7 +38,7 @@ acceso.
   - migración desde la v2 en la misma MV (parada, arranque, datos con los CSV de la v2,
     comprobaciones y vuelta atrás);
   - «Acceso al panel».
-- [ ] T011 [US2] Ensayo de producción con HTTPS desde un clon limpio (research R3):
+- [X] T011 [US2] Ensayo de producción con HTTPS desde un clon limpio (research R3):
   - HTTP→HTTPS, `www`→dominio y HSTS;
   - certificado;
   - acceso al panel con cookie `Secure` y un guardado real;
@@ -49,7 +49,7 @@ acceso.
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
-- [ ] T012 Regresión tras la US2 (pytest, `verificar-rutas`, `verificar-cierre` con la configuración local) y actualización de `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
+- [X] T012 Regresión tras la US2 (pytest, `verificar-rutas`, `verificar-cierre` con la configuración local) y actualización de `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
 
 ## Dependencies & Execution Order
 
