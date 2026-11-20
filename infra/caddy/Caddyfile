@@ -4,6 +4,10 @@
 	admin off
 }
 
+# Sitios adicionales solo de producción (compose.produccion.yaml monta aquí la redirección de
+# www.<dominio>). Sin archivos, la importación no hace nada.
+import /etc/caddy/sitios/*.caddy
+
 # Dirección del sitio: `:80` en local; en producción, el dominio (HTTPS automático de Caddy).
 {$SITE_ADDRESS::80} {
 	encode zstd gzip
@@ -12,6 +16,8 @@
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		X-Frame-Options "SAMEORIGIN"
+		# HTTPS obligatorio para el navegador durante un año (sin subdominios). Por HTTP se ignora.
+		Strict-Transport-Security "max-age=31536000"
 		# CSP (feature 011, research R4): solo la propia web, el mapa de Wikiloc e imágenes https.
 		# `?` = valor por defecto: /media conserva la CSP propia que fija la API.
 		?Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-src https://es.wikiloc.com https://www.wikiloc.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"

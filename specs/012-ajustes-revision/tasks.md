@@ -24,9 +24,32 @@ description: "Tareas de implementación de la feature 012-ajustes-revision"
 - [X] T005 [US1] Añadir A-004 a `frontend/src/styles/ajustes.css`: `contain` y centrado en los 11 selectores, con el fondo de relleno de research R1
 - [X] T006 [US1] Reconstruir `web` y ejecutar `verificar-fotos.mjs --comparar` (públicas y panel), `verificar-accesibilidad.mjs` y las capturas en `frontend/capturas/despues-012`. Revisar visualmente la foto de Adriana en `/` y `/solidaridad` y una tarjeta de prueba. Comprobar en `verificar-fotos.mjs` que los logotipos, el visor y la vista previa de subida no cambian (FR-005), y que una foto que no carga deja el marco en `#172e28`
 
-## Phase 3: Polish
+## Phase 3: User Story 2 — Desplegar en la MV de la web anterior (P1)
+
+**Goal**: producción con HTTPS, `www`, HSTS y panel con dominio con «ñ»; guía de migración y de
+acceso.
+
+**Independent Test**: ensayo de producción con HTTPS (research R3).
+
+- [X] T008 [US2] Normalizar a *punycode* en `normalizar_origen` (`backend/app/core/config.py`) y usar el origen normalizado en `backend/app/api/meta.py`, con pruebas en `backend/tests/test_origen_idn.py`
+- [X] T009 [US2] Añadir `import /etc/caddy/sitios/*.caddy` y HSTS a `infra/caddy/Caddyfile`. Crear `infra/caddy/redireccion-www.caddy`. Montarlo y pasar `PUBLIC_ORIGIN` a `web` en `compose.produccion.yaml`
+- [X] T010 [US2] Ampliar `docs/operacion.md`:
+  - `SITE_ADDRESS` y `PUBLIC_ORIGIN` en *punycode*;
+  - migración desde la v2 en la misma MV (parada, arranque, datos con los CSV de la v2,
+    comprobaciones y vuelta atrás);
+  - «Acceso al panel».
+- [ ] T011 [US2] Ensayo de producción con HTTPS desde un clon limpio (research R3):
+  - HTTP→HTTPS, `www`→dominio y HSTS;
+  - certificado;
+  - acceso al panel con cookie `Secure` y un guardado real;
+  - página con metadatos y CSP.
+
+  Retirarlo y comprobar que el entorno de desarrollo sigue intacto.
+
+## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
+- [ ] T012 Regresión tras la US2 (pytest, `verificar-rutas`, `verificar-cierre` con la configuración local) y actualización de `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
 
 ## Dependencies & Execution Order
 

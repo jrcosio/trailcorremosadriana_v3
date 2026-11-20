@@ -1,8 +1,15 @@
 # Operación y despliegue independiente
 
 Guía para instalar, mantener y recuperar la web **Trail Peñasagra — Corremos por Adriana** en un
-servidor propio. Probada en un ensayo local desde un clon limpio (feature 011, «Ensayo de
-despliegue» al final). Nada de esta guía se ha ejecutado contra el dominio ni la producción real.
+servidor propio. Probada en dos ensayos locales desde un clon limpio:
+
+- el de la feature 011 (sección 11);
+- el ensayo en modo producción con HTTPS y un dominio con «ñ» de la feature 012 (sección 14).
+
+Nada de esta guía se ha ejecutado contra el dominio ni la producción real.
+
+> **¿Sustituyes la web anterior en su misma MV?** Sigue la **sección 12**. **¿Cómo entro al
+> panel?** Lo explica la **sección 13**.
 
 > Todos los comandos se ejecutan en la carpeta del repositorio. En producción, añade siempre
 > `-f compose.yaml -f compose.produccion.yaml` (en esta guía, `$DC`).
@@ -28,8 +35,8 @@ DC="docker compose -f compose.yaml -f compose.produccion.yaml"
    |---|---|
    | `POSTGRES_DB`, `POSTGRES_USER` | Nombres a elegir |
    | `POSTGRES_PASSWORD` | Secreto aleatorio: `openssl rand -base64 32` |
-   | `PUBLIC_ORIGIN` | `https://<dominio>`, exactamente como lo escribe el visitante |
-   | `SITE_ADDRESS` | `<dominio>`, sin `https://` (p. ej. `xn--trailpeasagra-okb.com`) |
+   | `PUBLIC_ORIGIN` | `https://<dominio>`, en *punycode* si el dominio lleva «ñ»: `https://xn--trailpeasagra-okb.com`. La API lo normaliza igualmente, pero el *punycode* evita dudas |
+   | `SITE_ADDRESS` | `<dominio>`, solo el principal, sin `https://` ni `www`: `xn--trailpeasagra-okb.com` |
    | `ALMACENAMIENTO` | `s3` (R2) o `local` |
    | `S3_*` | Solo con R2 (sección 4) |
    | `SESSION_HOURS`, `LOGIN_*`, `UPLOAD_MAX_BYTES` | Por defecto, salvo necesidad |
@@ -49,8 +56,13 @@ DC="docker compose -f compose.yaml -f compose.produccion.yaml"
   apunta al servidor y los puertos 80 y 443 están abiertos.
 - Los certificados se guardan en el volumen `caddy_data`: **no borres ese volumen**, porque
   forzaría a pedirlos de nuevo y hay límites de emisión.
-- Para servir también `www.<dominio>`, añade la variante a `SITE_ADDRESS` separada por coma
-  (`dominio, www.dominio`).
+- **`www.<dominio>`**: `compose.produccion.yaml` monta `infra/caddy/redireccion-www.caddy`, que
+  pide su certificado y redirige con 301 al dominio principal, conservando la ruta, como hacía la
+  web anterior. El DNS de `www` también debe apuntar a la MV.
+- **HTTP**: redirige a HTTPS automáticamente. Las respuestas llevan
+  `Strict-Transport-Security: max-age=31536000`, sin incluir otros subdominios.
+- **Dominio con «ñ»**: Caddy acepta el nombre con «ñ» o en *punycode*. La API compara el origen
+  del panel en *punycode*, que es lo que envían los navegadores.
 - Las cookies del panel exigen HTTPS (`COOKIE_SECURE=true`). En producción no se puede usar el
   panel por HTTP.
 
@@ -88,7 +100,10 @@ $DC up -d
 | Comprobación | Resultado esperado |
 |---|---|
 | `curl -s https://<dominio>/api/ready` | `{"estado":"disponible", …}` |
-| `curl -sI https://<dominio>/` | 200 con `Content-Security-Policy`, `X-Content-Type-Options` y `Referrer-Policy` |
+| `curl -sI https://<dominio>/` | 200 con `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options` y `Referrer-Policy` |
+| `curl -sI http://<dominio>/` | 308 a `https://<dominio>/` |
+| `curl -sI https://www.<dominio>/noticias` | 301 a `https://<dominio>/noticias` |
+| `echo \| openssl s_client -connect <dominio>:443 -servername <dominio> 2>/dev/null \| openssl x509 -noout -issuer -dates` | Emisor Let's Encrypt; vigente |
 | `curl -s -o /dev/null -w '%{http_code}' https://<dominio>/no-existe` | `404` |
 | `curl -s -o /dev/null -w '%{http_code}' https://<dominio>/pantallas` | `404` (P5) |
 | `curl -s https://<dominio>/noticias/<id>` | Título y `og:*` propios en el HTML |
@@ -188,3 +203,98 @@ El ensayo se hizo en la máquina de desarrollo, sin servidor ni dominio real:
 | Acceso al panel | Con la cuenta restaurada |
 | Archivos | 42 restaurados, servidos con bytes idénticos |
 | Entorno de desarrollo | Intacto tras la retirada |
+
+## 12. Migración desde la web anterior en la misma MV
+
+La web anterior (v2) se ejecuta en la MV con su propio `docker-compose.yml`: un servicio `app` y
+un `caddy` que ocupa los puertos 80/443 y tiene los certificados de `trailpeñasagra.com`. Las dos
+webs no pueden usar los puertos a la vez, así que el cambio consiste en parar una y arrancar la
+otra. **Las comprobaciones y la carga de datos se hacen antes de parar la v2**, para que el corte
+dure solo lo que tarda Caddy en pedir los certificados (segundos).
+
+1. **Preparar la v3** en una carpeta nueva, sin tocar la v2 (por ejemplo `/srv/trail-v3`):
+
+   ```bash
+   git clone https://github.com/jrcosio/trailcorremosadriana_v3.git /srv/trail-v3 && cd /srv/trail-v3
+   cp .env.example .env    # y edítalo (sección 2), con, como mínimo:
+   #   POSTGRES_PASSWORD=<secreto: openssl rand -base64 32>
+   #   PUBLIC_ORIGIN=https://xn--trailpeasagra-okb.com
+   #   SITE_ADDRESS=xn--trailpeasagra-okb.com
+   #   ALMACENAMIENTO=local    (o s3 con los datos de R2, sección 4)
+   DC="docker compose -f compose.yaml -f compose.produccion.yaml"
+   $DC config > /dev/null && $DC build
+   ```
+
+2. **Base de datos y datos** (la web aún no está publicada; solo arrancan `db` y `api`):
+
+   ```bash
+   $DC up -d db
+   $DC run --rm api alembic upgrade head
+   $DC run --rm api python -m app.cli importar-inicial
+   V2=/ruta/a/trailcorremosadriana_v2/datos/2026     # los CSV ya están en la MV, en la carpeta de la v2
+   $DC run --rm -T api python -m app.cli importar-clasificacion --carrera trail-27k --edicion 2026 \
+     --titulo "Clasificación Trail Peñasagra 2026" --archivo Clasificacion_27km.csv --publicar < $V2/Clasificacion_27km.csv
+   $DC run --rm -T api python -m app.cli importar-clasificacion --carrera speed-14k --edicion 2026 \
+     --titulo "Clasificación Speed Trail 2026" --archivo Clasificacion_14km.csv --publicar < $V2/Clasificacion_14km.csv
+   $DC run --rm -T api python -m app.cli importar-clasificacion --carrera familiar-7k --edicion 2026 \
+     --titulo "Clasificación Familiar Peñasagra 2026" --archivo Clasificacion_marcha.csv --publicar < $V2/Clasificacion_marcha.csv
+   $DC run --rm api python -m app.cli crear-admin <tu-usuario>   # pide la contraseña dos veces
+   ```
+
+   Resultado esperado: 63, 205 y 224 participantes. Es una instalación limpia, sin los datos de
+   prueba del entorno de desarrollo.
+
+3. **Cambio** (el corte empieza aquí):
+
+   ```bash
+   cd /ruta/a/trailcorremosadriana_v2 && docker compose down    # SIN -v: conserva la v2 para volver
+   cd /srv/trail-v3 && $DC up -d
+   $DC logs -f web    # espera a «certificate obtained successfully» para el dominio y para www
+   ```
+
+4. **Comprobaciones**: las de la sección 6 y el acceso al panel (sección 13).
+
+5. **Vuelta atrás** si algo falla (los datos de la v3 se conservan en sus volúmenes):
+
+   ```bash
+   cd /srv/trail-v3 && $DC down
+   cd /ruta/a/trailcorremosadriana_v2 && docker compose up -d
+   ```
+
+6. **Después**: programa las copias (sección 7). Cuando la v3 lleve unos días estable, puedes
+   borrar la carpeta y los volúmenes de la v2.
+
+## 13. Acceso al panel de administración
+
+- **Dirección**: `https://<dominio>/admin`; con el dominio actual,
+  `https://trailpeñasagra.com/admin`. No hay enlace desde la web pública.
+- **Cuenta**: no hay usuario ni contraseña por defecto. La cuenta se crea en la MV con
+  `$DC run --rm api python -m app.cli crear-admin <usuario>` (sección 12, paso 2). La contraseña
+  se pide oculta, dos veces, y debe tener entre 12 y 128 caracteres y ser distinta del usuario.
+  Para crear más cuentas, repite el comando con otro usuario.
+- **Sesión**: dura 8 horas (`SESSION_HOURS`) y se cierra con «Cerrar sesión». La cookie es
+  `Secure`, así que el panel solo funciona por HTTPS.
+- **Contraseña olvidada, cuenta bloqueada o sesión sospechosa**: sección 9. Tras 8 intentos
+  fallidos en 15 minutos desde la misma IP hay que esperar a que pase la ventana.
+- **Qué se gestiona**:
+  - noticias, galería, pruebas y recorridos;
+  - inscripciones y Dorsal Solidario;
+  - fecha y contador;
+  - clasificaciones (CSV);
+  - patrocinadores y colaboradores;
+  - reglamento;
+  - contacto.
+
+## 14. Ensayo en modo producción con HTTPS (feature 012)
+
+Hecho en la máquina de desarrollo, sin servidor ni dominio real:
+
+1. **Clon limpio**.
+2. **Proyecto `trail-prod-ensayo`** con `compose.yaml` + `compose.produccion.yaml`.
+3. **Dominio de prueba con «ñ»**: `SITE_ADDRESS=trailpeñasagra.localhost` y
+   `PUBLIC_ORIGIN=https://trailpeñasagra.localhost`. Los `.localhost` reciben un certificado de la
+   CA interna de Caddy en lugar de Let's Encrypt; el resto del mecanismo es el mismo.
+4. **Puertos** 80/443 de la máquina.
+
+Resultado en `docs/ESTADO_PROYECTO.md` (pruebas de la 012).
+

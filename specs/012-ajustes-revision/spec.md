@@ -44,6 +44,50 @@ que los textos superpuestos siguen siendo legibles.
 6. **Given** cualquier página, **When** se compara con la versión anterior, **Then** los marcos
    ocupan el mismo sitio y la página no desborda horizontalmente.
 
+---
+
+### User Story 2 - Desplegar en la MV de la web anterior (Priority: P1)
+
+El propietario despliega la web nueva en la máquina virtual de la nube donde hoy funciona la web
+anterior (v2). Allí, un Caddy propio ocupa los puertos 80 y 443, sirve `trailpeñasagra.com` con
+certificado automático y redirige `www` al dominio principal. El cambio debe hacerse:
+
+- con HTTPS válido y renovado automáticamente;
+- con la misma redirección de `www`;
+- con el panel funcionando con un dominio que lleva «ñ»;
+- con una vuelta atrás sencilla a la web anterior.
+
+El propietario también necesita saber cómo entrar al panel una vez desplegada.
+
+**Why this priority**: es el paso que pone la web en producción. Un fallo de certificado o de
+acceso al panel la dejaría inservible.
+
+**Independent Test**: ensayo completo en modo producción con HTTPS en esta máquina, desde un clon
+limpio y con un dominio con «ñ» de prueba (`.localhost`, certificado de Caddy). Se comprueba:
+
+- redirección de HTTP a HTTPS y de `www`;
+- certificado, HSTS y acceso al panel con cookie `Secure`;
+- un guardado real en el panel.
+
+**Acceptance Scenarios**:
+
+1. **Given** la configuración de producción con el dominio, **When** arranca, **Then** se sirve por
+   HTTPS con certificado automático, HTTP redirige a HTTPS y las respuestas llevan HSTS.
+2. **Given** `www.<dominio>`, **When** se visita, **Then** redirige permanentemente al dominio
+   principal, conservando la ruta.
+3. **Given** el dominio con «ñ», escrito en la configuración con «ñ» o en *punycode*, **When** se
+   entra al panel y se guarda un cambio, **Then** funciona, porque el origen se compara siempre en
+   *punycode*.
+4. **Given** la guía de operación, **When** el propietario la sigue en la MV, **Then** sabe:
+   - parar la web anterior y arrancar la nueva;
+   - cargar los datos aprobados y las clasificaciones de 2026 desde los CSV de la v2;
+   - crear su cuenta;
+   - comprobar el despliegue;
+   - volver a la web anterior si algo falla.
+5. **Given** la web desplegada, **When** el propietario quiere entrar al panel, **Then** la guía le
+   indica la dirección (`https://<dominio>/admin`), cómo crear la cuenta y cómo recuperar el
+   acceso.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -67,6 +111,16 @@ que los textos superpuestos siguen siendo legibles.
 - **FR-004**: Los textos superpuestos MUST seguir legibles. Las páginas MUST tener 0
   incumplimientos WCAG 2.1 A/AA en la revisión automática y 0 desbordamientos horizontales.
 - **FR-005**: Los logotipos, el visor de fotos y la vista previa de subida MUST NOT cambiar.
+- **FR-006**: La configuración de producción MUST:
+  - servir el dominio por HTTPS con certificado automático y renovado;
+  - redirigir HTTP a HTTPS y `www.<dominio>` al dominio principal (301, conservando la ruta);
+  - enviar `Strict-Transport-Security`.
+- **FR-007**: Los orígenes permitidos del panel MUST normalizarse a *punycode*, para que el acceso
+  funcione aunque la configuración escriba el dominio con «ñ».
+- **FR-008**: La guía de operación MUST incluir:
+  - la migración desde la web anterior en la misma MV (parada, arranque, datos y comprobaciones);
+  - la vuelta atrás;
+  - el acceso al panel: dirección, creación de la cuenta y recuperación.
 
 ## Success Criteria *(mandatory)*
 
@@ -79,6 +133,12 @@ que los textos superpuestos siguen siendo legibles.
 - **SC-003**: 0 incumplimientos de accesibilidad AA y 0 desbordamientos en las páginas revisadas.
 - **SC-004**: Los marcos de foto conservan su tamaño y su posición respecto a la versión anterior
   (diferencia de 0 px).
+- **SC-005**: El ensayo en modo producción con HTTPS y un dominio con «ñ» da 0 fallos en:
+  - las redirecciones;
+  - el certificado;
+  - HSTS;
+  - el acceso al panel;
+  - un guardado.
 
 ## Assumptions
 
