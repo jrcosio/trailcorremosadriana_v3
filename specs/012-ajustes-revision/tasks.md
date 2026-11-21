@@ -194,6 +194,31 @@ credenciales); capturas y axe.
   vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos
   --comparar` con el panel
 
+## Phase 3g: User Story 9 — Contraste AA en todo el panel (P1)
+
+**Goal**: 0 incumplimientos AA en el panel con la sesión iniciada, cambiando solo el color de los
+textos que fallan.
+
+**Independent Test**: `verificar-panel-aa.mjs`, con credenciales.
+
+- [X] T042 [US9] Crear `frontend/scripts/verificar-panel-aa.mjs` (research R9):
+  - axe en todas las secciones, un elemento existente y el alta de cada colección, a 360, 1024 y
+    1440 px;
+  - estados de guardado con las escrituras interceptadas;
+  - las dos variantes de la etiqueta de estado;
+  - fallos agrupados.
+
+  Ejecutarlo antes del cambio para obtener la lista de defectos.
+- [X] T043 [US9] Hacer capturas del panel antes del cambio: 6 pantallas a 1440 y 360 px
+- [X] T044 [US9] Añadir A-009 a `frontend/src/styles/ajustes.css`: `--muted` en `.admin-table th`
+  y en `.admin-footer`
+- [X] T045 [US9] Reconstruir `web` y ejecutar `verificar-panel-aa.mjs`. Comprobar en la API que
+  ningún dato ha cambiado. Comparar las capturas: solo cambian los textos corregidos. Regresión:
+  `verificar-panel.mjs`, `verificar-accesibilidad.mjs`, vitest, `typecheck`, `verificar-rutas` y
+  `verificar-cierre`
+- [X] T046 [US9] Actualizar `docs/referencia/DISCREPANCIAS.md` (P4), `docs/arquitectura.md`,
+  `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -208,8 +233,9 @@ credenciales); capturas y axe.
 - **US5**: T025 [P] y T026 [P] (comprobaciones que fallan antes del cambio) → T027 → T028 → T029.
 - **US6**: T030 (referencia antes del cambio) → T031 [P] → T032 → T033 → T034 → T035.
 - **US7 y US8**: T036 (referencia antes del cambio) → T037 → T038 → T039 → T040 → T041.
+- **US9**: T042 y T043 (auditoría y capturas antes del cambio) → T044 → T045 → T046.
 
 ## Implementation Strategy
 
-- **Alcance**: hasta ahora, las US1–US8 completas. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US9…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US9 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US10…) de esta misma feature.

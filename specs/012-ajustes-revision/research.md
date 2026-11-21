@@ -335,3 +335,36 @@ hay credenciales. Para cada `<img>` de foto comprueba:
   el contenido del panel. Las cabeceras de la tabla de «Últimas noticias» dan 3,39:1 y el pie
   del panel 2,66:1. Ya existía: el cierre (011) solo revisó la pantalla de acceso. Se informa al
   propietario y queda registrado en `docs/ESTADO_PROYECTO.md`.
+
+## R9. Contraste AA en todo el panel (US9, decisión P4)
+
+- **Auditoría** (`scripts/verificar-panel-aa.mjs`, con credenciales): axe WCAG 2.1 A/AA con la
+  sesión iniciada en 69 vistas:
+  - 22 rutas: las 11 secciones, un elemento existente y el alta de cada colección;
+  - a 360, 1024 y 1440 px;
+  - más 3 estados de guardado: el aviso de éxito en «Ajustes», «Guardado correctamente» en una
+    noticia y el mensaje de error del servidor.
+
+  Si una página solo muestra la etiqueta «Publicado», se clona como «Borrador» para revisar las
+  dos variantes. Las escrituras se interceptan: responden con éxito o con error, o se abortan, y
+  ninguna llega al servidor. Después se comprueba en la API que los datos no han cambiado.
+- **Resultado antes del cambio**: 222 incumplimientos en las 69 vistas, de solo 2 defectos:
+  - cabeceras de las tablas de listados (`.admin-table th`): #7a8d7f sobre #f9fbfa, 3,40:1;
+  - pie del panel (`.admin-footer`): #8b9b90 sobre #f3f5f4, 2,67:1.
+
+  Los estados de guardado, las etiquetas de estado, los formularios y la barra lateral ya
+  cumplían.
+- **Decisión**: `ajustes.css` A-009 pone los dos textos en el gris de texto secundario de la
+  paleta, `--muted` (#66716b), que el panel ya usa para el texto secundario: 4,88:1 y 4,63:1.
+  Tamaños, pesos y fondos no cambian.
+- **Alternativas descartadas**:
+  - Oscurecer el mismo tono hasta el límite (#67786c, 4,51:1, y #637368, 4,59:1): margen mínimo y
+    colores fuera de la paleta.
+  - Aclarar los fondos: cambia más el diseño y no basta en el pie.
+- **Verificación**:
+  - `verificar-panel-aa.mjs`: 0 incumplimientos en las 69 vistas.
+  - Capturas del panel antes y después (6 pantallas a 1440 y 360 px): solo cambian dos franjas
+    por página, la fila de cabeceras de la tabla y el pie, sin cambios de tamaño. Queda además un
+    píxel de rasterizado del logotipo, con una diferencia de 2/255.
+  - `verificar-panel.mjs`, axe público y regresión correctos.
+- **Fuera de la revisión automática**: los estados al pasar el ratón y de foco, que axe no evalúa.

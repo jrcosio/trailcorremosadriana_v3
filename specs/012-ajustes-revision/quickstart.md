@@ -116,3 +116,19 @@ Resultados esperados:
 - Logotipo oficial en la barra lateral, con «ADMINISTRACIÓN», y en el acceso. No es más ancho que
   la marca anterior y es nítido en densidad 2. Barra, contenido y formulario en su sitio.
 - axe da 0 incumplimientos en la barra lateral y en el acceso.
+
+## US9: contraste AA en todo el panel
+
+```bash
+export ADMIN_USUARIO=admin ADMIN_PASSWORD=…
+cd frontend && node scripts/verificar-panel-aa.mjs     # antes del cambio: 222 incumplimientos (2 defectos)
+docker compose build web && docker compose up -d web
+node scripts/verificar-panel-aa.mjs
+curl -s http://localhost:8080/api/content | jq '.data.settings.email'   # sin cambios
+```
+
+Resultados esperados:
+
+- 0 incumplimientos en 69 vistas: 22 rutas × 3 anchos y 3 estados de guardado.
+- Escrituras interceptadas; ningún dato cambia.
+- En las capturas solo cambia el color de las cabeceras de tabla y del pie del panel.

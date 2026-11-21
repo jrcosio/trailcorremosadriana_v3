@@ -119,11 +119,19 @@
     - axe 0 en la barra lateral.
   - Cabecera y pie públicos con 0 px de diferencia.
   - Acceso, panel, axe, capturas (0 cambios en la web pública) y regresión correctos.
-- **Hallazgo pendiente de decisión**: con la sesión iniciada, axe encuentra contraste
-  insuficiente en el contenido del panel. Las cabeceras de la tabla «Últimas noticias» dan 3,39:1
-  y el pie del panel 2,66:1. Ya existía, porque el cierre (011) solo revisó la pantalla de acceso.
-  Se ha informado al propietario; la decisión P4 (AA) lo cubre.
-- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). Las US4–US8 están solo en local, en
+- **US9 terminada** (el propietario pidió corregir el contraste del panel; decisión P4):
+  - Auditoría (`verificar-panel-aa.mjs`): axe con la sesión iniciada en 69 vistas. Son 22 rutas
+    a 360, 1024 y 1440 px y 3 estados de guardado, con las escrituras interceptadas.
+  - Antes: 222 incumplimientos, de solo 2 defectos:
+    - las cabeceras de las tablas de listados, a 3,40:1;
+    - el pie del panel, a 2,67:1.
+  - Cambio (`ajustes.css` A-009): los dos textos pasan a `--muted` (#66716b), con 4,88:1 y
+    4,63:1. Tamaños, pesos y fondos no cambian.
+  - Después: 0 incumplimientos en las 69 vistas.
+  - Ningún dato cambió durante la revisión (comprobado en la API).
+  - Capturas: solo cambian esos textos.
+  - Regresión correcta.
+- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). Las US4–US9 están solo en local, en
   `012-ajustes-revision` y fusionadas en `main`. Se suben cuando el propietario lo pida.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
@@ -179,6 +187,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Contraste AA también en el panel con la sesión iniciada: cabeceras de tabla y pie del panel en `--muted` | Propietario (P4, confirmado para el panel), 012 research R9 |
 | 2026-11-21 | Logotipo oficial en negativo en la barra lateral del panel (con «ADMINISTRACIÓN») y en el acceso; favicon sin cambios | Propietario (P11), 012 research R8 |
 | 2026-11-21 | Barra lateral del panel con desplazamiento vertical propio, sin arrastrar la página; opción abierta a la vista | 012 US7, research R8 |
 | 2026-11-21 | Podio de las clasificaciones en oro, plata y bronce suaves (fondo, franja y medalla) por el puesto publicado; sin podios por sexo ni categoría | Propietario (P10), 012 research R7 |
@@ -324,8 +333,11 @@
 | 2026-11-21 | 012 | US8: `verificar-logo.mjs --comparar` (con `/pantallas` en local) | Cabecera y pie públicos con 0 px de diferencia tras extraer `LogoImg`; barra del panel con el logotipo oficial |
 | 2026-11-21 | 012 | US7 y US8: `verificar-acceso.mjs`, `verificar-admin.mjs`, axe (17 rutas) y 44 capturas comparadas con las de la US6 | Todo correcto; 0 incumplimientos; 0 desbordamientos; 0 capturas públicas cambian |
 | 2026-11-21 | 012 | US8: logotipo que no carga (petición abortada) en el acceso y en el panel | Enlaces con su nombre accesible; «ADMINISTRACIÓN» visible |
-| 2026-11-21 | 012 | US7 y US8: axe con la sesión iniciada en todo el panel (1440×560 y 360×640) | 0 en la barra lateral. En el contenido, contraste previo: cabeceras de «Últimas noticias» a 3,39:1 y pie del panel a 2,66:1 (pendiente de decisión) |
+| 2026-11-21 | 012 | US7 y US8: axe con la sesión iniciada en todo el panel (1440×560 y 360×640) | 0 en la barra lateral. En el contenido, contraste previo: cabeceras de «Últimas noticias» a 3,39:1 y pie del panel a 2,66:1 (corregido en la US9) |
 | 2026-11-21 | 012 | US7 y US8: regresión (vitest, typecheck, build, rutas, cierre, fotos con el panel) | 91 passed; OK; 42/42; 7/7; 180/180 fotos con el panel |
+| 2026-11-21 | 012 | US9: `verificar-panel-aa.mjs` (axe con la sesión iniciada: 22 rutas × 360/1024/1440 px y 3 estados de guardado, con las escrituras interceptadas), antes y después del cambio | Antes: 222 incumplimientos en 69 vistas (2 defectos: cabeceras de tabla a 3,40:1 y pie del panel a 2,67:1). Después: 0 en 69 vistas; 3 escrituras interceptadas; datos sin cambios en la API |
+| 2026-11-21 | 012 | US9: capturas del panel antes y después (6 pantallas a 1440 y 360 px) | Solo cambian la fila de cabeceras de la tabla y el pie, sin cambios de tamaño, más 1 píxel de rasterizado del logotipo (2/255) |
+| 2026-11-21 | 012 | US9: regresión (`verificar-panel`, axe público, vitest, typecheck, rutas, cierre) | OK; 0 incumplimientos en 17 rutas; 91 passed; OK; 42/42; 7/7 |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |
