@@ -1,5 +1,5 @@
 // Feature 012 · US3 y US4 (decisiones P7 y P8): logotipo nuevo en la cabecera y, en negativo, en el
-// pie, sin mover el resto.
+// pie, sin mover el resto. US5 (decisión P9): frase de autoría de la línea inferior del pie.
 // Uso (desde frontend/, con Docker Compose en marcha; con PANTALLAS=si se mide también el panel):
 //   node scripts/verificar-logo.mjs --referencia capturas/pie-antes-012.json   # antes del cambio
 //   node scripts/verificar-logo.mjs --comparar capturas/pie-antes-012.json
@@ -17,6 +17,7 @@ const ANCHOS = [320, 340, 359, 360, 390, 414, 700, 701, 768, 1000, 1001, 1024, 1
 const RUTAS = ['/', '/carreras', '/solidaridad', '/noticias', '/clasificaciones', '/contacto'];
 const CABECERA = ['logo_cabecera-480.webp', 'logo_cabecera-720.webp'];
 const PIE = ['logo_pie-480.webp', 'logo_pie-720.webp'];
+const FRASE = 'Hecho por la Escuela Hacker Cosío';
 
 /**
  * Lleva el pie a la vista para que cargue su logotipo (carga diferida) y vuelve arriba. El
@@ -74,6 +75,16 @@ async function medir() {
     columnas: columnas.map(rect),
     primera: { p: rect(columnas[0]?.querySelector('p')), instagram: rect(columnas[0]?.querySelector('.instagram')) },
     bajo: rect(document.querySelector('.footer-bottom')),
+    // textContent y no innerText: no depende de transformaciones de mayúsculas del CSS.
+    credito: (() => {
+      const lineas = [...(document.querySelector('.footer-bottom')?.children ?? [])];
+      return {
+        lineas: lineas.map((s) => s.textContent.trim()),
+        enlaces: document.querySelectorAll('.footer-bottom a').length,
+        estilos: lineas.map((s) => `${getComputedStyle(s).color} ${getComputedStyle(s).fontSize}`),
+        restos: /Hecho con pasión|JR BLANCO|Hackers Cosío/i.test(document.querySelector('footer')?.textContent ?? ''),
+      };
+    })(),
     desborda: document.documentElement.scrollWidth > innerWidth,
   };
 }
@@ -174,6 +185,13 @@ for (const [clave, m] of Object.entries(medidas)) {
   if (m.texto) p(`queda texto de marca en la cabecera («${m.texto}»)`);
   if (m.enlace.href !== '/' || !m.enlace.etiqueta) p(`cabecera: enlace a la portada incorrecto (${JSON.stringify(m.enlace)})`);
   if (m.desborda) p('desbordamiento horizontal');
+  // Línea inferior del pie (US5): aviso de copyright intacto, frase nueva como texto y con el estilo de la línea.
+  const c = m.credito;
+  if (!/^© \d{4} Asociación Peñasagra$/.test(c.lineas[0] ?? '')) p(`aviso de copyright del pie: «${c.lineas[0]}»`);
+  if (c.lineas[1] !== FRASE || c.lineas.length !== 2) p(`frase del pie: ${JSON.stringify(c.lineas)}`);
+  if (c.enlaces) p(`la línea inferior del pie tiene ${c.enlaces} enlace(s)`);
+  if (c.estilos[0] !== c.estilos[1]) p(`la frase no tiene el color y el tamaño de la línea (${c.estilos.join(' / ')})`);
+  if (c.restos) p('quedan restos de la frase anterior en el pie');
   // Pie (US4): logotipo en negativo; las demás columnas no se mueven en horizontal y nada baja más de lo que crece la marca.
   const f = m.pie, fa = antes.pie;
   if (!fa?.huella) { p('la referencia no tiene la huella del pie (tomarla con esta versión del script)'); continue; }
@@ -199,7 +217,7 @@ for (const [clave, m] of Object.entries(medidas)) {
   baja(m.bajo, antes.bajo, 'franja inferior del pie');
 }
 const total = Object.keys(medidas).length;
-if (!problemas.length) ok(`${total} vistas (${RUTAS.length} rutas × ${ANCHOS.length} anchos): logotipos completos y sin deformar, sin texto de marca, cabecera/navegación/INSCRIPCIONES/menú con 0 px de diferencia; pie con el logotipo en negativo, no más ancho que la marca anterior ni que su columna, columnas 2.ª–4.ª en su sitio y bajada máxima de ${maxBajada.toFixed(1)} px (≤ lo que crece la marca); sin desbordamientos`);
+if (!problemas.length) ok(`${total} vistas (${RUTAS.length} rutas × ${ANCHOS.length} anchos): logotipos completos y sin deformar, sin texto de marca, cabecera/navegación/INSCRIPCIONES/menú con 0 px de diferencia; pie con el logotipo en negativo, no más ancho que la marca anterior ni que su columna, columnas 2.ª–4.ª en su sitio y bajada máxima de ${maxBajada.toFixed(1)} px (≤ lo que crece la marca); línea inferior con «© año Asociación Peñasagra» y «${FRASE}», sin enlaces, con el mismo estilo y sin restos de la frase anterior; sin desbordamientos`);
 else fallo(`${problemas.length} problemas:\n  ${problemas.slice(0, 25).join('\n  ')}`);
 
 const tamanos = [...CABECERA, ...PIE].map((v) => [v, statSync(new URL(`../public/reused/logos/${v}`, import.meta.url)).size]);

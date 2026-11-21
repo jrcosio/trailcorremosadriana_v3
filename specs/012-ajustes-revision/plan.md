@@ -34,7 +34,11 @@ US4 (decisión P8): el logotipo también en el pie.
   columna si es menor. Su alto sale de la proporción.
 - Las demás columnas del pie no se mueven.
 
-Detalle en [research.md](research.md) (R4 y R5).
+US5 (decisión P9): la línea inferior del pie dice «Hecho por la Escuela Hacker Cosío» en lugar de
+«Hecho con pasión por JR BLANCO · Hackers Cosío». Es texto sin enlace, con el estilo de la línea;
+sin CSS nuevo.
+
+Detalle en [research.md](research.md) (R4, R5 y R6).
 
 ## Technical Context
 
@@ -56,6 +60,8 @@ cabecera con Playwright, con una referencia tomada antes del cambio.
 **US4**: `Site.tsx` (pie), `ajustes.css` A-006 y 2 archivos WebP nuevos
 (`logo_pie-{480,720}.webp`). La geometría de la cabecera y del pie se verifica contra una
 referencia nueva.
+**US5**: `Site.tsx` (`Footer`). Prueba vitest nueva (`tests/pie.test.tsx`) y comprobación de la
+línea inferior del pie en `verificar-logo.mjs`.
 
 ## Constitution Check
 
@@ -66,6 +72,8 @@ referencia nueva.
 | IV (US3) | Procedencia del logotipo en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
 | I (US4) | Cambio de marca ordenado por el propietario (P8). La cabecera no cambia y las columnas 2.ª–4.ª del pie conservan su posición horizontal. Solo baja el resto de la primera columna, lo que crece el logotipo. Capturas antes y después | ✅ |
 | IV (US4) | Procedencia de la versión en negativo (derivada de `new_logo.png`) en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
+| I (US5) | Cambio de texto ordenado por el propietario (P9); mismo estilo y nada más se mueve. Capturas antes y después | ✅ |
+| VI (US5) | La frase va sin enlace: no hay dirección aprobada y no se inventan enlaces | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -91,6 +99,9 @@ docs/{PROCEDENCIA_RECURSOS,referencia/DISCREPANCIAS}.md
 frontend/public/reused/logos/logo_pie-{480,720}.webp (nuevos)
 frontend/src/components/Site.tsx (Logo en cabecera y pie) · frontend/src/styles/ajustes.css (A-006)
 frontend/scripts/verificar-logo.mjs (pie, contraste y densidad del pie)
+# US5
+frontend/src/components/Site.tsx (Footer) · frontend/tests/pie.test.tsx (nuevo)
+frontend/scripts/verificar-logo.mjs (línea inferior del pie)
 ```
 
 ## Complexity Tracking

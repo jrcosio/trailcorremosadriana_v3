@@ -55,3 +55,22 @@ Resultados esperados:
 - Naranja con al menos 3:1 y blanco con al menos 4,5:1 sobre el verde del pie.
 - 0 desbordamientos y 0 incumplimientos AA.
 - Variantes de 50 KB como máximo y nítidas en densidad 2.
+
+## US5: frase de autoría del pie
+
+```bash
+cd frontend && npx vitest run tests/pie.test.tsx          # antes del cambio: falla
+docker compose build web && PANTALLAS=si docker compose up -d web
+node scripts/verificar-logo.mjs --comparar capturas/pie-antes-012.json
+docker compose up -d web                    # vuelve a PANTALLAS=no
+node scripts/verificar-accesibilidad.mjs
+node scripts/capturas.mjs http://localhost:8080 capturas/despues-pie-texto-012
+```
+
+Resultados esperados:
+
+- Línea inferior del pie: «© año Asociación Peñasagra» y «Hecho por la Escuela Hacker Cosío».
+- Sin enlaces en esa línea y sin restos de «Hecho con pasión», «JR BLANCO» ni «Hackers Cosío».
+- La frase, con el color y el tamaño de la línea.
+- Cabecera y resto del pie como en la US4.
+- 0 desbordamientos y 0 incumplimientos AA.

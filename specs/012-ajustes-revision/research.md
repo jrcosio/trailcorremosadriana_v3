@@ -201,3 +201,28 @@ hay credenciales. Para cada `<img>` de foto comprueba:
     - el contraste;
     - la variante descargada en densidad 2;
     - el panel, sin cambios.
+
+## R6. Frase de autoría del pie (US5, decisión P9)
+
+- **Decisión**: en `Footer` (`Site.tsx`), la segunda línea de `.footer-bottom` pasa a ser el texto
+  literal «Hecho por la Escuela Hacker Cosío», sin enlace. El aviso «© año Asociación Peñasagra»
+  no cambia.
+- **Estilo**: lo da la regla de `.footer-bottom` de `globals.css` (color #99afa1 y tamaño de la
+  línea), así que no hace falta CSS nuevo. La regla de A-002 que subraya los enlaces de esa línea
+  ya no tiene a qué aplicarse. Se conserva: si el propietario da una dirección, el enlace saldrá
+  subrayado (AA) sin tocar el CSS. Su comentario lo indica.
+- **Alternativas descartadas**:
+  - Enlazar la frase a `jrblanco.es`: la frase ya no nombra a JR BLANCO y sería un enlace que el
+    propietario no ha pedido.
+  - Enlazar a una web de la Escuela Hacker Cosío: no hay dirección aprobada y no se inventan
+    enlaces (constitución VI).
+- **Verificación**:
+  - vitest (`tests/pie.test.tsx`): renderiza `Site` en 13 rutas públicas, incluida una
+    inexistente. Comprueba que la línea inferior tiene el aviso de copyright y la frase nueva, sin
+    enlaces y sin restos de la frase anterior en toda la página. Falla antes del cambio.
+  - `verificar-logo.mjs --comparar capturas/pie-antes-012.json`, ampliado con la línea inferior:
+    las dos líneas, sin enlaces, con el mismo color y tamaño, y sin restos de la frase anterior.
+    Detecta la frase anterior en la versión previa. La cabecera y el resto del pie se comprueban
+    como en la US4.
+  - axe, desbordamiento y capturas. Comparación píxel a píxel con las de la US4: solo cambia la
+    línea inferior del pie.
