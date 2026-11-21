@@ -74,10 +74,11 @@ repositorio.
     muestra con `contain` y el espacio sobrante se rellena con la misma foto bajo un velo verde.
   - A-005: logotipo nuevo de la cabecera por la decisión P7 (feature 012).
     - `Logo en="cabecera"` (`Site.tsx`) sirve `reused/logos/logo_cabecera-{480,720}.webp` con
-      `srcset`/`sizes`.
+      `srcset`/`sizes`. La imagen la genera `LogoImg` (`components/Logo.tsx`), compartido con el
+      panel.
     - La altura del logotipo depende del tramo de la cabecera (80/70/68/58/49 px).
     - El enlace conserva el ancho de la marca anterior, así que nada más se mueve.
-    - La barra lateral del panel sigue con `logo1.webp` en blanco (marcado propio de `Admin.tsx`).
+    - La barra lateral del panel siguió con `logo1.webp` en blanco hasta la decisión P11 (A-008).
   - A-006: logotipo también en el pie por la decisión P8 (feature 012).
     - `Logo en="pie"` sirve `reused/logos/logo_pie-{480,720}.webp`, la versión en negativo para el
       fondo verde oscuro, con `loading="lazy"`. `Brand`, con la silueta y el texto, se eliminó.
@@ -89,6 +90,14 @@ repositorio.
     - Fondo suave de oro, plata y bronce, con una franja interior de 4 px y la medalla en el mismo
       color más intenso (variable `--podio`).
     - La medalla no cambia el alto de la fila. Cuenta el puesto publicado, también con filtros.
+  - A-008: panel de administración (feature 012).
+    - US7: la barra lateral se desplaza en vertical (`overflow-y: auto`,
+      `overscroll-behavior: contain`). `Admin.tsx` muestra la opción de la sección abierta una vez
+      por sección.
+    - Con el menú de móvil abierto, el contenido usa `overflow-x: clip` para que «Ver web» no
+      desborde la página.
+    - US8 (decisión P11): `LogoImg` en negativo en la barra lateral (180 px, con
+      «ADMINISTRACIÓN» debajo) y en el acceso (261 px). `logo1.webp` queda solo como favicon.
 - **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.

@@ -274,3 +274,64 @@ hay credenciales. Para cada `<img>` de foto comprueba:
     - búsqueda del ganador por dorsal y filtro «Femenino».
   - axe, desbordamiento y capturas. Comparación píxel a píxel: solo cambian las de
     clasificaciones.
+
+## R8. Panel de administración: barra lateral con desplazamiento (US7) y logotipo oficial (US8, decisión P11)
+
+- **Causa del fallo (US7)**: la barra lateral es `position: fixed` con `top: 0; bottom: 0` (alto
+  de la ventana) y sin desbordamiento propio. Su contenido mide unos 780 px (811 px con el
+  logotipo nuevo). Por debajo de eso, las últimas opciones, el usuario y «Cerrar sesión» quedaban
+  fuera de la ventana. Ni la rueda ni el teclado podían alcanzarlos: la rueda movía la página de
+  detrás.
+- **Solución (US7)**, en `ajustes.css` A-008:
+  - `overflow-y: auto` en la barra, con `overflow-x: hidden`.
+  - `overscroll-behavior: contain`: al llegar al final, la rueda no arrastra la página.
+  - Barra de desplazamiento fina y clara (`scrollbar-width`, `scrollbar-color`).
+  - Con altura suficiente no hay desplazamiento y el usuario sigue abajo del todo
+    (`margin-top: auto`, sin cambios).
+  - `Admin.tsx`: al abrir una sección, si su opción no se ve, la barra se desplaza lo justo para
+    mostrarla. Solo ocurre una vez por sección, así que no deshace después el desplazamiento del
+    usuario.
+- **Fallo previo encontrado al verificar (US7)**: con el menú de móvil abierto, la hoja aprobada
+  desplaza el botón del menú 220 px. Eso empujaba «Ver web» fuera de la ventana y la página se
+  desbordaba 78 px a 360 px; ya pasaba en la referencia. Mientras el menú está abierto, el
+  contenido del panel usa `overflow-x: clip`. Recorta sin crear otro contenedor de
+  desplazamiento, así que no afecta a los elementos fijos ni a los pegajosos.
+- **Logotipo (US8)**:
+  - Versión en negativo (`logo_pie-{480,720}.webp`), la misma del pie, porque los dos fondos son
+    oscuros: el verde de la barra lateral y la foto oscurecida del acceso.
+  - Componente `LogoImg` (`components/Logo.tsx`), compartido por la web (`Logo` de `Site.tsx`) y
+    el panel. Así `Admin.tsx` no importa `Site.tsx`, que ya lo importa a él.
+  - Barra lateral: 180 px, el ancho de la marca anterior (silueta y texto: 180,4 px), o el de su
+    hueco si es menor (177–180 px). Lleva «ADMINISTRACIÓN» debajo, con su estilo, en columna.
+    Las opciones bajan lo que crece la marca, como mucho 28,8 px.
+  - Acceso: 261 px, el ancho de la marca anterior (261,2 px), en el mismo sitio sobre la foto. El
+    blanco y el naranja quedan sobre la misma zona que el texto blanco anterior.
+  - El icono del navegador sigue siendo `logo1.webp`, por el mismo motivo que en la US3.
+- **Alternativas descartadas**:
+  - Desplazar toda la página en lugar de la barra: la barra dejaría de estar fija y el diseño
+    aprobado cambiaría.
+  - Compactar la barra (menos margen y opciones más bajas): no garantiza que quepa en cualquier
+    ventana y cambia el diseño.
+  - Quitar «ADMINISTRACIÓN»: indica que se está en el panel; queda como supuesto reversible.
+- **Verificación** (`scripts/verificar-panel.mjs`, con credenciales y una referencia tomada antes
+  del cambio, `capturas/panel-antes-012.json`):
+  - Barra lateral en 8 ventanas de escritorio y de móvil, altas y bajas:
+    - desplazable;
+    - cada opción y «Cerrar sesión» a la vista y pulsable al recibir el foco;
+    - con la rueda se llega al final sin mover la página;
+    - «Ajustes» a la vista al abrirla;
+    - sin desplazamiento horizontal;
+    - con altura suficiente, igual que antes;
+    - axe limitado a la barra lateral.
+  - Logotipo: completo, sin deformar, no más ancho que la marca anterior, con «ADMINISTRACIÓN» y
+    su estilo, y con los enlaces al panel y a la portada.
+  - Barra, contenido del panel y formulario de acceso en su sitio; lo de debajo baja como mucho
+    lo que crece el logotipo; nítido en densidad 2.
+  - Con la versión previa detecta los dos fallos: no se alcanzan las opciones y la marca es la
+    antigua.
+  - `verificar-logo.mjs` pasa a comprobar que la barra lateral (vista `/pantallas/admin`) tiene
+    el logotipo oficial.
+- **Hallazgo fuera de alcance**: axe con la sesión iniciada encuentra contraste insuficiente en
+  el contenido del panel. Las cabeceras de la tabla de «Últimas noticias» dan 3,39:1 y el pie
+  del panel 2,66:1. Ya existía: el cierre (011) solo revisó la pantalla de acceso. Se informa al
+  propietario y queda registrado en `docs/ESTADO_PROYECTO.md`.

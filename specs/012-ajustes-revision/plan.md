@@ -45,7 +45,15 @@ US6 (decisión P10): podio destacado en las clasificaciones.
   en el mismo color más intenso.
 - Ni las filas cambian de alto ni la tabla de ancho.
 
-Detalle en [research.md](research.md) (R4, R5, R6 y R7).
+US7: la barra lateral del panel se desplaza en ventanas bajas (`overflow-y: auto` y
+`overscroll-behavior: contain`). La opción abierta queda a la vista y, con el menú de móvil
+abierto, la página no se desborda.
+
+US8 (decisión P11): logotipo oficial en negativo en la barra lateral, con «ADMINISTRACIÓN»
+debajo, y en la pantalla de acceso. Lo sirve un componente compartido, `LogoImg`
+(`components/Logo.tsx`).
+
+Detalle en [research.md](research.md) (R4, R5, R6, R7 y R8).
 
 ## Technical Context
 
@@ -72,6 +80,9 @@ línea inferior del pie en `verificar-logo.mjs`.
 **US6**: `ClassificationTable.tsx` y `ajustes.css` A-007. Prueba vitest nueva
 (`tests/podio.test.tsx`) y `scripts/verificar-podio.mjs`, con una referencia tomada antes del
 cambio.
+**US7 y US8**: `Admin.tsx` (barra lateral y acceso), `components/Logo.tsx` (nuevo, compartido con
+`Site.tsx`) y `ajustes.css` A-008. `scripts/verificar-panel.mjs` (nuevo, con credenciales y
+referencia previa).
 
 ## Constitution Check
 
@@ -86,6 +97,9 @@ cambio.
 | VI (US5) | La frase va sin enlace: no hay dirección aprobada y no se inventan enlaces | ✅ |
 | I (US6) | Cambio visual ordenado por el propietario (P10), con los colores a elección del equipo; filas y tabla con 0 px de diferencia. Capturas antes y después | ✅ |
 | VI (US6) | El podio es el puesto publicado; no se calculan podios por sexo ni por categoría | ✅ |
+| I (US7) | Corrige un fallo sin cambiar el diseño: con altura suficiente la barra lateral se ve igual | ✅ |
+| III (US7) | «Cerrar sesión» vuelve a estar al alcance en cualquier ventana | ✅ |
+| I (US8) | Cambio de marca ordenado por el propietario (P11). La barra, el contenido y el formulario no cambian en horizontal. Capturas antes y después | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -117,6 +131,10 @@ frontend/scripts/verificar-logo.mjs (línea inferior del pie)
 # US6
 frontend/src/components/ClassificationTable.tsx · frontend/src/styles/ajustes.css (A-007)
 frontend/tests/podio.test.tsx (nuevo) · frontend/scripts/verificar-podio.mjs (nuevo)
+# US7 y US8
+frontend/src/components/Logo.tsx (nuevo) · frontend/src/components/Site.tsx (Logo)
+frontend/src/components/admin/Admin.tsx (barra lateral y acceso) · frontend/src/styles/ajustes.css (A-008)
+frontend/scripts/verificar-panel.mjs (nuevo) · frontend/scripts/verificar-logo.mjs (panel)
 ```
 
 ## Complexity Tracking

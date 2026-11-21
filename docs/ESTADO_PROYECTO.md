@@ -96,8 +96,35 @@
     - axe 0;
     - 44 capturas: solo cambian las 4 de clasificaciones;
     - regresión correcta.
-- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). Las US4, US5 y US6 están solo en local,
-  en `012-ajustes-revision` y fusionadas en `main`. Se suben cuando el propietario lo pida.
+- **US7 terminada** (fallo del panel: la barra lateral no se desplazaba en ventanas bajas):
+  - Causa: la barra es fija y ocupa toda la altura, sin desbordamiento propio. Las últimas
+    opciones y «Cerrar sesión» quedaban fuera de alcance.
+  - Cambio:
+    - desplazamiento vertical de la barra, sin arrastrar la página (`ajustes.css` A-008);
+    - la opción de la sección abierta queda a la vista (`Admin.tsx`);
+    - con altura suficiente, la barra se ve igual que antes.
+  - Fallo previo encontrado al verificar: con el menú de móvil abierto, la página se desbordaba
+    78 px a 360 px. Corregido con `overflow-x: clip` mientras el menú está abierto.
+- **US8 terminada** (decisión P11: logotipo oficial también en el panel):
+  - Logotipo en negativo en la barra lateral (180 px, con «ADMINISTRACIÓN» debajo) y en la
+    pantalla de acceso (261 px).
+  - Componente compartido `LogoImg` (`components/Logo.tsx`).
+  - `logo1.webp` queda solo como favicon.
+- **Verificación de la US7 y la US8**:
+  - `verificar-panel.mjs`, con una referencia previa:
+    - con la versión previa detecta los dos fallos;
+    - con la nueva todo se alcanza con el teclado y con la rueda en 8 ventanas, sin
+      desbordamientos;
+    - barra, contenido y formulario en su sitio y logotipo correcto;
+    - axe 0 en la barra lateral.
+  - Cabecera y pie públicos con 0 px de diferencia.
+  - Acceso, panel, axe, capturas (0 cambios en la web pública) y regresión correctos.
+- **Hallazgo pendiente de decisión**: con la sesión iniciada, axe encuentra contraste
+  insuficiente en el contenido del panel. Las cabeceras de la tabla «Últimas noticias» dan 3,39:1
+  y el pie del panel 2,66:1. Ya existía, porque el cierre (011) solo revisó la pantalla de acceso.
+  Se ha informado al propietario; la decisión P4 (AA) lo cubre.
+- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). Las US4–US8 están solo en local, en
+  `012-ajustes-revision` y fusionadas en `main`. Se suben cuando el propietario lo pida.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
      GitHub (`main`, push del 2026-11-20 a petición del propietario).
@@ -152,6 +179,8 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Logotipo oficial en negativo en la barra lateral del panel (con «ADMINISTRACIÓN») y en el acceso; favicon sin cambios | Propietario (P11), 012 research R8 |
+| 2026-11-21 | Barra lateral del panel con desplazamiento vertical propio, sin arrastrar la página; opción abierta a la vista | 012 US7, research R8 |
 | 2026-11-21 | Podio de las clasificaciones en oro, plata y bronce suaves (fondo, franja y medalla) por el puesto publicado; sin podios por sexo ni categoría | Propietario (P10), 012 research R7 |
 | 2026-11-21 | Frase del pie «Hecho por la Escuela Hacker Cosío», sin enlace (no hay dirección aprobada) | Propietario (P9), 012 research R6 |
 | 2026-11-21 | Logotipo también en el pie, en negativo (tinta oscura → blanco, naranja intacto), con el ancho de la marca anterior; el panel conserva la marca blanca | Propietario (P8), 012 research R5 |
@@ -291,6 +320,12 @@
 | 2026-11-21 | 012 | US6: `verificar-podio.mjs` contra una referencia previa (`podio-antes-012.json`; `/clasificaciones/2026` a 320, 360, 768, 1024 y 1440 px, 8 primeras filas de las 3 tablas) | Con la versión previa, 136 problemas. Con la nueva: 45 filas del podio con su fondo, su franja y su medalla; 75 filas sin cambios; filas y tablas con 0 px de diferencia; contraste mínimo de 11,62:1 (texto) y 5,68:1 (medallas). La búsqueda del ganador conserva el oro; el filtro «Femenino» no colorea las primeras filas |
 | 2026-11-21 | 012 | US6: axe y desbordamiento; 44 capturas comparadas píxel a píxel con las de la US5; revisión visual de la tabla a 360 y 1440 px | 0 incumplimientos en 17 rutas; 0 desbordamientos; solo cambian las 4 capturas de clasificaciones, con el mismo alto |
 | 2026-11-21 | 012 | US6: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 91 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
+| 2026-11-21 | 012 | US7 y US8: `verificar-panel.mjs` contra una referencia previa (`panel-antes-012.json`; acceso a 7 anchos; barra lateral en 8 ventanas de 1440×900 a 360×480, con el menú de móvil abierto) | Con la versión previa, 66 problemas: opciones y «Cerrar sesión» inalcanzables, rueda que mueve la página y marca antigua. Con la nueva: 7 ventanas con desplazamiento y todo alcanzable con el teclado y con la rueda, sin mover la página; 1 sin él, como antes; «Ajustes» a la vista; sin desplazamiento horizontal; logotipo oficial con «ADMINISTRACIÓN»; barra, contenido y formulario en su sitio (bajada máxima de 28,8 px); densidad 2 correcta; axe 0 en la barra lateral |
+| 2026-11-21 | 012 | US8: `verificar-logo.mjs --comparar` (con `/pantallas` en local) | Cabecera y pie públicos con 0 px de diferencia tras extraer `LogoImg`; barra del panel con el logotipo oficial |
+| 2026-11-21 | 012 | US7 y US8: `verificar-acceso.mjs`, `verificar-admin.mjs`, axe (17 rutas) y 44 capturas comparadas con las de la US6 | Todo correcto; 0 incumplimientos; 0 desbordamientos; 0 capturas públicas cambian |
+| 2026-11-21 | 012 | US8: logotipo que no carga (petición abortada) en el acceso y en el panel | Enlaces con su nombre accesible; «ADMINISTRACIÓN» visible |
+| 2026-11-21 | 012 | US7 y US8: axe con la sesión iniciada en todo el panel (1440×560 y 360×640) | 0 en la barra lateral. En el contenido, contraste previo: cabeceras de «Últimas noticias» a 3,39:1 y pie del panel a 2,66:1 (pendiente de decisión) |
+| 2026-11-21 | 012 | US7 y US8: regresión (vitest, typecheck, build, rutas, cierre, fotos con el panel) | 91 passed; OK; 42/42; 7/7; 180/180 fotos con el panel |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

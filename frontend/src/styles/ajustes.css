@@ -207,3 +207,48 @@
   font-weight: 800;
   line-height: 1;
 }
+
+/*
+ * A-008 (feature 012): panel de administración (research R8).
+ * US7: la barra lateral es fija y ocupa toda la altura. En ventanas bajas su contenido no cabía y
+ * las últimas opciones y «Cerrar sesión» quedaban fuera de alcance. Ahora se desplaza en vertical,
+ * también el menú de móvil, y al llegar al final no arrastra la página. Con altura suficiente no
+ * cambia. La barra de desplazamiento es fina y clara sobre el verde.
+ * Con el menú de móvil abierto, el botón del menú se desplaza 220 px (hoja aprobada) y empujaba
+ * «Ver web» fuera de la pantalla: la página se desbordaba 78 px a 360 px. Fallo previo, visto
+ * al verificar. Mientras el menú está abierto se recorta lo que sale por la derecha (`clip` no
+ * crea otro contenedor de desplazamiento).
+ * US8 (decisión P11): logotipo oficial en negativo en lugar de la silueta y el texto:
+ * - en la barra lateral, con el ancho de la marca anterior (180 px) y el rótulo «ADMINISTRACIÓN»
+ *   debajo, con su estilo;
+ * - en la pantalla de acceso, con el ancho de la marca anterior (261 px).
+ * `sizes` de LogoImg (components/Logo.tsx) usa estos anchos.
+ */
+.admin-sidebar {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff40 transparent;
+}
+.admin-sidebar.visible + .admin-body {
+  overflow-x: clip;
+}
+.admin-sidebar > .brand.brand-panel {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.admin-sidebar .brand.brand-logo img {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+}
+.admin-sidebar .brand-panel small {
+  line-height: 1;
+}
+.login-photo .brand.brand-logo img {
+  width: 261px;
+  max-width: 100%;
+  height: auto;
+}

@@ -95,3 +95,24 @@ Resultados esperados:
 - Texto y medallas con un contraste de al menos 4,5:1; 0 incumplimientos AA y 0 desbordamientos.
 - El ganador conserva su color al buscarlo; con el filtro «Femenino», las primeras filas no se
   colorean.
+
+## US7 y US8: panel (barra lateral con desplazamiento y logotipo oficial)
+
+```bash
+export ADMIN_USUARIO=admin ADMIN_PASSWORD=…
+cd frontend && node scripts/verificar-panel.mjs --referencia capturas/panel-antes-012.json   # antes del cambio
+docker compose build web && docker compose up -d web
+node scripts/verificar-panel.mjs --comparar capturas/panel-antes-012.json
+node scripts/verificar-acceso.mjs && node scripts/verificar-admin.mjs
+node scripts/verificar-accesibilidad.mjs
+```
+
+Resultados esperados:
+
+- En ventanas bajas, de escritorio y de móvil, la barra lateral se desplaza. Todas las opciones y
+  «Cerrar sesión» se alcanzan con el teclado y con la rueda, y la página no se mueve.
+- La opción de la sección abierta se ve al cargar.
+- Sin desplazamiento horizontal. Con altura suficiente, la barra lateral se ve igual que antes.
+- Logotipo oficial en la barra lateral, con «ADMINISTRACIÓN», y en el acceso. No es más ancho que
+  la marca anterior y es nítido en densidad 2. Barra, contenido y formulario en su sitio.
+- axe da 0 incumplimientos en la barra lateral y en el acceso.

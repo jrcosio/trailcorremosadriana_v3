@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»)."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración)."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -256,6 +256,79 @@ resultados oficiales.
 6. **Given** la vista previa de un CSV en el panel, **When** muestra sus primeras filas, **Then**
    los tres primeros se ven igual que en la web pública.
 
+---
+
+### User Story 7 - La barra lateral del panel se desplaza en pantallas bajas (Priority: P1)
+
+Fallo detectado por el propietario: en el panel de administración, si la pantalla es baja, las
+últimas opciones de la barra lateral quedan cortadas y no se pueden alcanzar. Con ellas quedan
+fuera el usuario y el botón «Cerrar sesión».
+
+**Why this priority**: con la pantalla baja no se puede entrar en «Ajustes» ni cerrar la sesión
+desde la barra lateral. Impide usar el panel.
+
+**Independent Test**: entrar en el panel con ventanas bajas, de escritorio y de móvil, con el menú
+desplegado. Comprobar que la barra lateral se desplaza y que todas las opciones y «Cerrar sesión»
+se pueden alcanzar y pulsar.
+
+**Acceptance Scenarios**:
+
+1. **Given** una ventana más baja que el contenido de la barra lateral, de escritorio o de móvil
+   con el menú abierto, **When** se desplaza la barra lateral, **Then**:
+   - se llega a todas las opciones, al usuario y a «Cerrar sesión», y se pueden pulsar;
+   - la barra lateral sigue fija y el contenido de la página no se mueve con ella.
+2. **Given** una ventana con altura suficiente, **When** se muestra la barra lateral, **Then** se
+   ve como antes: sin barra de desplazamiento y con el usuario y «Cerrar sesión» abajo del todo.
+3. **Given** una ventana baja y una opción del final, por ejemplo «Ajustes», **When** se abre esa
+   sección, **Then** la barra lateral muestra la opción marcada sin tener que buscarla.
+4. **Given** la navegación por teclado, **When** el foco llega a una opción que no se ve, **Then**
+   la barra lateral se desplaza hasta mostrarla.
+5. **Given** cualquier ancho, **When** se muestra la barra lateral, **Then** no aparece
+   desplazamiento horizontal, ni en la barra ni en la página.
+
+---
+
+### User Story 8 - Logotipo oficial en el panel de administración (Priority: P1)
+
+Decisión P11 del propietario: «el logo, es cierto que hay que poner el oficial también aquí»,
+sobre la barra lateral del panel.
+
+La marca antigua, con la silueta y el texto, se sustituye por el logotipo oficial en negativo, el
+mismo del pie, en los dos sitios del panel donde aparece:
+
+- la barra lateral, donde se conserva debajo el rótulo «ADMINISTRACIÓN»;
+- la pantalla de acceso, sobre la foto.
+
+**Why this priority**: es una instrucción directa del propietario y completa la marca nueva en
+toda la web.
+
+**Independent Test**: abrir la pantalla de acceso a varios anchos y entrar en el panel a
+escritorio y a móvil. Comprobar que el logotipo oficial se ve completo y nítido, sin la silueta ni
+el texto antiguo, y que el resto no se mueve en horizontal.
+
+**Acceptance Scenarios**:
+
+1. **Given** la barra lateral del panel, **When** se muestra a cualquier ancho, **Then**:
+   - aparece el logotipo oficial en negativo, completo y sin deformar;
+   - debajo queda el rótulo «ADMINISTRACIÓN» con su estilo;
+   - ya no aparecen la silueta ni «PEÑASAGRA»;
+   - lleva a la portada del panel.
+2. **Given** la pantalla de acceso, **When** se muestra la foto, **Then**:
+   - aparece el logotipo oficial en negativo en lugar de la silueta y de «TRAIL PEÑASAGRA /
+     CORREMOS POR ADRIANA»;
+   - lleva a la portada de la web.
+3. **Given** la barra lateral y la pantalla de acceso, **When** se comparan con la versión
+   anterior, **Then**:
+   - el logotipo no es más ancho que la marca anterior;
+   - la barra lateral, el contenido del panel y el formulario de acceso no cambian de ancho ni de
+     posición horizontal;
+   - lo que queda debajo del logotipo solo baja, y como mucho lo que el logotipo es más alto que
+     la marca anterior.
+4. **Given** una pantalla de alta densidad, **When** se muestra el logotipo, **Then** se ve
+   nítido.
+5. **Given** la cabecera y el pie públicos y el icono del navegador, **When** se comparan,
+   **Then** no han cambiado.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -273,6 +346,10 @@ resultados oficiales.
 - **Puestos de dos o tres cifras (US6)**: solo el 1, el 2 y el 3 llevan medalla. La medalla se
   ensancha si hiciera falta, sin cortar el número.
 - **Clasificación sin puestos (US6)**: si nadie tiene puesto, no se colorea ninguna fila.
+- **Pantalla muy baja con el menú de móvil abierto (US7)**: el panel desplegado también se
+  desplaza. Al llegar a su final, no arrastra la página de detrás.
+- **Logotipo del panel que no carga (US8)**: el enlace conserva su nombre accesible y el rótulo
+  «ADMINISTRACIÓN» sigue visible.
 
 ## Requirements *(mandatory)*
 
@@ -336,6 +413,18 @@ resultados oficiales.
 - **FR-021**: Las demás filas, el alto de todas las filas, el ancho de la tabla y el resto de la
   página MUST NOT cambiar. El podio se decide por el puesto publicado (la general), no por la
   posición en una lista filtrada.
+- **FR-022**: La barra lateral del panel MUST desplazarse en vertical cuando su contenido no cabe
+  en la ventana, en escritorio y en el menú de móvil. Todas sus opciones, el usuario y «Cerrar
+  sesión» MUST poder alcanzarse y pulsarse. MUST NOT aparecer desplazamiento horizontal.
+- **FR-023**: Con altura suficiente, la barra lateral MUST verse como antes: sin barra de
+  desplazamiento y con el usuario abajo. Al abrir una sección, su opción marcada MUST quedar a la
+  vista en la barra lateral.
+- **FR-024**: La barra lateral del panel y la pantalla de acceso MUST mostrar el logotipo oficial
+  en negativo en lugar de la silueta y del texto de la marca. La barra lateral MUST conservar el
+  rótulo «ADMINISTRACIÓN». Cada enlace MUST conservar su destino: el panel y la portada.
+- **FR-025**: El logotipo del panel MUST NOT ser más ancho que la marca anterior. La barra
+  lateral, el contenido del panel y el formulario de acceso MUST NOT cambiar de ancho ni de
+  posición horizontal. La cabecera, el pie y el icono del navegador MUST NOT cambiar.
 
 ## Success Criteria *(mandatory)*
 
@@ -382,6 +471,14 @@ resultados oficiales.
   - las demás filas conservan su fondo y todas las filas su alto (diferencia de 0 px);
   - contraste del texto y de las medallas de al menos 4,5:1, 0 incumplimientos AA y 0
     desbordamientos.
+- **SC-014**: En ventanas de escritorio y de móvil más bajas que la barra lateral, el 100 % de las
+  opciones, el usuario y «Cerrar sesión» se alcanzan y se pueden pulsar. La opción de la sección
+  abierta se ve al cargar. Hay 0 desplazamientos horizontales. Con altura suficiente, la barra
+  lateral no se desplaza.
+- **SC-015**: El logotipo oficial se ve completo y nítido en la barra lateral y en la pantalla de
+  acceso, en todos los anchos medidos, sin restos de la marca antigua. La barra lateral, el
+  contenido del panel y el formulario de acceso tienen 0 px de diferencia en ancho y posición
+  horizontal. Hay 0 incumplimientos AA.
 
 ## Assumptions
 
@@ -409,7 +506,8 @@ resultados oficiales.
   la marca anterior. Por eso el párrafo y el enlace a Instagram de la primera columna bajan esa
   diferencia. El pie solo crece donde la primera columna es la más alta.
 - **Barra lateral del panel (US4)**: el propietario habla del pie. La barra lateral del panel
-  conserva su marca. Si la quiere también allí, se añadirá como historia.
+  conserva su marca. Si la quiere también allí, se añadirá como historia. *(Actualizado por la
+  US8: el propietario lo pidió, decisión P11.)*
 - **Frase sin enlace (US5)**: en la frase anterior, «JR BLANCO» enlazaba a `jrblanco.es`. La frase
   nueva no nombra a JR BLANCO, y el propietario no ha dado una dirección para la Escuela Hacker
   Cosío. Por eso va como texto, sin enlace (constitución VI: no se inventan enlaces). Si el
@@ -422,3 +520,9 @@ resultados oficiales.
   No se calcula un podio por sexo ni por categoría, porque sería interpretar los resultados
   oficiales. Si el propietario quiere destacar también el podio femenino o el de cada categoría,
   se añadirá como historia.
+- **Alcance del logotipo en el panel (US8)**: el propietario habla del panel, cuya marca antigua
+  está en la barra lateral y en la pantalla de acceso. Se cambia en los dos sitios. El icono del
+  navegador sigue igual, por el mismo motivo que en la US3.
+- **Rótulo «ADMINISTRACIÓN» (US8)**: no forma parte de la marca: indica que se está en el panel.
+  Se conserva debajo del logotipo, con su estilo, y el «PEÑASAGRA» repetido desaparece. Si el
+  propietario prefiere solo el logotipo, basta con quitarlo.
