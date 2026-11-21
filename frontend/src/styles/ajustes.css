@@ -165,3 +165,45 @@
   height: auto;
   filter: none;
 }
+
+/*
+ * A-007 (feature 012, decisión del propietario P10): podio de las clasificaciones (research R7).
+ * Las filas con puesto 1, 2 y 3 llevan un fondo suave de oro, plata y bronce, una franja a la
+ * izquierda y el número dentro de una medalla, ambas en el mismo color más intenso. El texto
+ * (#172e28) tiene un contraste de al menos 11,6:1 con las filas y de 5,7:1 con las medallas. La
+ * medalla no cambia el alto de la fila: sus márgenes negativos la ajustan a la línea de texto.
+ * Las demás filas conservan su fondo, alterno o no.
+ */
+.classification-table tbody tr.podium-1 {
+  --podio: #e9b824;
+  background: #fcf1cc;
+}
+.classification-table tbody tr.podium-2 {
+  --podio: #bcc6ce;
+  background: #ebeff3;
+}
+.classification-table tbody tr.podium-3 {
+  --podio: #d9935d;
+  background: #f9e3d1;
+}
+.classification-table tr.podium > td:first-child {
+  box-shadow: inset 4px 0 0 var(--podio);
+}
+.classification-table .podium-position {
+  color: var(--forest);
+}
+.classification-table .podium-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 24px;
+  height: 24px;
+  margin-block: -4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--podio);
+  color: var(--forest);
+  font-weight: 800;
+  line-height: 1;
+}

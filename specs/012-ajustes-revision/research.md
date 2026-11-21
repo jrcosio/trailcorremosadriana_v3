@@ -226,3 +226,51 @@ hay credenciales. Para cada `<img>` de foto comprueba:
     como en la US4.
   - axe, desbordamiento y capturas. Comparación píxel a píxel con las de la US4: solo cambia la
     línea inferior del pie.
+
+## R7. Podio de las clasificaciones (US6, decisión P10)
+
+- **Colores**: el propietario deja la elección abierta. Se usan oro, plata y bronce suaves, que se
+  reconocen como podio sin explicación y no se confunden con el verde de la cabecera de la tabla
+  ni con el naranja de los botones.
+
+  | Puesto | Fondo de la fila | Medalla y franja | Texto/fila | Número/medalla |
+  |---|---|---|---|---|
+  | 1.º | #fcf1cc | #e9b824 | 12,75:1 | 7,78:1 |
+  | 2.º | #ebeff3 | #bcc6ce | 12,47:1 | 8,30:1 |
+  | 3.º | #f9e3d1 | #d9935d | 11,62:1 | 5,68:1 |
+
+  El texto es el verde de la paleta (#172e28). Los tres fondos son distintos entre sí, del blanco
+  y del gris de las filas alternas (#f8faf9).
+- **Marcado** (`ClassificationTable.tsx`): la fila lleva `podium podium-N` y el número va en
+  `<span class="podium-medal">`. El puesto sigue escrito, así que la información no depende solo
+  del color. El mismo componente sirve la web pública y la vista previa del CSV en el panel.
+- **Estilos** (`ajustes.css` A-007):
+  - el color de cada puesto se define en la variable `--podio` de la fila;
+  - la franja es un `box-shadow` interior de 4 px en la primera celda, así que no cambia el ancho;
+  - la medalla mide 24 px de alto con márgenes verticales de −4 px. Ocupa menos que la línea de
+    texto (23 px), así que la fila no cambia de alto;
+  - la celda del puesto pasa del naranja oscuro al verde de la paleta, porque el número ya va
+    sobre la medalla.
+- **Criterio del podio**: el puesto publicado (`position` ≤ 3), igual que la negrita anterior. Los
+  empates llevan el mismo color. Con la búsqueda o los filtros, cada fila conserva su puesto
+  general. No se calcula un podio por sexo ni por categoría (supuesto de la spec).
+- **Alternativas descartadas**:
+  - Verde para el 1.º, como sugería el propietario a modo de ejemplo: el verde ya es el color de
+    la cabecera de la tabla y de la marca, y no se asocia al podio.
+  - Iconos de trofeo o de medalla: añaden ancho a la columna del puesto y moverían la tabla.
+  - Podio por sexo o por categoría: sería interpretar los resultados oficiales.
+- **Verificación**:
+  - vitest (`tests/podio.test.tsx`): la clase y la medalla solo en los puestos 1–3, también con
+    empates; en la vista previa del panel, igual; sin puestos, ninguna fila marcada. Falla antes
+    del cambio.
+  - `scripts/verificar-podio.mjs`, con una referencia tomada antes del cambio
+    (`capturas/podio-antes-012.json`). Mide `/clasificaciones/2026` a 320, 360, 768, 1024 y
+    1440 px, en las 8 primeras filas de cada tabla:
+    - fondo, franja y medalla del podio, con un color por puesto, los tres distintos y distintos
+      del resto;
+    - las demás filas sin cambios;
+    - alto y posición de las filas y tamaño de las tablas con 0 px de diferencia;
+    - contraste del texto y de las medallas;
+    - búsqueda del ganador por dorsal y filtro «Femenino».
+  - axe, desbordamiento y capturas. Comparación píxel a píxel: solo cambian las de
+    clasificaciones.

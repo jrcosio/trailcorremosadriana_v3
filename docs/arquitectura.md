@@ -83,6 +83,12 @@ repositorio.
       fondo verde oscuro, con `loading="lazy"`. `Brand`, con la silueta y el texto, se eliminó.
     - Ancho de 233 px, el de la marca anterior, o el de la columna si es menor; el alto sale de
       la proporción. Las demás columnas del pie no se mueven.
+  - A-007: podio de las clasificaciones por la decisión P10 (feature 012).
+    - `ClassificationTable` marca las filas con puesto 1–3 (`podium podium-N`) y pone el número
+      en una medalla (`podium-medal`).
+    - Fondo suave de oro, plata y bronce, con una franja interior de 4 px y la medalla en el mismo
+      color más intenso (variable `--podio`).
+    - La medalla no cambia el alto de la fila. Cuenta el puesto publicado, también con filtros.
 - **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.

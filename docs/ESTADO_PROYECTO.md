@@ -81,7 +81,22 @@
     - axe 0;
     - 44 capturas: solo cambia esa línea, comparadas píxel a píxel con las de la US4;
     - regresión correcta.
-- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). La US4 y la US5 están solo en local:
+- **US6 terminada** (decisión P10: podio destacado en las clasificaciones):
+  - Cambio: las filas del 1.º, 2.º y 3.º llevan un fondo suave de oro, plata y bronce, una franja
+    a la izquierda y el número dentro de una medalla del mismo color más intenso.
+    - Código: `ClassificationTable.tsx` y `ajustes.css` A-007.
+    - Los colores los eligió el equipo, porque el propietario los dejó a su elección.
+    - El podio es el puesto publicado: con la búsqueda o los filtros, cada fila conserva el suyo.
+      No se calculan podios por sexo ni por categoría (supuesto ampliable).
+  - Verificación:
+    - `tests/podio.test.tsx`: falla antes del cambio y pasa después;
+    - `verificar-podio.mjs` contra una referencia previa: 45 filas del podio en 5 anchos, las demás
+      sin cambios, filas y tablas con 0 px de diferencia, contraste mínimo de 11,6:1 en el texto y
+      de 5,7:1 en las medallas, búsqueda y filtro correctos;
+    - axe 0;
+    - 44 capturas: solo cambian las 4 de clasificaciones;
+    - regresión correcta.
+- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). Las US4, US5 y US6 están solo en local,
   en `012-ajustes-revision` y fusionadas en `main`. Se suben cuando el propietario lo pida.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
@@ -137,6 +152,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Podio de las clasificaciones en oro, plata y bronce suaves (fondo, franja y medalla) por el puesto publicado; sin podios por sexo ni categoría | Propietario (P10), 012 research R7 |
 | 2026-11-21 | Frase del pie «Hecho por la Escuela Hacker Cosío», sin enlace (no hay dirección aprobada) | Propietario (P9), 012 research R6 |
 | 2026-11-21 | Logotipo también en el pie, en negativo (tinta oscura → blanco, naranja intacto), con el ancho de la marca anterior; el panel conserva la marca blanca | Propietario (P8), 012 research R5 |
 | 2026-11-21 | Logotipo nuevo en la cabecera pública; el pie y el panel conservan la marca blanca | Propietario (P7), 012 research R4 |
@@ -271,6 +287,10 @@
 | 2026-11-21 | 012 | US5: `verificar-logo.mjs --comparar` ampliado con la línea inferior del pie (6 rutas × 15 anchos y barra del panel con `/pantallas` en local) | Con la versión previa detecta la frase anterior. Con la nueva: frase correcta, sin enlaces, mismo estilo, sin restos; cabecera con 0 px de diferencia y pie como en la US4; panel sin cambios |
 | 2026-11-21 | 012 | US5: axe y desbordamiento; 44 capturas, comparadas píxel a píxel con las de la US4 y revisión visual del pie a 360, 768 y 1440 px | 0 incumplimientos en 17 rutas; 0 desbordamientos; solo cambia la línea inferior del pie y ninguna página cambia de alto |
 | 2026-11-21 | 012 | US5: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 88 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
+| 2026-11-21 | 012 | US6 (P10): `tests/podio.test.tsx` (puestos 1–3, empate, vista previa y sin puestos), antes y después del cambio | Antes: 2 fallos. Después: 3 passed |
+| 2026-11-21 | 012 | US6: `verificar-podio.mjs` contra una referencia previa (`podio-antes-012.json`; `/clasificaciones/2026` a 320, 360, 768, 1024 y 1440 px, 8 primeras filas de las 3 tablas) | Con la versión previa, 136 problemas. Con la nueva: 45 filas del podio con su fondo, su franja y su medalla; 75 filas sin cambios; filas y tablas con 0 px de diferencia; contraste mínimo de 11,62:1 (texto) y 5,68:1 (medallas). La búsqueda del ganador conserva el oro; el filtro «Femenino» no colorea las primeras filas |
+| 2026-11-21 | 012 | US6: axe y desbordamiento; 44 capturas comparadas píxel a píxel con las de la US5; revisión visual de la tabla a 360 y 1440 px | 0 incumplimientos en 17 rutas; 0 desbordamientos; solo cambian las 4 capturas de clasificaciones, con el mismo alto |
+| 2026-11-21 | 012 | US6: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 91 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |
