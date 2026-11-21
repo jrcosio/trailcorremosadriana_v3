@@ -33,3 +33,25 @@ Resultados esperados:
 - Cabecera, navegación, «INSCRIPCIONES» y menú con 0 px de diferencia.
 - 0 desbordamientos y 0 incumplimientos AA.
 - Variantes de 50 KB como máximo; en densidad 2 se descarga la de 720.
+
+## US4: logotipo también en el pie
+
+```bash
+PANTALLAS=si docker compose up -d web       # para medir también la barra lateral del panel
+cd frontend && node scripts/verificar-logo.mjs --referencia capturas/pie-antes-012.json   # antes del cambio
+docker compose build web && PANTALLAS=si docker compose up -d web
+node scripts/verificar-logo.mjs --comparar capturas/pie-antes-012.json
+docker compose up -d web                    # vuelve a PANTALLAS=no
+node scripts/verificar-accesibilidad.mjs
+node scripts/capturas.mjs http://localhost:8080 capturas/despues-pie-012
+```
+
+Resultados esperados:
+
+- El pie muestra el logotipo en negativo, completo, sin la silueta ni el texto en dos filas.
+- La cabecera, con 0 px de diferencia.
+- Las columnas 2.ª a 4.ª del pie, con la misma posición horizontal y el mismo ancho.
+- Lo que baja en el pie, no más que lo que crece el logotipo.
+- Naranja con al menos 3:1 y blanco con al menos 4,5:1 sobre el verde del pie.
+- 0 desbordamientos y 0 incumplimientos AA.
+- Variantes de 50 KB como máximo y nítidas en densidad 2.

@@ -17,7 +17,7 @@ corresponde. Estado: ⏳ pendiente · 🔄 activa · ✅ terminada.
 | 9 | Patrocinadores y colaboradores | 3 | ✅ | `009-patrocinadores-colaboradores` |
 | 10 | Reglamento y contacto | 4 | ✅ | `010-reglamento-contacto` |
 | 11 | Cierre: accesibilidad, móvil, rendimiento, 404/metadatos, copias, despliegue independiente | 1–10 | ✅ | `011-cierre` |
-| 12 | Ajustes de la revisión del propietario (P6: fotos siempre completas; se irán añadiendo los demás) | 11 | 🔄 activa: US1 ✅ (fotos completas); US2 ✅ (despliegue en la MV de la v2: `www`, HSTS, dominio con «ñ», guía de migración y acceso al panel; ensayo de producción con HTTPS correcto); US3 ✅ (P7: logotipo nuevo en la cabecera; geometría con 0 px de diferencia en 90 vistas, axe 0, capturas) | `012-ajustes-revision` |
+| 12 | Ajustes de la revisión del propietario (P6: fotos siempre completas; se irán añadiendo los demás) | 11 | 🔄 activa: US1 ✅ (fotos completas); US2 ✅ (despliegue en la MV de la v2: `www`, HSTS, dominio con «ñ», guía de migración y acceso al panel; ensayo de producción con HTTPS correcto); US3 ✅ (P7: logotipo nuevo en la cabecera; geometría con 0 px de diferencia en 90 vistas, axe 0, capturas); US4 ✅ (P8: logotipo también en el pie, en negativo; cabecera con 0 px de diferencia y columnas del pie en su sitio en 90 vistas, contraste 5,5:1 y 16,2:1, axe 0, capturas) | `012-ajustes-revision` |
 
 ## Detalle de la feature 011-cierre (terminada)
 

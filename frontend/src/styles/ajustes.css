@@ -149,3 +149,17 @@
     height: 49px;
   }
 }
+
+/*
+ * A-006 (feature 012, decisión del propietario P8): logotipo también en el pie, en su versión en
+ * negativo para el fondo verde oscuro (research R5). Ocupa el ancho de la marca anterior (silueta,
+ * separación y texto: 233,7 px medidos), o el de la columna si es menor, y su alto sale de la
+ * proporción. Las demás columnas no se mueven; el resto de la primera columna baja lo que el
+ * logotipo es más alto que la marca anterior. `sizes` de `Logo` (Site.tsx) usa este ancho.
+ */
+.footer-main .brand.brand-logo img {
+  width: 233px;
+  max-width: 100%;
+  height: auto;
+  filter: none;
+}

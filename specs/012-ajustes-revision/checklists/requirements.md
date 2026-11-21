@@ -42,3 +42,10 @@
   la barra lateral del panel, con fondo oscuro, quedan fuera como supuesto explícito: el logotipo
   tiene el texto oscuro. Umbrales: 0 px de diferencia en la cabecera, 0 desbordamientos, 0
   incumplimientos AA y variantes de 50 KB como máximo. FR-009–FR-012 tienen escenarios en la US3.
+- Revisión (2026-11-21, US4/P8): «pon también el logo en el pie» fija el alcance: el pie, no el
+  panel. La legibilidad sobre el verde oscuro exige una versión en negativo, derivada sin
+  redibujar y sustituible si el propietario aporta una oficial (supuesto explícito). El
+  crecimiento de la primera columna está acotado y es medible (FR-014). FR-012 se actualiza para
+  no contradecir la US4. Umbrales: 0 px en la cabecera y en la posición horizontal de las columnas
+  2.ª a 4.ª, naranja ≥ 3:1, blanco ≥ 4,5:1 y variantes ≤ 50 KB. FR-013–FR-016 tienen escenarios en
+  la US4.
