@@ -252,3 +252,17 @@
   max-width: 100%;
   height: auto;
 }
+
+/*
+ * A-009 (feature 012, US9; decisión P4 aplicada al panel con la sesión iniciada): contraste AA.
+ * - Cabeceras de las tablas de listados: #7a8d7f sobre #f9fbfa daba 3,40:1.
+ * - Pie del panel: #8b9b90 sobre #f3f5f4 daba 2,67:1.
+ * Pasan al gris de texto secundario de la paleta (--muted, #66716b): 4,88:1 y 4,63:1. Tamaños,
+ * pesos y fondos no cambian (scripts/verificar-panel-aa.mjs, research R9).
+ */
+.admin-table th {
+  color: var(--muted);
+}
+.admin-footer {
+  color: var(--muted);
+}

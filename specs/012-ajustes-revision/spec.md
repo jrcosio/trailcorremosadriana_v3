@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración)."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4)."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -329,6 +329,33 @@ el texto antiguo, y que el resto no se mueve en horizontal.
 5. **Given** la cabecera y el pie públicos y el icono del navegador, **When** se comparan,
    **Then** no han cambiado.
 
+---
+
+### User Story 9 - Contraste AA en todo el panel (Priority: P1)
+
+El propietario lo pide: «sí, corrige el contraste del panel». La decisión P4 (contraste AA) se
+aplica también al panel con la sesión iniciada. Al verificar la US8 aparecieron textos con
+contraste insuficiente. El cierre (011) solo había revisado la pantalla de acceso.
+
+**Why this priority**: la organización usa el panel a diario y la decisión P4 exige AA.
+
+**Independent Test**: revisar con axe todas las secciones del panel con la sesión iniciada:
+listas, un elemento existente y el alta de cada colección, a 360, 1024 y 1440 px. Revisar también
+los estados de guardado (aviso de éxito, «Guardado correctamente» y mensaje de error) y las dos
+variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
+
+**Acceptance Scenarios**:
+
+1. **Given** cualquier sección del panel con la sesión iniciada, **When** se revisa a 360, 1024 y
+   1440 px, **Then** axe da 0 incumplimientos WCAG 2.1 A/AA.
+2. **Given** los estados de guardado y las etiquetas «Publicado» y «Borrador», **When** se
+   revisan, **Then** dan 0 incumplimientos.
+3. **Given** los textos corregidos, **When** se comparan con la versión anterior, **Then** solo
+   cambia su color, a un tono de la paleta del mismo estilo. No cambian ni el tamaño, ni el peso,
+   ni los fondos, ni la posición de nada.
+4. **Given** la revisión, **When** guarda para comprobar los estados, **Then** no cambia ningún
+   dato: las escrituras se interceptan.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -425,6 +452,11 @@ el texto antiguo, y que el resto no se mueve en horizontal.
 - **FR-025**: El logotipo del panel MUST NOT ser más ancho que la marca anterior. La barra
   lateral, el contenido del panel y el formulario de acceso MUST NOT cambiar de ancho ni de
   posición horizontal. La cabecera, el pie y el icono del navegador MUST NOT cambiar.
+- **FR-026**: Todo el texto del panel con la sesión iniciada MUST tener contraste AA: 4,5:1, o
+  3:1 si es grande. Esto incluye las listas, los formularios, los estados de guardado y las
+  etiquetas de estado.
+- **FR-027**: Cada corrección MUST limitarse al color del texto, con un tono de la paleta. Los
+  tamaños, los pesos, los fondos y la disposición MUST NOT cambiar.
 
 ## Success Criteria *(mandatory)*
 
@@ -479,6 +511,10 @@ el texto antiguo, y que el resto no se mueve en horizontal.
   acceso, en todos los anchos medidos, sin restos de la marca antigua. La barra lateral, el
   contenido del panel y el formulario de acceso tienen 0 px de diferencia en ancho y posición
   horizontal. Hay 0 incumplimientos AA.
+- **SC-016**: 0 incumplimientos de axe (WCAG 2.1 A/AA) en el 100 % de las vistas del panel
+  revisadas: todas las secciones, un elemento existente y el alta de cada colección, a 360, 1024
+  y 1440 px, más los estados de guardado. Ningún dato cambia durante la revisión. Las capturas
+  del panel solo difieren en el color de los textos corregidos.
 
 ## Assumptions
 
@@ -526,3 +562,11 @@ el texto antiguo, y que el resto no se mueve en horizontal.
 - **Rótulo «ADMINISTRACIÓN» (US8)**: no forma parte de la marca: indica que se está en el panel.
   Se conserva debajo del logotipo, con su estilo, y el «PEÑASAGRA» repetido desaparece. Si el
   propietario prefiere solo el logotipo, basta con quitarlo.
+- **Contraste del panel (US9)**: antes del cambio, la revisión encuentra 2 defectos repetidos en
+  todas las vistas:
+  - las cabeceras de las tablas de listados: #7a8d7f sobre #f9fbfa, 3,40:1;
+  - el pie del panel: #8b9b90 sobre #f3f5f4, 2,67:1.
+
+  Pasan al gris de texto secundario de la paleta, `--muted` (#66716b), ya usado en el panel: 4,88:1
+  y 4,63:1. axe no revisa los estados al pasar el ratón ni de foco: quedan fuera de esta
+  revisión automática.

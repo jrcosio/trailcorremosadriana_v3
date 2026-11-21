@@ -53,7 +53,12 @@ US8 (decisión P11): logotipo oficial en negativo en la barra lateral, con «ADM
 debajo, y en la pantalla de acceso. Lo sirve un componente compartido, `LogoImg`
 (`components/Logo.tsx`).
 
-Detalle en [research.md](research.md) (R4, R5, R6, R7 y R8).
+US9 (decisión P4 aplicada al panel): con la sesión iniciada, las cabeceras de las tablas de
+listados y el pie del panel pasan al gris de texto secundario de la paleta, `--muted`
+(`ajustes.css` A-009). Una auditoría axe de todo el panel, sin escrituras reales, da 0
+incumplimientos.
+
+Detalle en [research.md](research.md) (R4, R5, R6, R7, R8 y R9).
 
 ## Technical Context
 
@@ -83,6 +88,8 @@ cambio.
 **US7 y US8**: `Admin.tsx` (barra lateral y acceso), `components/Logo.tsx` (nuevo, compartido con
 `Site.tsx`) y `ajustes.css` A-008. `scripts/verificar-panel.mjs` (nuevo, con credenciales y
 referencia previa).
+**US9**: `ajustes.css` A-009 y `scripts/verificar-panel-aa.mjs` (nuevo, con credenciales y las
+escrituras interceptadas).
 
 ## Constitution Check
 
@@ -100,6 +107,8 @@ referencia previa).
 | I (US7) | Corrige un fallo sin cambiar el diseño: con altura suficiente la barra lateral se ve igual | ✅ |
 | III (US7) | «Cerrar sesión» vuelve a estar al alcance en cualquier ventana | ✅ |
 | I (US8) | Cambio de marca ordenado por el propietario (P11). La barra, el contenido y el formulario no cambian en horizontal. Capturas antes y después | ✅ |
+| I (US9) | Solo cambia el color de dos textos, con un tono de la paleta, por la decisión P4; capturas antes y después | ✅ |
+| II (US9) | La auditoría intercepta las escrituras y no cambia ningún dato (comprobado en la API) | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -135,6 +144,8 @@ frontend/tests/podio.test.tsx (nuevo) · frontend/scripts/verificar-podio.mjs (n
 frontend/src/components/Logo.tsx (nuevo) · frontend/src/components/Site.tsx (Logo)
 frontend/src/components/admin/Admin.tsx (barra lateral y acceso) · frontend/src/styles/ajustes.css (A-008)
 frontend/scripts/verificar-panel.mjs (nuevo) · frontend/scripts/verificar-logo.mjs (panel)
+# US9
+frontend/src/styles/ajustes.css (A-009) · frontend/scripts/verificar-panel-aa.mjs (nuevo)
 ```
 
 ## Complexity Tracking

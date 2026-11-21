@@ -98,6 +98,9 @@ repositorio.
       desborde la página.
     - US8 (decisión P11): `LogoImg` en negativo en la barra lateral (180 px, con
       «ADMINISTRACIÓN» debajo) y en el acceso (261 px). `logo1.webp` queda solo como favicon.
+  - A-009: contraste AA del panel con la sesión iniciada (decisión P4; feature 012, US9).
+    - Las cabeceras de las tablas de listados y el pie del panel pasan a `--muted`.
+    - Lo vigila `scripts/verificar-panel-aa.mjs`.
 - **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.

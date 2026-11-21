@@ -66,3 +66,8 @@
   interpreta como el panel, cuya marca antigua está en la barra lateral y en el acceso. El rótulo
   «ADMINISTRACIÓN» se conserva como supuesto reversible. FR-022–FR-025 tienen escenarios en la US7
   y la US8.
+- Revisión (2026-11-21, US9/P4): el criterio es objetivo (axe WCAG 2.1 A/AA) y el alcance está
+  acotado. Todas las vistas del panel con la sesión iniciada, en tres anchos y en los estados de
+  guardado, y sin escrituras reales. Las correcciones se limitan al color, con un tono de la
+  paleta. FR-026 y FR-027 tienen escenarios en la US9. Los estados al pasar el ratón y de foco
+  quedan fuera, como supuesto explícito.
