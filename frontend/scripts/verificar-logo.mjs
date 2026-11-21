@@ -231,6 +231,7 @@ else fallo(`densidad 2 sin resolución suficiente: ${JSON.stringify(densidad)}`)
 if (colores?.cNaranja >= 3 && colores?.cBlanco >= 4.5) ok(`contraste sobre el pie rgb(${colores.fondo}): naranja rgb(${colores.naranja}) ${colores.cNaranja.toFixed(2)}:1 (≥ 3) y blanco rgb(${colores.blanco}) ${colores.cBlanco.toFixed(2)}:1 (≥ 4,5); ${colores.pixeles.join(' y ')} píxeles`);
 else fallo(`contraste insuficiente o no medible: ${JSON.stringify(colores)}`);
 
-if (ref.panel && JSON.stringify(panel) !== JSON.stringify(ref.panel)) fallo(`la barra lateral del panel ha cambiado: ${JSON.stringify(panel)}`);
-else if (ref.panel) ok('barra lateral del panel sin cambios');
-else console.log('AVISO /pantallas no disponible: barra lateral del panel no comprobada');
+// US8 (decisión P11): la barra lateral del panel pasa a mostrar el logotipo oficial. La comprobación completa está en verificar-panel.mjs.
+if (!panel) console.log('AVISO /pantallas no disponible: barra lateral del panel no comprobada');
+else if (panel.src?.startsWith('/reused/logos/logo_pie-') && panel.texto.trim() === 'ADMINISTRACIÓN') ok('barra lateral del panel con el logotipo oficial y el rótulo «ADMINISTRACIÓN» (US8)');
+else fallo(`la barra lateral del panel no muestra el logotipo oficial: ${JSON.stringify(panel)}`);

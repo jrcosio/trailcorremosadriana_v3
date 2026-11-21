@@ -157,6 +157,43 @@ capturas/podio-antes-012.json`; capturas y axe.
   `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: `typecheck`,
   `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
 
+## Phase 3f: User Story 7 y User Story 8 — Panel: barra lateral con desplazamiento y logotipo oficial (P1)
+
+**Goal**: en cualquier ventana se alcanzan todas las opciones de la barra lateral y «Cerrar
+sesión». El panel muestra el logotipo oficial en la barra lateral y en el acceso.
+
+**Independent Test**: `verificar-panel.mjs --comparar capturas/panel-antes-012.json` (con
+credenciales); capturas y axe.
+
+- [X] T036 [US7] [US8] Crear `frontend/scripts/verificar-panel.mjs` (research R8) y ejecutar
+  `--referencia capturas/panel-antes-012.json` antes del cambio. Comprobar que `--comparar`
+  detecta los dos fallos con la versión previa
+- [X] T037 [US8] Crear `frontend/src/components/Logo.tsx` (`LogoImg`, con los sitios cabecera,
+  pie, panel y acceso) y usarlo en `Logo` de `frontend/src/components/Site.tsx`, con el mismo
+  marcado
+- [X] T038 [US7] [US8] En `frontend/src/components/admin/Admin.tsx`:
+  - barra lateral con `LogoImg` y «ADMINISTRACIÓN»;
+  - acceso con `LogoImg`;
+  - referencia a la barra y efecto que muestra la opción abierta una vez por sección.
+- [X] T039 [US7] [US8] Añadir A-008 a `frontend/src/styles/ajustes.css`:
+  - desplazamiento vertical sin arrastrar la página;
+  - `overflow-x: clip` con el menú de móvil abierto;
+  - logotipo de 180 px en la barra lateral y de 261 px en el acceso.
+- [X] T040 [US7] [US8] Reconstruir `web` y ejecutar:
+  - `verificar-panel.mjs --comparar`;
+  - `verificar-logo.mjs --comparar capturas/pie-antes-012.json`, con `/pantallas`, para la
+    cabecera y el pie sin cambios y la barra del panel con el logotipo;
+  - `verificar-admin.mjs` y `verificar-acceso.mjs`;
+  - `verificar-accesibilidad.mjs`;
+  - las capturas en `frontend/capturas/despues-panel-012`, comparadas con las de la US6.
+
+  Revisión visual de la barra lateral y del acceso, y caso en que el logotipo no carga.
+- [X] T041 [US7] [US8] Registrar la decisión P11 en `docs/referencia/DISCREPANCIAS.md` y
+  actualizar `docs/PROCEDENCIA_RECURSOS.md`, `docs/arquitectura.md`, `docs/ROADMAP.md` y
+  `docs/ESTADO_PROYECTO.md`, con el hallazgo de contraste del contenido del panel. Regresión:
+  vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos
+  --comparar` con el panel
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -170,8 +207,9 @@ capturas/podio-antes-012.json`; capturas y axe.
 - **US4**: T019 (referencia antes del cambio) → T020 [P] → T021 → T022 → T023 → T024.
 - **US5**: T025 [P] y T026 [P] (comprobaciones que fallan antes del cambio) → T027 → T028 → T029.
 - **US6**: T030 (referencia antes del cambio) → T031 [P] → T032 → T033 → T034 → T035.
+- **US7 y US8**: T036 (referencia antes del cambio) → T037 → T038 → T039 → T040 → T041.
 
 ## Implementation Strategy
 
-- **Alcance**: hasta ahora, las US1–US6 completas. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US7…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US8 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US9…) de esta misma feature.

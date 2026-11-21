@@ -61,3 +61,8 @@
   sexo ni por categoría (supuesto ampliable). Umbrales: 100 % de las filas 1–3, tres colores
   distintos, 0 px de diferencia en filas y tablas, contraste ≥ 4,5:1, 0 incumplimientos AA y 0
   desbordamientos. FR-019–FR-021 tienen escenarios en la US6.
+- Revisión (2026-11-21, US7 y US8/P11): la US7 es un fallo con un criterio objetivo: se alcanza
+  todo, sin desbordamientos, y con altura suficiente queda igual. En la US8, «también aquí» se
+  interpreta como el panel, cuya marca antigua está en la barra lateral y en el acceso. El rótulo
+  «ADMINISTRACIÓN» se conserva como supuesto reversible. FR-022–FR-025 tienen escenarios en la US7
+  y la US8.
