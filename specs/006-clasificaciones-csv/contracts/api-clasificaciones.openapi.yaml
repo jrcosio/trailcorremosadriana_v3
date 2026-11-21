@@ -63,5 +63,9 @@ paths:
         "200":
           description: >
             {rows, total, filtered, page, pages, pageSize: 50, categories, genders,
-             columns: {category, club, gender, status}}
+             columns: {category, club, gender, status}}.
+            Cada fila: {position, bib, name, time, category, club, gender, status, podium}.
+            `podium` (1–3 o null) se añadió en la feature 012, US10 (decisión P12). Es el puesto
+            en el podio de su sexo, o de la general si no hay datos de sexo, dentro de los filtros
+            de categoría y sexo. La búsqueda `q` no cuenta y los empates comparten puesto.
         "404": { description: No existe o no está publicada }

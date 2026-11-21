@@ -125,3 +125,67 @@ def test_rendimiento_con_5000_participantes(admin_importado):
     r = _q(admin_importado, q="participante 4321")
     assert r.status_code == 200 and r.json()["filtered"] == 1
     assert time.monotonic() - inicio < 1.0
+
+
+# --- Feature 012 · US10 (decisión P12): podio por sexo y, al filtrar por categoría, de la categoría
+
+
+def _csv_podio(con_sexo=True):
+    """Hombres 1–4 y 6; mujeres 5, 7 (empate), 9 y 10; con puesto y sin sexo; sin puesto."""
+    filas = [
+        ("1", "0001", "H1", "Vet A M", "Masculino", ""),
+        ("2", "0002", "H2", "Senior M", "Masculino", ""),
+        ("3", "0003", "H3", "Vet A M", "Masculino", ""),
+        ("4", "0004", "H4", "Senior M", "Masculino", ""),
+        ("5", "0005", "M1", "Senior F", "Femenino", ""),
+        ("6", "0006", "H5", "Vet A M", "Masculino", ""),
+        ("7", "0007", "M2", "Vet A F", "Femenino", ""),
+        ("7", "0008", "M2b", "Senior F", "Femenino", ""),
+        ("9", "0009", "M4", "Senior F", "Femenino", ""),
+        ("10", "0010", "M5", "Vet A F", "Femenino", ""),
+        ("11", "0012", "SinSexo", "", "", ""),
+        ("DNF", "0011", "SinPuesto", "Senior F", "Femenino", "Retirado"),
+    ]
+    lineas = ["pos;dorsal;nombre;tiempo;categoria;club;sexo;estado"]
+    for pos, dorsal, nombre, cat, sexo, estado in filas:
+        lineas.append(f"{pos};{dorsal};{nombre};1:00:00;{cat};;{sexo if con_sexo else ''};{estado}")
+    return "\n".join(lineas) + "\n"
+
+
+def _podio(respuesta):
+    return {f["name"]: f["podium"] for f in respuesta["rows"] if f["podium"]}
+
+
+def test_podio_por_sexo_sin_filtros(admin_importado):
+    _publicar(admin_importado, _csv_podio())
+    r = _q(admin_importado).json()
+    # 3 primeros hombres y 3 primeras mujeres; el empate comparte el 2.º y deja sin 3.º (rank).
+    assert _podio(r) == {"H1": 1, "H2": 2, "H3": 3, "M1": 1, "M2": 2, "M2b": 2}
+    por_nombre = {f["name"]: f for f in r["rows"]}
+    assert por_nombre["SinSexo"]["podium"] is None  # con datos de sexo, sin sexo no entra
+    assert por_nombre["SinPuesto"]["podium"] is None
+    assert por_nombre["M1"]["position"] == 5  # la posición general no cambia
+
+
+def test_podio_con_filtro_de_sexo(admin_importado):
+    _publicar(admin_importado, _csv_podio())
+    assert _podio(_q(admin_importado, sexo="Femenino").json()) == {"M1": 1, "M2": 2, "M2b": 2}
+    assert _podio(_q(admin_importado, sexo="Masculino").json()) == {"H1": 1, "H2": 2, "H3": 3}
+
+
+def test_podio_con_filtro_de_categoria(admin_importado):
+    _publicar(admin_importado, _csv_podio())
+    assert _podio(_q(admin_importado, categoria="Senior F").json()) == {"M1": 1, "M2b": 2, "M4": 3}
+    assert _podio(_q(admin_importado, categoria="Vet A M").json()) == {"H1": 1, "H3": 2, "H5": 3}
+
+
+def test_la_busqueda_no_cambia_el_podio(admin_importado):
+    _publicar(admin_importado, _csv_podio())
+    assert _podio(_q(admin_importado, q="0005").json()) == {"M1": 1}
+    assert _podio(_q(admin_importado, q="0009", categoria="Senior F").json()) == {"M4": 3}
+    assert _podio(_q(admin_importado, q="0009").json()) == {}  # 4.ª mujer: fuera del podio
+
+
+def test_podio_general_sin_datos_de_sexo(admin_importado):
+    _publicar(admin_importado, _csv_podio(con_sexo=False))
+    assert _podio(_q(admin_importado).json()) == {"H1": 1, "H2": 2, "H3": 3}

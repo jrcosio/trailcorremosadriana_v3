@@ -7,8 +7,45 @@ export const resultFields = [
 ] as const;
 export type ResultField = typeof resultFields[number][0];
 export type ColumnMapping = Partial<Record<ResultField, number>>;
-export type ClassificationRow = { position: number | null; bib: string; name: string; time: string; category: string; club: string; gender: string; status: string };
+// `podium`: puesto en el podio (1–3) que da la consulta pública del servidor (feature 012, US10).
+export type ClassificationRow = { position: number | null; bib: string; name: string; time: string; category: string; club: string; gender: string; status: string; podium?: number | null };
 export type CsvTable = { headers: string[]; records: string[][]; delimiter: string };
+
+// Feature 012 · US10 (decisión P12): podio por sexo y, con el filtro de categoría, de la categoría.
+const FEMENINO = /^(femenino|f|mujer)$/i, MASCULINO = /^(masculino|m|hombre)$/i;
+/**
+ * Puesto en el podio (1–3) de cada fila. Es la misma regla que aplica el servidor en la consulta
+ * pública (FR-028), y aquí la usan la vista previa y la clasificación actual del panel:
+ * - cuentan quienes tienen puesto y cumplen los filtros de categoría y sexo (no la búsqueda);
+ * - hay un podio por sexo, o uno de la general si no hay datos de sexo;
+ * - si los hay, quien no tiene sexo no entra;
+ * - los empates comparten puesto.
+ */
+export function rangosPodio(rows: ClassificationRow[], { category = '', gender = '' }: { category?: string; gender?: string } = {}): Map<ClassificationRow, number> {
+  const conSexo = rows.some(r => r.gender);
+  const grupos = new Map<string, ClassificationRow[]>();
+  for (const r of rows) {
+    if (r.position == null || (category && r.category !== category) || (gender && r.gender !== gender) || (conSexo && !r.gender)) continue;
+    const grupo = grupos.get(r.gender);
+    if (grupo) grupo.push(r); else grupos.set(r.gender, [r]);
+  }
+  const puestos = new Map<ClassificationRow, number>();
+  for (const grupo of grupos.values()) {
+    grupo.sort((a, b) => a.position! - b.position!);
+    let puesto = 0;
+    for (const [i, r] of grupo.entries()) {
+      if (i === 0 || r.position! > grupo[i - 1].position!) puesto = i + 1;
+      if (puesto > 3) break;
+      puestos.set(r, puesto);
+    }
+  }
+  return puestos;
+}
+/** Texto de la etiqueta del podio: «1.ª mujer», «2.º hombre», «1.º Vet A M» o «1.º general» (FR-029). */
+export function etiquetaPodio(puesto: number, gender: string, categoria = ''): string {
+  const grupo = categoria || (FEMENINO.test(gender) ? 'mujer' : MASCULINO.test(gender) ? 'hombre' : gender || 'general');
+  return `${puesto}.${FEMENINO.test(gender) ? 'ª' : 'º'} ${grupo}`;
+}
 const normalize = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 const aliases: Record<ResultField, string[]> = {
   position: ['posicion', 'pos', 'puesto', 'posgeneral', 'posiciongeneral', 'puestogeneral', 'clasificacion', 'rank', 'ranking', 'position'],

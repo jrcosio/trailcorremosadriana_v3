@@ -90,6 +90,11 @@ repositorio.
     - Fondo suave de oro, plata y bronce, con una franja interior de 4 px y la medalla en el mismo
       color más intenso (variable `--podio`).
     - La medalla no cambia el alto de la fila. Cuenta el puesto publicado, también con filtros.
+  - A-007, ampliado por la decisión P12 (feature 012, US10): podio por sexo y por categoría.
+    - La consulta pública devuelve `podium` por fila (`services/clasificaciones.py::_podio`,
+      `rank()` por sexo sobre el grupo filtrado, sin la búsqueda).
+    - El panel usa `rangosPodio` (`lib/classifications.ts`).
+    - La medalla pasa a ser una etiqueta junto al nombre (`.podium-label`).
   - A-008: panel de administración (feature 012).
     - US7: la barra lateral se desplaza en vertical (`overflow-y: auto`,
       `overscroll-behavior: contain`). `Admin.tsx` muestra la opción de la sección abierta una vez

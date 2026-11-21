@@ -71,3 +71,8 @@
   guardado, y sin escrituras reales. Las correcciones se limitan al color, con un tono de la
   paleta. FR-026 y FR-027 tienen escenarios en la US9. Los estados al pasar el ratón y de foco
   quedan fuera, como supuesto explícito.
+- Revisión (2026-11-21, US10/P12): el propietario fija el alcance: chicas y chicos de cada prueba,
+  y por categoría. Respondió dos preguntas: sin filtros, podio masculino y femenino; presentación
+  con una etiqueta junto al nombre. La regla (FR-028) es objetiva y se comprueba con un oráculo
+  independiente. El reajuste de columnas que causa la etiqueta se ha medido y queda escrito
+  (FR-031). FR-028–FR-031 tienen escenarios en la US10.

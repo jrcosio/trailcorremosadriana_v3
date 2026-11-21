@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4)."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4). Historia 10 (P12): «si cambio a femenino no me identifica a las tres campeonas»; podio de las tres primeras chicas y los tres primeros chicos de todas las pruebas, y también por categoría."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -252,7 +252,8 @@ resultados oficiales.
    - axe da 0 incumplimientos AA.
 5. **Given** la búsqueda o los filtros de categoría o sexo, **When** el resultado incluye a alguno
    de los tres primeros de la general, **Then** su fila conserva el color de su puesto. El resto de
-   filas no se colorea, aunque quede entre las primeras de la lista filtrada.
+   filas no se colorea, aunque quede entre las primeras de la lista filtrada. *(Sustituido por la
+   US10, decisión P12: el podio es por sexo y, con el filtro de categoría, por categoría.)*
 6. **Given** la vista previa de un CSV en el panel, **When** muestra sus primeras filas, **Then**
    los tres primeros se ven igual que en la web pública.
 
@@ -356,6 +357,61 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
 4. **Given** la revisión, **When** guarda para comprobar los estados, **Then** no cambia ningún
    dato: las escrituras se interceptan.
 
+---
+
+### User Story 10 - Podio masculino, femenino y por categoría (Priority: P1)
+
+Decisión P12 del propietario. Con el filtro «Femenino» no se identificaba a las tres campeonas:
+el podio de la US6 era el de la general, y en 2026 los tres primeros de la general son hombres en
+las tres pruebas. «Son campeones tanto los masculinos como los femeninos». Hay que identificar a
+las tres primeras chicas y a los tres primeros chicos de todas las pruebas, y también el podio de
+cada categoría.
+
+El propietario elige:
+
+- sin filtros, los 3 primeros chicos y las 3 primeras chicas de la prueba;
+- con el filtro de sexo, el podio de ese sexo; con el de categoría, el de esa categoría;
+- la columna «Pos.» sigue con la posición general;
+- la fila conserva el fondo y la franja de oro, plata o bronce;
+- junto al nombre, una etiqueta del mismo color con el puesto del podio: «1.ª mujer», «2.º hombre»,
+  «1.º Vet A M».
+
+**Why this priority**: sin esto, las campeonas no aparecen como tales. Es un fallo visible en los
+resultados oficiales.
+
+**Independent Test**: abrir `/clasificaciones/2026`. Sin filtros, cada prueba muestra 6 filas
+destacadas: los 3 primeros chicos y las 3 primeras chicas. Con «Femenino», las 3 primeras chicas;
+con una categoría, sus 3 primeros. Al buscar a la campeona por su dorsal, conserva su etiqueta.
+
+**Acceptance Scenarios**:
+
+1. **Given** una clasificación con participantes de los dos sexos, **When** se muestra sin
+   filtros, **Then**:
+   - los 3 primeros hombres y las 3 primeras mujeres, por su puesto, llevan el fondo, la franja y
+     la etiqueta de su puesto en el podio: «1.º hombre», «1.ª mujer»…;
+   - la columna «Pos.» sigue mostrando su posición general.
+2. **Given** el filtro «Femenino» o «Masculino», **When** se aplica, **Then** las 3 primeras
+   personas de ese sexo llevan su color y su etiqueta, aunque no estén entre los 3 primeros de la
+   general.
+3. **Given** el filtro de una categoría, **When** se aplica, **Then** sus 3 primeros llevan su color
+   y una etiqueta con la categoría, por ejemplo «1.º Vet A M».
+4. **Given** una búsqueda o el cambio de página, **When** aparece alguien del podio del grupo
+   filtrado, **Then** conserva su color y su etiqueta. La búsqueda no cambia quién está en el
+   podio.
+5. **Given** dos participantes empatados en un puesto del podio, **When** se muestran, **Then** los
+   dos llevan el color y la etiqueta de ese puesto.
+6. **Given** una clasificación sin datos de sexo, **When** se muestra, **Then** se destaca el podio
+   de la general con la etiqueta «1.º general».
+7. **Given** la vista previa de un CSV o la clasificación actual en el panel, **When** se muestran,
+   **Then** el podio se calcula con la misma regla.
+8. **Given** la tabla, **When** se revisa, **Then**:
+   - la etiqueta tiene un contraste de al menos 4,5:1;
+   - las filas que no son del podio conservan su fondo;
+   - no hay desbordamientos de la página.
+
+   La etiqueta ensancha la columna del nombre. Por eso la tabla puede repartir de nuevo los anchos
+   y algún texto largo (el club) puede cambiar de salto de línea.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -377,6 +433,11 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
   desplaza. Al llegar a su final, no arrastra la página de detrás.
 - **Logotipo del panel que no carga (US8)**: el enlace conserva su nombre accesible y el rótulo
   «ADMINISTRACIÓN» sigue visible.
+- **Participantes sin sexo (US10)**: si la clasificación tiene datos de sexo, quien no lo tiene no
+  entra en ningún podio. Si no hay datos de sexo en toda la clasificación, se usa la general.
+- **Categoría con los dos sexos (US10)**: su podio se calcula para cada sexo, cada uno con la
+  etiqueta de la categoría y el ordinal de su género.
+- **Podio fuera de la primera página (US10)**: la etiqueta aparece igual en la página donde esté.
 
 ## Requirements *(mandatory)*
 
@@ -433,13 +494,15 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
 - **FR-019**: En las tablas de clasificación, públicas y de vista previa del panel, las filas con
   puesto 1, 2 y 3 MUST distinguirse con un fondo suave propio: oro, plata y bronce. Cada una lleva
   una franja a la izquierda y una medalla con el número, ambas en el mismo color más intenso. Los
-  tres colores MUST ser distintos entre sí y del fondo de las demás filas.
+  tres colores MUST ser distintos entre sí y del fondo de las demás filas. *(La US10 sustituye la
+  medalla por una etiqueta junto al nombre, y el puesto general por el podio de cada grupo.)*
 - **FR-020**: El texto de las filas del podio y el número de cada medalla MUST tener un contraste
   de al menos 4,5:1. El puesto MUST seguir escrito, así que la información no depende solo del
   color.
 - **FR-021**: Las demás filas, el alto de todas las filas, el ancho de la tabla y el resto de la
   página MUST NOT cambiar. El podio se decide por el puesto publicado (la general), no por la
-  posición en una lista filtrada.
+  posición en una lista filtrada. *(Sustituido en parte por FR-028–FR-031: el podio es por sexo o
+  por categoría; las filas del podio pueden crecer si la etiqueta no cabe en su línea.)*
 - **FR-022**: La barra lateral del panel MUST desplazarse en vertical cuando su contenido no cabe
   en la ventana, en escritorio y en el menú de móvil. Todas sus opciones, el usuario y «Cerrar
   sesión» MUST poder alcanzarse y pulsarse. MUST NOT aparecer desplazamiento horizontal.
@@ -457,6 +520,22 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
   etiquetas de estado.
 - **FR-027**: Cada corrección MUST limitarse al color del texto, con un tono de la paleta. Los
   tamaños, los pesos, los fondos y la disposición MUST NOT cambiar.
+- **FR-028**: El podio de una clasificación MUST calcularse sobre quienes tienen puesto y cumplen
+  los filtros de categoría y sexo activos, sin contar la búsqueda de texto:
+  - se calcula para cada sexo;
+  - si la clasificación no tiene datos de sexo, se usa la general;
+  - cada uno ocupa el puesto que le corresponde por su posición, y los empates lo comparten;
+  - solo cuentan los puestos 1, 2 y 3.
+- **FR-029**: Las filas del podio MUST llevar el fondo, la franja y una etiqueta del color de su
+  puesto (oro, plata o bronce) junto al nombre. La etiqueta dice el puesto en el podio, con el
+  ordinal en el género de la persona, y el grupo: «hombre» o «mujer», la categoría filtrada o
+  «general». La columna «Pos.» MUST seguir mostrando la posición general.
+- **FR-030**: El servidor MUST indicar el puesto en el podio de cada fila de la consulta pública,
+  para que la búsqueda y la paginación no lo cambien. La vista previa y la clasificación actual
+  del panel MUST calcularlo con la misma regla.
+- **FR-031**: La etiqueta MUST tener un contraste de al menos 4,5:1. Las filas que no son del podio
+  MUST conservar su fondo, y la página MUST NOT desbordarse. El reparto de anchos de la tabla
+  puede cambiar el salto de línea de algún texto largo.
 
 ## Success Criteria *(mandatory)*
 
@@ -511,6 +590,14 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
   acceso, en todos los anchos medidos, sin restos de la marca antigua. La barra lateral, el
   contenido del panel y el formulario de acceso tienen 0 px de diferencia en ancho y posición
   horizontal. Hay 0 incumplimientos AA.
+- **SC-017**: En las 3 clasificaciones de 2026, a 320, 360, 768, 1024 y 1440 px:
+  - sin filtros, el 100 % de los 3 primeros hombres y las 3 primeras mujeres de cada prueba
+    llevan su color y su etiqueta, y nadie más;
+  - con «Femenino», «Masculino» o una categoría, el 100 % de su podio y nadie más;
+  - buscar a la campeona conserva su etiqueta;
+  - las demás filas conservan el fondo, y su alto solo cambia por el reparto de anchos de la
+    tabla (medido: 5 filas a 1024 y 1440 px, de 1 a 2 líneas o al revés);
+  - contraste de al menos 4,5:1 y 0 desbordamientos.
 - **SC-016**: 0 incumplimientos de axe (WCAG 2.1 A/AA) en el 100 % de las vistas del panel
   revisadas: todas las secciones, un elemento existente y el alta de cada colección, a 360, 1024
   y 1440 px, más los estados de guardado. Ningún dato cambia durante la revisión. Las capturas
@@ -555,7 +642,7 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
   puesto publicado en el CSV. Con la búsqueda o los filtros, cada fila conserva su puesto general.
   No se calcula un podio por sexo ni por categoría, porque sería interpretar los resultados
   oficiales. Si el propietario quiere destacar también el podio femenino o el de cada categoría,
-  se añadirá como historia.
+  se añadirá como historia. *(Sustituido por la US10: el propietario lo pidió, decisión P12.)*
 - **Alcance del logotipo en el panel (US8)**: el propietario habla del panel, cuya marca antigua
   está en la barra lateral y en la pantalla de acceso. Se cambia en los dos sitios. El icono del
   navegador sigue igual, por el mismo motivo que en la US3.
@@ -570,3 +657,6 @@ variantes de la etiqueta de estado. Comprobar que no hay ningún incumplimiento.
   Pasan al gris de texto secundario de la paleta, `--muted` (#66716b), ya usado en el panel: 4,88:1
   y 4,63:1. axe no revisa los estados al pasar el ratón ni de foco: quedan fuera de esta
   revisión automática.
+- **Etiqueta del podio (US10)**: «hombre» sale de los valores «Masculino», «M» u «Hombre» del CSV,
+  y «mujer», de «Femenino», «F» o «Mujer». Si el CSV usa otro valor de sexo, la etiqueta lo
+  muestra tal cual, con «.º».
