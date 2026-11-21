@@ -323,6 +323,31 @@ def _escapar_like(texto: str) -> str:
     return texto.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
+def _podio(db: Session, de_esta, categoria: str, sexo: str, con_sexo: bool, ids: list[int]) -> dict:
+    """Puesto en el podio (1–3) de las filas `ids` (feature 012, US10, decisión P12).
+
+    Se calcula sobre quienes tienen puesto y cumplen los filtros de categoría y sexo. La búsqueda
+    no cuenta, así que buscar o cambiar de página no cambia quién está en el podio. Hay un podio
+    por sexo; si la clasificación no tiene datos de sexo, uno de la general. Si los tiene, quien
+    no tiene sexo no entra. Los empates comparten puesto (`rank`).
+    """
+    if not ids:
+        return {}
+    grupo = [de_esta, Resultado.posicion.is_not(None)]
+    if categoria:
+        grupo.append(Resultado.categoria == categoria)
+    if sexo:
+        grupo.append(Resultado.sexo == sexo)
+    if con_sexo:
+        grupo.append(Resultado.sexo != "")
+    puesto = func.rank().over(partition_by=Resultado.sexo, order_by=Resultado.posicion)
+    ranking = select(Resultado.id, puesto.label("puesto")).where(*grupo).subquery()
+    consulta = select(ranking.c.id, ranking.c.puesto).where(
+        ranking.c.puesto <= 3, ranking.c.id.in_(ids)
+    )
+    return {fila_id: p for fila_id, p in db.execute(consulta)}
+
+
 def consultar(
     db: Session, identificador: str, q: str, categoria: str, sexo: str, pagina: int
 ) -> dict:
@@ -350,12 +375,14 @@ def consultar(
     filtrados = db.scalar(select(func.count()).select_from(Resultado).where(*filtros)) or 0
     paginas = max(1, math.ceil(filtrados / TAMANO_PAGINA))
     actual = min(max(1, pagina), paginas)
-    filas = db.scalars(
-        select(Resultado)
-        .where(*filtros)
-        .order_by(Resultado.orden)
-        .offset((actual - 1) * TAMANO_PAGINA)
-        .limit(TAMANO_PAGINA)
+    filas = list(
+        db.scalars(
+            select(Resultado)
+            .where(*filtros)
+            .order_by(Resultado.orden)
+            .offset((actual - 1) * TAMANO_PAGINA)
+            .limit(TAMANO_PAGINA)
+        )
     )
 
     def distintos(columna):
@@ -366,8 +393,10 @@ def consultar(
     def tiene(columna) -> bool:
         return bool(db.scalar(select(exists().where(de_esta, columna != ""))))
 
+    con_sexo = tiene(Resultado.sexo)
+    podio = _podio(db, de_esta, categoria, sexo, con_sexo, [r.id for r in filas])
     return {
-        "rows": [_fila(r) for r in filas],
+        "rows": [{**_fila(r), "podium": podio.get(r.id)} for r in filas],
         "total": clasificacion.participantes,
         "filtered": filtrados,
         "page": actual,
@@ -378,7 +407,7 @@ def consultar(
         "columns": {
             "category": tiene(Resultado.categoria),
             "club": tiene(Resultado.club),
-            "gender": tiene(Resultado.sexo),
+            "gender": con_sexo,
             "status": tiene(Resultado.estado),
         },
     }

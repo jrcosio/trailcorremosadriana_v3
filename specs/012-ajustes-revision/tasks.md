@@ -219,6 +219,42 @@ textos que fallan.
 - [X] T046 [US9] Actualizar `docs/referencia/DISCREPANCIAS.md` (P4), `docs/arquitectura.md`,
   `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
 
+## Phase 3h: User Story 10 — Podio masculino, femenino y por categoría (P1)
+
+**Goal**: sin filtros se destacan los 3 primeros chicos y las 3 primeras chicas de cada prueba;
+con el filtro de sexo o de categoría, su podio. Cada fila del podio lleva una etiqueta junto al
+nombre.
+
+**Independent Test**: pytest de la consulta; `npx vitest run tests/podio.test.tsx`;
+`verificar-podio.mjs --comparar capturas/podio-sexo-antes-012.json`.
+
+- [X] T047 [P] [US10] Añadir a `backend/tests/test_consulta_clasificaciones.py` las pruebas del
+  podio: por sexo, filtro de sexo, categoría, búsqueda, empate, sin sexo y sin puesto. Deben
+  fallar antes del cambio.
+- [X] T048 [P] [US10] Reescribir `frontend/tests/podio.test.tsx`: `rangosPodio`,
+  `etiquetaPodio` y el render en modo cliente. Debe fallar antes del cambio.
+- [X] T049 [US10] Reescribir `frontend/scripts/verificar-podio.mjs` con un oráculo que lee todas
+  las páginas de la API, filtros y búsqueda. Tomar la referencia
+  `capturas/podio-sexo-antes-012.json` y comprobar que `--comparar` falla con la versión previa.
+- [X] T050 [US10] En `backend/app/services/clasificaciones.py`: `_podio` (`rank()` por sexo sobre
+  el grupo filtrado) y `podium` en cada fila de `consultar`. Añadir `podium` al contrato
+  `specs/006-clasificaciones-csv/contracts/api-clasificaciones.openapi.yaml`.
+- [X] T051 [US10] En el frontend:
+  - `rangosPodio`, `etiquetaPodio` y `podium` en `frontend/src/lib/classifications.ts`;
+  - `ClassificationTable.tsx`: `podium` del servidor o `rangosPodio`, «Pos.» con la posición
+    general y la etiqueta junto al nombre;
+  - A-007 en `ajustes.css`: `.podium-label` en lugar de `.podium-medal`.
+- [X] T052 [US10] Reconstruir `api` y `web` y ejecutar:
+  - pytest completo, vitest, `typecheck` y `build`;
+  - `verificar-podio.mjs --comparar`;
+  - `verificar-clasificaciones`, `verificar-accesibilidad` y `verificar-panel-aa`;
+  - capturas en `frontend/capturas/despues-podio-sexo-012`, comparadas con las de la US9;
+  - `verificar-rutas`, `verificar-cierre` y `verificar-fotos`.
+
+  Revisión visual a 360 y 1440 px, sin filtros y con «Femenino».
+- [X] T053 [US10] Registrar la decisión P12 en `docs/referencia/DISCREPANCIAS.md` y actualizar
+  `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -234,8 +270,10 @@ textos que fallan.
 - **US6**: T030 (referencia antes del cambio) → T031 [P] → T032 → T033 → T034 → T035.
 - **US7 y US8**: T036 (referencia antes del cambio) → T037 → T038 → T039 → T040 → T041.
 - **US9**: T042 y T043 (auditoría y capturas antes del cambio) → T044 → T045 → T046.
+- **US10**: T047 [P], T048 [P] y T049 (pruebas y referencia que fallan antes del cambio) → T050 →
+  T051 → T052 → T053.
 
 ## Implementation Strategy
 
-- **Alcance**: hasta ahora, las US1–US9 completas. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US10…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US10 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US11…) de esta misma feature.

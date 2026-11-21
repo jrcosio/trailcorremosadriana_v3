@@ -58,7 +58,14 @@ listados y el pie del panel pasan al gris de texto secundario de la paleta, `--m
 (`ajustes.css` A-009). Una auditoría axe de todo el panel, sin escrituras reales, da 0
 incumplimientos.
 
-Detalle en [research.md](research.md) (R4, R5, R6, R7, R8 y R9).
+US10 (decisión P12): podio por sexo y por categoría.
+
+- La consulta pública devuelve `podium` (1–3) por fila: un podio por sexo, o el de la categoría
+  filtrada, sin contar la búsqueda. El panel lo calcula con `rangosPodio`.
+- La tabla muestra una etiqueta junto al nombre («1.ª mujer») en lugar de la medalla, y «Pos.»
+  conserva la posición general.
+
+Detalle en [research.md](research.md) (R4, R5, R6, R7, R8, R9 y R10).
 
 ## Technical Context
 
@@ -90,6 +97,13 @@ cambio.
 referencia previa).
 **US9**: `ajustes.css` A-009 y `scripts/verificar-panel-aa.mjs` (nuevo, con credenciales y las
 escrituras interceptadas).
+**US10**:
+- Backend: `services/clasificaciones.py`, con `_podio` y `podium` en la consulta pública, y
+  pytest.
+- Frontend: `lib/classifications.ts` (`rangosPodio`, `etiquetaPodio`),
+  `ClassificationTable.tsx` y `ajustes.css` A-007.
+- Pruebas y contrato: `tests/podio.test.tsx`, `scripts/verificar-podio.mjs` y el contrato de la
+  006.
 
 ## Constitution Check
 
@@ -109,6 +123,9 @@ escrituras interceptadas).
 | I (US8) | Cambio de marca ordenado por el propietario (P11). La barra, el contenido y el formulario no cambian en horizontal. Capturas antes y después | ✅ |
 | I (US9) | Solo cambia el color de dos textos, con un tono de la paleta, por la decisión P4; capturas antes y después | ✅ |
 | II (US9) | La auditoría intercepta las escrituras y no cambia ningún dato (comprobado en la API) | ✅ |
+| I (US10) | Cambio visual ordenado por el propietario (P12) con la presentación que eligió; fondos y franjas iguales | ✅ |
+| IV (US10) | Contrato de la consulta pública ampliado (`podium`), compatible: solo añade un campo | ✅ |
+| VI (US10) | El podio sale del puesto, el sexo y la categoría publicados; no se inventa nada | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -146,6 +163,11 @@ frontend/src/components/admin/Admin.tsx (barra lateral y acceso) · frontend/src
 frontend/scripts/verificar-panel.mjs (nuevo) · frontend/scripts/verificar-logo.mjs (panel)
 # US9
 frontend/src/styles/ajustes.css (A-009) · frontend/scripts/verificar-panel-aa.mjs (nuevo)
+# US10
+backend/app/services/clasificaciones.py (_podio) · backend/tests/test_consulta_clasificaciones.py
+frontend/src/lib/classifications.ts · frontend/src/components/ClassificationTable.tsx · frontend/src/styles/ajustes.css (A-007)
+frontend/tests/podio.test.tsx · frontend/scripts/verificar-podio.mjs
+specs/006-clasificaciones-csv/contracts/api-clasificaciones.openapi.yaml (podium)
 ```
 
 ## Complexity Tracking

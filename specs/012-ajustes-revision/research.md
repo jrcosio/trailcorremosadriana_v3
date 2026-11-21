@@ -368,3 +368,47 @@ hay credenciales. Para cada `<img>` de foto comprueba:
     píxel de rasterizado del logotipo, con una diferencia de 2/255.
   - `verificar-panel.mjs`, axe público y regresión correctos.
 - **Fuera de la revisión automática**: los estados al pasar el ratón y de foco, que axe no evalúa.
+
+## R10. Podio por sexo y por categoría (US10, decisión P12)
+
+- **Problema**: con el podio de la US6, el de los puestos 1–3 de la general, el filtro
+  «Femenino» no marcaba a nadie. En 2026, los tres primeros de la general son hombres en las tres
+  pruebas, y la 1.ª chica del Trail es la 13.ª.
+- **Regla** (FR-028):
+  - cuentan quienes tienen puesto y cumplen los filtros de categoría y sexo, no la búsqueda;
+  - hay un podio por sexo, o uno de la general si la clasificación no tiene datos de sexo;
+  - si los tiene, quien no tiene sexo no entra;
+  - los empates comparten puesto, como `rank()`: 1, 2, 2 y no hay 3.º;
+  - solo cuentan los puestos 1–3.
+
+  Sin filtros salen 3 + 3 filas; con «Femenino», las 3 primeras chicas; con una categoría
+  (todas son de un solo sexo), sus 3 primeros.
+- **Dónde se calcula**: la consulta pública pagina y busca en el servidor. Por eso
+  `services/clasificaciones.py::_podio` calcula el puesto con
+  `rank() OVER (PARTITION BY sexo ORDER BY posicion)` sobre el grupo filtrado. Cada fila de la
+  página lleva `podium: 1|2|3|null`. Así, buscar a la campeona o cambiar de página no cambia su
+  puesto. El panel, en modo cliente, usa `rangosPodio` (`lib/classifications.ts`), con la misma
+  regla. `/api/content?admin=1` no cambia.
+- **Presentación** (elegida por el propietario):
+  - «Pos.» conserva la posición general, en negrita en el podio;
+  - la medalla redonda pasa a ser una etiqueta junto al nombre (`.podium-label`, A-007): «1.ª
+    mujer», «2.º hombre», «1.º Vet A M» o «1.º general»;
+  - el fondo y la franja de oro, plata y bronce no cambian.
+
+  La etiqueta no se parte; en móvil baja a la línea siguiente. Contraste de 5,68–8,30:1.
+- **Efecto medido**: la etiqueta ensancha la columna del nombre y la tabla reparte de nuevo los
+  anchos. A 1024 y 1440 px, 5 filas que no son del podio cambian de salto de línea en algún texto
+  largo. Ninguna cambia de fondo y no hay desbordamientos.
+- **Alternativas descartadas**:
+  - Calcular el podio en el navegador con la página visible: falla con la búsqueda y con la
+    paginación.
+  - Etiqueta debajo del nombre: no mueve las columnas, pero el propietario eligió la etiqueta al
+    lado.
+  - Podio de todas las categorías sin filtrar: más de 25 filas destacadas en el Speed.
+- **Verificación**:
+  - pytest: 5 pruebas nuevas en `test_consulta_clasificaciones.py` (sexo, filtro de sexo,
+    categoría, búsqueda, empate, sin sexo y sin puesto);
+  - vitest: `tests/podio.test.tsx`, reescrito con la regla, las etiquetas y el render;
+  - `scripts/verificar-podio.mjs`, reescrito. Calcula el podio esperado leyendo todas las páginas
+    de la API y lo compara en 5 anchos sin filtros, y con «Femenino», «Masculino», «Senior F» y la
+    búsqueda de la campeona en las 3 pruebas.

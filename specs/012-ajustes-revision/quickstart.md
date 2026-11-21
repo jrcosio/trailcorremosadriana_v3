@@ -132,3 +132,23 @@ Resultados esperados:
 - 0 incumplimientos en 69 vistas: 22 rutas × 3 anchos y 3 estados de guardado.
 - Escrituras interceptadas; ningún dato cambia.
 - En las capturas solo cambia el color de las cabeceras de tabla y del pie del panel.
+
+## US10: podio masculino, femenino y por categoría
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml --profile test run --rm --build api-test pytest -q
+cd frontend && node scripts/verificar-podio.mjs --referencia capturas/podio-sexo-antes-012.json   # antes del cambio
+npx vitest run tests/podio.test.tsx
+docker compose build api web && docker compose up -d api web
+node scripts/verificar-podio.mjs --comparar capturas/podio-sexo-antes-012.json
+curl -s "http://localhost:8080/api/clasificaciones/trail-27k-2026/participantes?sexo=Femenino" | jq '[.rows[:4][] | [.position, .podium]]'
+```
+
+Resultados esperados:
+
+- Sin filtros, 6 filas destacadas por prueba: «1.º hombre»… y «1.ª mujer»….
+- Con «Femenino», las 3 primeras chicas: en el Trail, las posiciones 13, 21 y 22 llevan `podium`
+  1, 2 y 3. Con una categoría, sus 3 primeros: «1.ª Senior F».
+- Al buscar a la campeona, conserva su etiqueta.
+- «Pos.» con la posición general.
+- Contraste de 4,5:1 o más y sin desbordamientos.

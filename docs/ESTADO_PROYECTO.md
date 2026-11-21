@@ -131,10 +131,35 @@
   - Ningún dato cambió durante la revisión (comprobado en la API).
   - Capturas: solo cambian esos textos.
   - Regresión correcta.
+- **US10 terminada** (decisión P12: podio femenino, masculino y por categoría):
+  - Fallo: con «Femenino» no se marcaba a las campeonas. El podio de la US6 era el de la general,
+    y en 2026 los tres primeros son hombres.
+  - Regla:
+    - sin filtros, 3 chicos y 3 chicas;
+    - con el filtro de sexo, el de ese sexo; con el de categoría, el de la categoría;
+    - la búsqueda no cuenta y los empates comparten puesto.
+  - Dónde: lo calcula el servidor (`_podio`, `podium` en la consulta pública), y el panel con
+    `rangosPodio`.
+  - Presentación, elegida por el propietario: «Pos.» con la posición general y una etiqueta de oro,
+    plata o bronce junto al nombre («1.ª mujer»), en lugar de la medalla.
+  - Efecto medido: a 1024 y 1440 px la tabla reparte de nuevo los anchos, y 5 filas que no son
+    del podio cambian de salto de línea, sin desbordar.
+  - Verificación:
+    - pytest: 394 en total, 5 de ellas nuevas; vitest: 104;
+    - `verificar-podio` contra un oráculo que lee todas las páginas de la API: 18 filas sin
+      filtros y 11 casos con filtro o búsqueda;
+    - clasificaciones, axe público y del panel, rutas, cierre y fotos, correctos.
+- **Dato cambiado fuera de las verificaciones**: la noticia «Peñasagra 2027 ya está en el
+  horizonte» (`proxima-edicion`) pasó a no publicada a las 15:52 (hora peninsular) del
+  2026-11-21. Fue entre el push y el inicio de la US10, cuando no se ejecutó ningún script de
+  escritura. Probablemente se hizo desde el panel. No se ha tocado; se ha informado al
+  propietario.
 - **Publicación**: las US1–US9 están en GitHub. El 2026-11-21, a petición del propietario, se
   subieron `main` (56ccde5) y `012-ajustes-revision` (446dd14). Para actualizar la MV:
   `cd /srv/trail-v3 && git pull && dc build web && dc up -d web`. Los siguientes push, solo cuando
-  el propietario los pida.
+  el propietario los pida. La US10 está solo en local, en `012-ajustes-revision` y fusionada en
+  `main`. Al publicarla, en la MV hay que reconstruir **api y web**:
+  `git pull && dc build api web && dc up -d api web`.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
      GitHub (`main`, push del 2026-11-20 a petición del propietario).
@@ -189,6 +214,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Podio por sexo (3 + 3 sin filtros) y por categoría al filtrar, calculado en el servidor sin la búsqueda; etiqueta junto al nombre y «Pos.» con la posición general | Propietario (P12, con las dos preguntas respondidas), 012 research R10 |
 | 2026-11-21 | Contraste AA también en el panel con la sesión iniciada: cabeceras de tabla y pie del panel en `--muted` | Propietario (P4, confirmado para el panel), 012 research R9 |
 | 2026-11-21 | Logotipo oficial en negativo en la barra lateral del panel (con «ADMINISTRACIÓN») y en el acceso; favicon sin cambios | Propietario (P11), 012 research R8 |
 | 2026-11-21 | Barra lateral del panel con desplazamiento vertical propio, sin arrastrar la página; opción abierta a la vista | 012 US7, research R8 |
@@ -340,6 +366,9 @@
 | 2026-11-21 | 012 | US9: `verificar-panel-aa.mjs` (axe con la sesión iniciada: 22 rutas × 360/1024/1440 px y 3 estados de guardado, con las escrituras interceptadas), antes y después del cambio | Antes: 222 incumplimientos en 69 vistas (2 defectos: cabeceras de tabla a 3,40:1 y pie del panel a 2,67:1). Después: 0 en 69 vistas; 3 escrituras interceptadas; datos sin cambios en la API |
 | 2026-11-21 | 012 | US9: capturas del panel antes y después (6 pantallas a 1440 y 360 px) | Solo cambian la fila de cabeceras de la tabla y el pie, sin cambios de tamaño, más 1 píxel de rasterizado del logotipo (2/255) |
 | 2026-11-21 | 012 | US9: regresión (`verificar-panel`, axe público, vitest, typecheck, rutas, cierre) | OK; 0 incumplimientos en 17 rutas; 91 passed; OK; 42/42; 7/7 |
+| 2026-11-21 | 012 | US10 (P12): pytest de la consulta (5 nuevas: sexo, filtro de sexo, categoría, búsqueda, sin sexo) y vitest `podio.test.tsx` (16), antes y después | Antes: `KeyError: 'podium'` y `rangosPodio` inexistente. Después: pytest 394 passed y vitest 104 passed |
+| 2026-11-21 | 012 | US10: `verificar-podio.mjs` contra un oráculo que lee todas las páginas de la API (5 anchos, y a 1440 y 360 px con «Femenino», «Masculino», «Senior F» y la búsqueda de la campeona en las 3 pruebas) | Antes: 326 problemas (sin podio femenino y con la medalla). Después: 18 filas sin filtros (3 + 3 por prueba) y 11 casos con filtro o búsqueda correctos; 144 filas del podio con su etiqueta; contraste mínimo 5,68:1; sin desbordamientos. Información: 5 filas que no son del podio cambian de salto de línea a 1024 y 1440 px |
+| 2026-11-21 | 012 | US10: `verificar-clasificaciones`, axe público (17 rutas), `verificar-panel-aa` (69 vistas), capturas, rutas, cierre y fotos | Todo correcto. Capturas: cambian las 4 de clasificaciones (podio) y las 8 de inicio y noticias, por la noticia despublicada a las 15:52, no por el código |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |
