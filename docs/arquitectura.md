@@ -65,7 +65,9 @@ repositorio.
 - **Estilos**: `globals.css` se conserva idéntica a la propuesta. Los arreglos verificados van en
   `ajustes.css`, cada uno con su referencia:
   - A-001: cabecera a 360 px;
-  - A-002: contraste AA por la decisión P4;
+  - A-002: contraste AA por la decisión P4. Desde P9 (feature 012, US5), la frase del pie no
+    tiene enlace; la regla que subraya los enlaces de esa línea se conserva por si vuelve a
+    haber uno;
   - A-003: cabecera por debajo de 360 px;
   - A-004: fotos siempre completas por la decisión P6 (feature 012). Cada `<img>` de foto lleva
     `style={fondoFoto(src)}` (`lib/fotos.ts`, variable `--foto`). El marco no cambia; la foto se

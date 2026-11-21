@@ -98,6 +98,34 @@ en los anchos de cambio de diseño; capturas y axe.
   `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: vitest,
   `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
 
+## Phase 3d: User Story 5 — Nueva frase de autoría en el pie (P1)
+
+**Goal**: la línea inferior del pie dice «Hecho por la Escuela Hacker Cosío», sin enlace, con el
+mismo estilo y sin mover nada más.
+
+**Independent Test**: `npx vitest run tests/pie.test.tsx`; `verificar-logo.mjs --comparar
+capturas/pie-antes-012.json`; capturas y axe.
+
+- [X] T025 [P] [US5] Escribir `frontend/tests/pie.test.tsx`. Renderiza `Site` en las rutas
+  públicas y en una inexistente, y comprueba: el aviso de copyright, la frase nueva, ningún enlace
+  en la línea inferior y ningún resto de la frase anterior. Ejecutarlo antes del cambio: debe
+  fallar.
+- [X] T026 [P] [US5] Ampliar `frontend/scripts/verificar-logo.mjs` con la línea inferior del pie
+  (research R6): las dos líneas, sin enlaces, con el mismo color y tamaño, y sin restos. Ejecutarlo
+  contra la versión previa: debe detectar la frase anterior.
+- [X] T027 [US5] Cambiar la frase en `Footer` (`frontend/src/components/Site.tsx`). Anotar en el
+  comentario de A-002 (`frontend/src/styles/ajustes.css`) que la regla del enlace del pie ya no se
+  aplica.
+- [X] T028 [US5] Reconstruir `web` y ejecutar:
+  - vitest;
+  - `verificar-logo.mjs --comparar capturas/pie-antes-012.json`, con `/pantallas` en local;
+  - `verificar-accesibilidad.mjs`;
+  - las capturas en `frontend/capturas/despues-pie-texto-012`, con revisión visual del pie y
+    comparación con las de la US4.
+- [X] T029 [US5] Registrar la decisión P9 en `docs/referencia/DISCREPANCIAS.md` y actualizar
+  `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: `typecheck`,
+  `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -109,8 +137,9 @@ en los anchos de cambio de diseño; capturas y axe.
 - **En paralelo [P]**: T002 junto a T001 (archivos distintos).
 - **US3**: T013 (referencia antes del cambio) → T014 [P] → T015 → T016 → T017 → T018.
 - **US4**: T019 (referencia antes del cambio) → T020 [P] → T021 → T022 → T023 → T024.
+- **US5**: T025 [P] y T026 [P] (comprobaciones que fallan antes del cambio) → T027 → T028 → T029.
 
 ## Implementation Strategy
 
-- **Alcance**: esta entrega cubre la US1 completa. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US2, US3…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US5 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US6…) de esta misma feature.

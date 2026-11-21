@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie»."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío»."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -180,6 +180,33 @@ diseño del pie. Comprobar:
 6. **Given** la cabecera, la barra lateral del panel y el icono del navegador, **When** se
    comparan con la versión anterior, **Then** no han cambiado.
 
+---
+
+### User Story 5 - Nueva frase de autoría en el pie (Priority: P1)
+
+Decisión P9 del propietario: cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers
+Cosío» por «Hecho por la Escuela Hacker Cosío».
+
+**Why this priority**: es una instrucción directa del propietario y la frase aparece en todas las
+páginas públicas.
+
+**Independent Test**: abrir varias páginas públicas a 320, 360, 768, 1024 y 1440 px. Comprobar
+que la línea inferior del pie dice «Hecho por la Escuela Hacker Cosío» y que no quedan restos de
+la frase anterior.
+
+**Acceptance Scenarios**:
+
+1. **Given** cualquier página pública, incluida la de página no encontrada, **When** se muestra a
+   cualquier ancho entre 320 y 1440 px, **Then**:
+   - la línea inferior del pie dice exactamente «Hecho por la Escuela Hacker Cosío»;
+   - ya no aparecen «Hecho con pasión», «JR BLANCO» ni «Hackers Cosío».
+2. **Given** la línea inferior del pie, **When** se compara con la versión anterior, **Then**:
+   - el aviso «© año Asociación Peñasagra» no cambia;
+   - la frase nueva conserva el color y el tamaño de letra de esa línea;
+   - el resto del pie y la cabecera no se mueven.
+3. **Given** la revisión automática de accesibilidad, **When** se ejecuta en las páginas públicas,
+   **Then** da 0 incumplimientos AA y 0 desbordamientos horizontales.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -240,6 +267,11 @@ diseño del pie. Comprobar:
   densidad y en un formato ligero.
 - **FR-016**: El logotipo del pie MUST ser un enlace a la portada con nombre accesible. La barra
   lateral del panel y el icono del navegador MUST NOT cambiar.
+- **FR-017**: La línea inferior del pie de todas las páginas públicas MUST mostrar «Hecho por la
+  Escuela Hacker Cosío» en lugar de «Hecho con pasión por JR BLANCO · Hackers Cosío». El aviso
+  «© año Asociación Peñasagra» MUST NOT cambiar.
+- **FR-018**: La frase nueva MUST conservar el color y el tamaño de letra de la línea inferior del
+  pie. MUST NOT enlazar a ninguna dirección que no haya aportado el propietario.
 
 ## Success Criteria *(mandatory)*
 
@@ -275,6 +307,10 @@ diseño del pie. Comprobar:
   fondo del pie.
 - **SC-011**: Ninguna variante del logotipo del pie pesa más de 50 KB. La que se descarga mide al
   menos el doble del tamaño en pantalla en las de alta densidad.
+- **SC-012**: En el 100 % de las páginas públicas a 320, 360, 768, 1024 y 1440 px, la línea
+  inferior del pie muestra la frase nueva y ninguna de las palabras de la anterior. La cabecera y
+  la parte superior del pie no se mueven (diferencia de 0 px). Hay 0 desbordamientos y 0
+  incumplimientos de accesibilidad AA.
 
 ## Assumptions
 
@@ -303,3 +339,7 @@ diseño del pie. Comprobar:
   diferencia. El pie solo crece donde la primera columna es la más alta.
 - **Barra lateral del panel (US4)**: el propietario habla del pie. La barra lateral del panel
   conserva su marca. Si la quiere también allí, se añadirá como historia.
+- **Frase sin enlace (US5)**: en la frase anterior, «JR BLANCO» enlazaba a `jrblanco.es`. La frase
+  nueva no nombra a JR BLANCO, y el propietario no ha dado una dirección para la Escuela Hacker
+  Cosío. Por eso va como texto, sin enlace (constitución VI: no se inventan enlaces). Si el
+  propietario quiere enlazarla, basta con que dé la dirección.

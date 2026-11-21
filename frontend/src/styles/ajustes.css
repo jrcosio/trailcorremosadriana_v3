@@ -24,7 +24,9 @@
  *   y #9a3d1c al pasar por encima. Las variantes secondary y light conservan sus reglas.
  * - Bloque del Dorsal Solidario: antetítulo, texto y nota bajo el botón en blanco sobre #ba4b2e
  *   (5,1:1). La nota no aparecía en la muestra inicial de la auditoría; mismo criterio de P4.
- * - Enlace del pie «JR BLANCO»: subrayado para distinguirlo sin depender del color.
+ * - Enlace del pie «JR BLANCO»: subrayado para distinguirlo sin depender del color. Desde la
+ *   decisión P9 (feature 012, US5), la frase del pie no lleva enlace y la regla no se aplica.
+ *   Se conserva para que, si se añade un enlace a esa línea, salga subrayado (AA).
  */
 .button {
   background: #b64b24;

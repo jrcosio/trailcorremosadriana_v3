@@ -49,3 +49,9 @@
   no contradecir la US4. Umbrales: 0 px en la cabecera y en la posición horizontal de las columnas
   2.ª a 4.ª, naranja ≥ 3:1, blanco ≥ 4,5:1 y variantes ≤ 50 KB. FR-013–FR-016 tienen escenarios en
   la US4.
+- Revisión (2026-11-21, US5/P9): el propietario da el texto literal, así que no hay ambigüedad en
+  la frase. El enlace de «JR BLANCO» desaparece porque la frase nueva no lo nombra. Como no hay
+  dirección para la Escuela Hacker Cosío, va sin enlace (supuesto explícito y constitución VI).
+  Umbrales: 100 % de las páginas públicas, 0 restos de la frase anterior, 0 px de movimiento en la
+  cabecera y en la parte superior del pie, 0 desbordamientos y 0 incumplimientos AA. FR-017 y
+  FR-018 tienen escenarios en la US5.

@@ -67,6 +67,22 @@
     - regresión correcta.
   - Herramientas: `cargarTodo` y `verificar-logo` se desplazan de forma instantánea, porque
     `scroll-behavior: smooth` falseaba las medidas y las capturas del pie.
+- **US5 terminada** (decisión P9: frase del pie):
+  - Cambio: la línea inferior del pie dice «Hecho por la Escuela Hacker Cosío» en lugar de
+    «Hecho con pasión por JR BLANCO · Hackers Cosío».
+    - Va como texto, sin enlace: la frase nueva no nombra a JR BLANCO y no hay dirección de la
+      Escuela.
+    - El aviso de copyright y el estilo de la línea no cambian. La regla A-002 del enlace del pie
+      se conserva, sin efecto.
+  - Verificación:
+    - `tests/pie.test.tsx` en 13 rutas: falla antes del cambio y pasa después;
+    - `verificar-logo.mjs`, ampliado con la línea inferior: detecta la frase anterior y pasa con la
+      nueva en 90 vistas, con el panel sin cambios;
+    - axe 0;
+    - 44 capturas: solo cambia esa línea, comparadas píxel a píxel con las de la US4;
+    - regresión correcta.
+- **Publicación**: la US3 está en GitHub (`main` 22aa4f0). La US4 y la US5 están solo en local:
+  en `012-ajustes-revision` y fusionadas en `main`. Se suben cuando el propietario lo pida.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
      GitHub (`main`, push del 2026-11-20 a petición del propietario).
@@ -121,6 +137,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Frase del pie «Hecho por la Escuela Hacker Cosío», sin enlace (no hay dirección aprobada) | Propietario (P9), 012 research R6 |
 | 2026-11-21 | Logotipo también en el pie, en negativo (tinta oscura → blanco, naranja intacto), con el ancho de la marca anterior; el panel conserva la marca blanca | Propietario (P8), 012 research R5 |
 | 2026-11-21 | Logotipo nuevo en la cabecera pública; el pie y el panel conservan la marca blanca | Propietario (P7), 012 research R4 |
 
@@ -250,6 +267,10 @@
 | 2026-11-21 | 012 | US4: axe y desbordamiento; capturas (44) y revisión visual del pie a 360, 768, 1024 y 1440 px | 0 incumplimientos en 17 rutas; 0 desbordamientos; solo cambia el pie |
 | 2026-11-21 | 012 | US4: logotipo del pie que no carga (petición abortada, 360 y 1440 px) | Mismo hueco (74,8 px) y párrafo en el mismo sitio; enlace a la portada con su nombre accesible |
 | 2026-11-21 | 012 | US4: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 75 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
+| 2026-11-21 | 012 | US5 (P9): `tests/pie.test.tsx` (13 rutas públicas, incluida una inexistente), antes y después del cambio | Antes: 13 fallos (frase anterior con enlace). Después: 13 passed |
+| 2026-11-21 | 012 | US5: `verificar-logo.mjs --comparar` ampliado con la línea inferior del pie (6 rutas × 15 anchos y barra del panel con `/pantallas` en local) | Con la versión previa detecta la frase anterior. Con la nueva: frase correcta, sin enlaces, mismo estilo, sin restos; cabecera con 0 px de diferencia y pie como en la US4; panel sin cambios |
+| 2026-11-21 | 012 | US5: axe y desbordamiento; 44 capturas, comparadas píxel a píxel con las de la US4 y revisión visual del pie a 360, 768 y 1440 px | 0 incumplimientos en 17 rutas; 0 desbordamientos; solo cambia la línea inferior del pie y ninguna página cambia de alto |
+| 2026-11-21 | 012 | US5: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 88 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |
