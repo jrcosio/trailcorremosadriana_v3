@@ -55,3 +55,9 @@
   Umbrales: 100 % de las páginas públicas, 0 restos de la frase anterior, 0 px de movimiento en la
   cabecera y en la parte superior del pie, 0 desbordamientos y 0 incumplimientos AA. FR-017 y
   FR-018 tienen escenarios en la US5.
+- Revisión (2026-11-21, US6/P10): el propietario fija qué se destaca (los tres primeros, cada uno
+  con un color suave) y delega los colores. Se eligen oro, plata y bronce (supuesto explícito).
+  Lo ambiguo, el podio con filtros, se resuelve con el puesto publicado, sin calcular podios por
+  sexo ni por categoría (supuesto ampliable). Umbrales: 100 % de las filas 1–3, tres colores
+  distintos, 0 px de diferencia en filas y tablas, contraste ≥ 4,5:1, 0 incumplimientos AA y 0
+  desbordamientos. FR-019–FR-021 tienen escenarios en la US6.

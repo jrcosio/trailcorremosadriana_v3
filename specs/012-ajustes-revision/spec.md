@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío»."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»)."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -207,6 +207,55 @@ la frase anterior.
 3. **Given** la revisión automática de accesibilidad, **When** se ejecuta en las páginas públicas,
    **Then** da 0 incumplimientos AA y 0 desbordamientos horizontales.
 
+---
+
+### User Story 6 - Podio destacado en las clasificaciones (Priority: P1)
+
+Decisión P10 del propietario: en las clasificaciones, los tres primeros no solo deben llevar el
+puesto en negrita. Cada uno debe distinguirse con un color suave propio: «el primero verdecito, el
+segundo otro color suave y el tercero lo mismo. Lo de verde es por decir algo, pero lo que tú
+decidas que queda más visual para el podio».
+
+Se eligen los colores de las medallas, que todo el mundo asocia al podio: oro, plata y bronce, en
+tonos suaves.
+
+- La fila de cada uno de los tres primeros lleva un fondo suave de su color.
+- Tiene una franja a la izquierda del mismo color, más intenso.
+- El puesto aparece dentro de una medalla redonda de ese color.
+
+**Why this priority**: es una instrucción directa del propietario y mejora la lectura de los
+resultados oficiales.
+
+**Independent Test**: abrir `/clasificaciones/2026` a 320, 360, 768, 1024 y 1440 px. Comprobar:
+
+- que las filas del 1.º, 2.º y 3.º de cada carrera se distinguen con tres colores diferentes;
+- que el resto de filas, la tabla y la página no cambian.
+
+**Acceptance Scenarios**:
+
+1. **Given** una clasificación publicada, **When** se muestra la página con los primeros puestos,
+   **Then**:
+   - la fila del 1.º lleva un fondo suave dorado, la del 2.º uno plateado y la del 3.º uno
+     bronce, distintos entre sí, del blanco y del gris de las filas alternas;
+   - su número de puesto aparece en negrita dentro de una medalla del mismo color, más intenso;
+   - la fila lleva a la izquierda una franja de ese color.
+2. **Given** las filas del 4.º en adelante y las de participantes sin puesto, **When** se muestran,
+   **Then** no cambian respecto a la versión anterior: el mismo fondo, alternado, y el mismo texto.
+3. **Given** cualquier ancho entre 320 y 1440 px, **When** se muestra la tabla, **Then**:
+   - ninguna fila cambia de alto ni la tabla de ancho;
+   - no hay desbordamientos de la página, aunque la tabla siga desplazándose en horizontal dentro
+     de su recuadro, como antes.
+4. **Given** la revisión de accesibilidad, **When** se comprueba la tabla, **Then**:
+   - el texto de las filas del podio y el número de cada medalla tienen un contraste de al menos
+     4,5:1;
+   - el puesto sigue escrito, así que la información no depende solo del color;
+   - axe da 0 incumplimientos AA.
+5. **Given** la búsqueda o los filtros de categoría o sexo, **When** el resultado incluye a alguno
+   de los tres primeros de la general, **Then** su fila conserva el color de su puesto. El resto de
+   filas no se colorea, aunque quede entre las primeras de la lista filtrada.
+6. **Given** la vista previa de un CSV en el panel, **When** muestra sus primeras filas, **Then**
+   los tres primeros se ven igual que en la web pública.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -219,6 +268,11 @@ la frase anterior.
   accesible; la cabecera no cambia de altura. En el pie, el hueco del logotipo conserva su tamaño.
 - **Pantallas muy estrechas (320 px)**: el logotipo se reduce lo necesario para que el botón
   «INSCRIPCIONES» y el de menú quepan sin desbordar.
+- **Empate en un puesto del podio (US6)**: si dos participantes comparten puesto, los dos llevan el
+  color de ese puesto.
+- **Puestos de dos o tres cifras (US6)**: solo el 1, el 2 y el 3 llevan medalla. La medalla se
+  ensancha si hiciera falta, sin cortar el número.
+- **Clasificación sin puestos (US6)**: si nadie tiene puesto, no se colorea ninguna fila.
 
 ## Requirements *(mandatory)*
 
@@ -272,6 +326,16 @@ la frase anterior.
   «© año Asociación Peñasagra» MUST NOT cambiar.
 - **FR-018**: La frase nueva MUST conservar el color y el tamaño de letra de la línea inferior del
   pie. MUST NOT enlazar a ninguna dirección que no haya aportado el propietario.
+- **FR-019**: En las tablas de clasificación, públicas y de vista previa del panel, las filas con
+  puesto 1, 2 y 3 MUST distinguirse con un fondo suave propio: oro, plata y bronce. Cada una lleva
+  una franja a la izquierda y una medalla con el número, ambas en el mismo color más intenso. Los
+  tres colores MUST ser distintos entre sí y del fondo de las demás filas.
+- **FR-020**: El texto de las filas del podio y el número de cada medalla MUST tener un contraste
+  de al menos 4,5:1. El puesto MUST seguir escrito, así que la información no depende solo del
+  color.
+- **FR-021**: Las demás filas, el alto de todas las filas, el ancho de la tabla y el resto de la
+  página MUST NOT cambiar. El podio se decide por el puesto publicado (la general), no por la
+  posición en una lista filtrada.
 
 ## Success Criteria *(mandatory)*
 
@@ -311,6 +375,13 @@ la frase anterior.
   inferior del pie muestra la frase nueva y ninguna de las palabras de la anterior. La cabecera y
   la parte superior del pie no se mueven (diferencia de 0 px). Hay 0 desbordamientos y 0
   incumplimientos de accesibilidad AA.
+- **SC-013**: En las 3 clasificaciones de 2026, a 320, 360, 768, 1024 y 1440 px:
+  - el 100 % de las filas con puesto 1, 2 o 3 muestran su color, su franja y su medalla, y ninguna
+    otra fila;
+  - los tres colores son distintos entre sí y del fondo de las demás filas;
+  - las demás filas conservan su fondo y todas las filas su alto (diferencia de 0 px);
+  - contraste del texto y de las medallas de al menos 4,5:1, 0 incumplimientos AA y 0
+    desbordamientos.
 
 ## Assumptions
 
@@ -343,3 +414,11 @@ la frase anterior.
   nueva no nombra a JR BLANCO, y el propietario no ha dado una dirección para la Escuela Hacker
   Cosío. Por eso va como texto, sin enlace (constitución VI: no se inventan enlaces). Si el
   propietario quiere enlazarla, basta con que dé la dirección.
+- **Colores del podio (US6)**: el propietario deja la elección abierta («lo de verde es por decir
+  algo»). Se eligen oro, plata y bronce suaves porque se reconocen como podio sin explicación y no
+  se confunden con el verde de la cabecera de la tabla ni con el naranja de los botones.
+- **Podio de la general (US6)**: son los mismos tres puestos que ya iban en negrita, es decir, el
+  puesto publicado en el CSV. Con la búsqueda o los filtros, cada fila conserva su puesto general.
+  No se calcula un podio por sexo ni por categoría, porque sería interpretar los resultados
+  oficiales. Si el propietario quiere destacar también el podio femenino o el de cada categoría,
+  se añadirá como historia.

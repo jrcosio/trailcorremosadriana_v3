@@ -126,6 +126,37 @@ capturas/pie-antes-012.json`; capturas y axe.
   `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: `typecheck`,
   `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
 
+## Phase 3e: User Story 6 — Podio destacado en las clasificaciones (P1)
+
+**Goal**: los tres primeros de cada clasificación se distinguen con oro, plata y bronce suaves
+(fondo, franja y medalla) sin cambiar el resto de la tabla.
+
+**Independent Test**: `npx vitest run tests/podio.test.tsx`; `verificar-podio.mjs --comparar
+capturas/podio-antes-012.json`; capturas y axe.
+
+- [X] T030 [US6] Crear `frontend/scripts/verificar-podio.mjs` (research R7) y ejecutar
+  `--referencia capturas/podio-antes-012.json` antes del cambio. Comprobar que `--comparar` falla
+  con la versión previa.
+- [X] T031 [P] [US6] Escribir `frontend/tests/podio.test.tsx`:
+  - clase y medalla solo en los puestos 1–3, también con empates;
+  - la vista previa del panel, igual;
+  - sin puestos, ninguna fila marcada.
+
+  Debe fallar antes del cambio.
+- [X] T032 [US6] En `frontend/src/components/ClassificationTable.tsx`, poner `podium podium-N` en
+  la fila y el número dentro de `<span class="podium-medal">` en los puestos 1–3
+- [X] T033 [US6] Añadir A-007 a `frontend/src/styles/ajustes.css`: fondos de oro, plata y bronce,
+  la franja con `box-shadow` interior y la medalla sin cambiar el alto de la fila
+- [X] T034 [US6] Reconstruir `web` y ejecutar:
+  - vitest;
+  - `verificar-podio.mjs --comparar capturas/podio-antes-012.json`;
+  - `verificar-accesibilidad.mjs`;
+  - las capturas en `frontend/capturas/despues-podio-012`, con revisión visual de la tabla a 360 y
+    1440 px y comparación con las de la US5.
+- [X] T035 [US6] Registrar la decisión P10 en `docs/referencia/DISCREPANCIAS.md` y actualizar
+  `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: `typecheck`,
+  `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -138,8 +169,9 @@ capturas/pie-antes-012.json`; capturas y axe.
 - **US3**: T013 (referencia antes del cambio) → T014 [P] → T015 → T016 → T017 → T018.
 - **US4**: T019 (referencia antes del cambio) → T020 [P] → T021 → T022 → T023 → T024.
 - **US5**: T025 [P] y T026 [P] (comprobaciones que fallan antes del cambio) → T027 → T028 → T029.
+- **US6**: T030 (referencia antes del cambio) → T031 [P] → T032 → T033 → T034 → T035.
 
 ## Implementation Strategy
 
-- **Alcance**: hasta ahora, las US1–US5 completas. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US6…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US6 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US7…) de esta misma feature.

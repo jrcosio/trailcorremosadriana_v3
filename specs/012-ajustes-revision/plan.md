@@ -38,7 +38,14 @@ US5 (decisión P9): la línea inferior del pie dice «Hecho por la Escuela Hacke
 «Hecho con pasión por JR BLANCO · Hackers Cosío». Es texto sin enlace, con el estilo de la línea;
 sin CSS nuevo.
 
-Detalle en [research.md](research.md) (R4, R5 y R6).
+US6 (decisión P10): podio destacado en las clasificaciones.
+
+- Las filas con puesto 1, 2 y 3 llevan `podium podium-N` y el número va dentro de una medalla.
+- `ajustes.css` (A-007) les da un fondo suave de oro, plata y bronce, con una franja y la medalla
+  en el mismo color más intenso.
+- Ni las filas cambian de alto ni la tabla de ancho.
+
+Detalle en [research.md](research.md) (R4, R5, R6 y R7).
 
 ## Technical Context
 
@@ -62,6 +69,9 @@ cabecera con Playwright, con una referencia tomada antes del cambio.
 referencia nueva.
 **US5**: `Site.tsx` (`Footer`). Prueba vitest nueva (`tests/pie.test.tsx`) y comprobación de la
 línea inferior del pie en `verificar-logo.mjs`.
+**US6**: `ClassificationTable.tsx` y `ajustes.css` A-007. Prueba vitest nueva
+(`tests/podio.test.tsx`) y `scripts/verificar-podio.mjs`, con una referencia tomada antes del
+cambio.
 
 ## Constitution Check
 
@@ -74,6 +84,8 @@ línea inferior del pie en `verificar-logo.mjs`.
 | IV (US4) | Procedencia de la versión en negativo (derivada de `new_logo.png`) en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
 | I (US5) | Cambio de texto ordenado por el propietario (P9); mismo estilo y nada más se mueve. Capturas antes y después | ✅ |
 | VI (US5) | La frase va sin enlace: no hay dirección aprobada y no se inventan enlaces | ✅ |
+| I (US6) | Cambio visual ordenado por el propietario (P10), con los colores a elección del equipo; filas y tabla con 0 px de diferencia. Capturas antes y después | ✅ |
+| VI (US6) | El podio es el puesto publicado; no se calculan podios por sexo ni por categoría | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -102,6 +114,9 @@ frontend/scripts/verificar-logo.mjs (pie, contraste y densidad del pie)
 # US5
 frontend/src/components/Site.tsx (Footer) · frontend/tests/pie.test.tsx (nuevo)
 frontend/scripts/verificar-logo.mjs (línea inferior del pie)
+# US6
+frontend/src/components/ClassificationTable.tsx · frontend/src/styles/ajustes.css (A-007)
+frontend/tests/podio.test.tsx (nuevo) · frontend/scripts/verificar-podio.mjs (nuevo)
 ```
 
 ## Complexity Tracking

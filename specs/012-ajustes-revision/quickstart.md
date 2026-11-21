@@ -74,3 +74,24 @@ Resultados esperados:
 - La frase, con el color y el tamaño de la línea.
 - Cabecera y resto del pie como en la US4.
 - 0 desbordamientos y 0 incumplimientos AA.
+
+## US6: podio de las clasificaciones
+
+```bash
+cd frontend && node scripts/verificar-podio.mjs --referencia capturas/podio-antes-012.json   # antes del cambio
+npx vitest run tests/podio.test.tsx                        # antes del cambio: falla
+docker compose build web && docker compose up -d web
+node scripts/verificar-podio.mjs --comparar capturas/podio-antes-012.json
+node scripts/verificar-accesibilidad.mjs
+node scripts/capturas.mjs http://localhost:8080 capturas/despues-podio-012
+```
+
+Resultados esperados:
+
+- 1.º, 2.º y 3.º de cada clasificación con fondo de oro, plata y bronce, franja a la izquierda y
+  medalla con el número en negrita.
+- Las demás filas, igual que antes.
+- Filas y tablas con 0 px de diferencia.
+- Texto y medallas con un contraste de al menos 4,5:1; 0 incumplimientos AA y 0 desbordamientos.
+- El ganador conserva su color al buscarlo; con el filtro «Femenino», las primeras filas no se
+  colorean.
