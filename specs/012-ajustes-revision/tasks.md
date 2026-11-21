@@ -61,6 +61,43 @@ diseño; capturas y axe.
 - [X] T017 [US3] Reconstruir `web` y ejecutar `verificar-logo.mjs --comparar`, `verificar-accesibilidad.mjs` y las capturas en `frontend/capturas/despues-logo-012`. Revisión visual a 320, 360, 768, 1024 y 1440 px
 - [X] T018 [US3] Registrar la decisión P7 en `docs/referencia/DISCREPANCIAS.md` y actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
 
+## Phase 3c: User Story 4 — Logotipo nuevo también en el pie (P1)
+
+**Goal**: el pie muestra el logotipo en negativo en lugar de la silueta y el texto. La cabecera no
+cambia y las demás columnas del pie siguen en su sitio.
+
+**Independent Test**: `verificar-logo.mjs --comparar capturas/pie-antes-012.json` a 320–1440 px y
+en los anchos de cambio de diseño; capturas y axe.
+
+- [X] T019 [US4] Ampliar `frontend/scripts/verificar-logo.mjs` (research R5) con:
+  - la huella de la marca del pie, las columnas y el contenido de la primera columna;
+  - las comprobaciones del pie;
+  - el contraste;
+  - la densidad del pie.
+
+  Ejecutar `--referencia capturas/pie-antes-012.json` antes del cambio, con `/pantallas`
+  disponible.
+- [X] T020 [P] [US4] Generar `frontend/public/reused/logos/logo_pie-480.webp` y
+  `logo_pie-720.webp` (versión en negativo, research R5) desde `datos_iniciales/new_logo.png`, y
+  registrar su procedencia en `docs/PROCEDENCIA_RECURSOS.md`
+- [X] T021 [US4] En `frontend/src/components/Site.tsx`:
+  - unificar `LogoCabecera` en un componente `Logo` con la variante de cabecera y la de pie (pie
+    con `loading="lazy"` y `sizes="233px"`);
+  - usarlo en `Footer`;
+  - eliminar `Brand`.
+- [X] T022 [US4] Añadir A-006 a `frontend/src/styles/ajustes.css`: logotipo del pie de 233 px de
+  ancho como máximo (100 % de la columna si es menor), con `height: auto` y `filter: none`
+- [X] T023 [US4] Reconstruir `web` y ejecutar:
+  - `verificar-logo.mjs --comparar capturas/pie-antes-012.json`;
+  - `verificar-accesibilidad.mjs`;
+  - las capturas en `frontend/capturas/despues-pie-012`, con revisión visual del pie a 320, 360,
+    768, 1024 y 1440 px.
+
+  Comprobar también el caso en que el logotipo no carga.
+- [X] T024 [US4] Registrar la decisión P8 en `docs/referencia/DISCREPANCIAS.md` y actualizar
+  `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`. Regresión: vitest,
+  `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-fotos --comparar`
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -71,6 +108,7 @@ diseño; capturas y axe.
 - **Orden**: T001 (referencia antes del cambio) → T002 → T003 → T004 → T005 → T006 → T007.
 - **En paralelo [P]**: T002 junto a T001 (archivos distintos).
 - **US3**: T013 (referencia antes del cambio) → T014 [P] → T015 → T016 → T017 → T018.
+- **US4**: T019 (referencia antes del cambio) → T020 [P] → T021 → T022 → T023 → T024.
 
 ## Implementation Strategy
 

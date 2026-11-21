@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie»."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -128,9 +128,57 @@ diseño. Comprobar:
 4. **Given** un lector de pantalla o la navegación por teclado, **When** llega al logotipo,
    **Then** lo anuncia como enlace a la portada de Trail Peñasagra, y la revisión automática de
    accesibilidad AA da 0 incumplimientos.
-5. **Given** el pie de página y la barra lateral del panel (fondo verde oscuro), **When** se
-   muestran, **Then** conservan su marca actual en blanco, porque el logotipo nuevo tiene el texto
-   oscuro y no se leería sobre ese fondo.
+5. **Given** la barra lateral del panel (fondo verde oscuro), **When** se muestra, **Then**
+   conserva su marca actual en blanco. El pie, que en esta historia también la conservaba, pasa a
+   mostrar el logotipo con la US4 (decisión P8).
+
+---
+
+### User Story 4 - Logotipo nuevo también en el pie (Priority: P1)
+
+Decisión P8 del propietario: «pon también el logo en el pie».
+
+El pie de la web pública muestra el logotipo nuevo en lugar de la silueta y el texto en dos filas,
+igual que la cabecera. El pie tiene fondo verde oscuro, así que se usa una versión en negativo del
+mismo logotipo:
+
+- el texto y las montañas, en blanco;
+- la niña y las rayas, en su naranja original.
+
+Sigue llevando a la portada y se ve nítido en cualquier pantalla.
+
+**Why this priority**: es una instrucción directa del propietario, y la marca queda igual en la
+cabecera y en el pie de todas las páginas.
+
+**Independent Test**: abrir la web a 320, 360, 768, 1024 y 1440 px y en los anchos de cambio de
+diseño del pie. Comprobar:
+
+- que el pie muestra el logotipo completo y legible sobre el verde, en lugar de la silueta y el
+  texto;
+- que lleva a la portada;
+- que las demás columnas del pie siguen en su sitio;
+- que la cabecera no cambia y no hay desbordamientos.
+
+**Acceptance Scenarios**:
+
+1. **Given** cualquier página pública, **When** se muestra a cualquier ancho entre 320 y 1440 px,
+   **Then**:
+   - el pie muestra el logotipo nuevo completo, sin recortes ni deformación;
+   - ya no aparecen en el pie la silueta ni el texto en dos filas.
+2. **Given** el fondo verde oscuro del pie, **When** se muestra el logotipo, **Then**:
+   - el texto y las montañas se ven en blanco;
+   - la niña y las rayas conservan su naranja, con un contraste de al menos 3:1 con el fondo.
+3. **Given** el pie, **When** se compara con la versión anterior, **Then**:
+   - el logotipo no ocupa más ancho que la marca anterior ni que su columna;
+   - las demás columnas conservan su posición horizontal y su ancho;
+   - el resto de la primera columna solo baja lo que el logotipo es más alto que la marca anterior.
+4. **Given** una pantalla de alta densidad, **When** se muestra el logotipo del pie, **Then** se
+   ve nítido, sin pixelado.
+5. **Given** un lector de pantalla o la navegación por teclado, **When** llega al logotipo del pie,
+   **Then** lo anuncia como enlace a la portada de Trail Peñasagra, y la revisión automática de
+   accesibilidad AA da 0 incumplimientos.
+6. **Given** la cabecera, la barra lateral del panel y el icono del navegador, **When** se
+   comparan con la versión anterior, **Then** no han cambiado.
 
 ### Edge Cases
 
@@ -141,7 +189,7 @@ diseño. Comprobar:
 - **Foto que no carga**: el marco muestra el color de fondo de la paleta, sin errores.
 - **Visor de fotos y vista previa de subida**: ya muestran la foto completa y no cambian.
 - **Logotipo que no carga**: el enlace a la portada sigue funcionando y conserva su nombre
-  accesible; la cabecera no cambia de altura.
+  accesible; la cabecera no cambia de altura. En el pie, el hueco del logotipo conserva su tamaño.
 - **Pantallas muy estrechas (320 px)**: el logotipo se reduce lo necesario para que el botón
   «INSCRIPCIONES» y el de menú quepan sin desbordar.
 
@@ -177,8 +225,21 @@ diseño. Comprobar:
   todos los anchos entre 320 y 1440 px.
 - **FR-011**: El logotipo MUST servirse con resolución suficiente para pantallas de alta densidad
   y en un formato ligero, sin enviar el original de 393 KB.
-- **FR-012**: El logotipo MUST seguir siendo un enlace a la portada con nombre accesible. El pie
-  de página, la barra lateral del panel y el icono del navegador MUST NOT cambiar.
+- **FR-012**: El logotipo MUST seguir siendo un enlace a la portada con nombre accesible. La
+  barra lateral del panel y el icono del navegador MUST NOT cambiar. El pie lo cambia la US4
+  (FR-013–FR-016).
+- **FR-013**: El pie público MUST mostrar el logotipo nuevo en lugar de la silueta y del texto en
+  dos filas, en una versión en negativo para fondo oscuro derivada del original. La tinta oscura
+  (texto y montañas) MUST pasar a blanco y el naranja MUST conservarse. El logotipo MUST verse
+  completo, con su proporción original y sin recortes.
+- **FR-014**: El logotipo del pie MUST NOT superar el ancho de la marca anterior ni el de su
+  columna. La cabecera MUST NOT cambiar. Las demás columnas del pie MUST conservar su posición
+  horizontal y su ancho. El resto de la primera columna MUST desplazarse hacia abajo como mucho
+  lo que el logotipo es más alto que la marca anterior. 0 desbordamientos entre 320 y 1440 px.
+- **FR-015**: El logotipo del pie MUST servirse con resolución suficiente para pantallas de alta
+  densidad y en un formato ligero.
+- **FR-016**: El logotipo del pie MUST ser un enlace a la portada con nombre accesible. La barra
+  lateral del panel y el icono del navegador MUST NOT cambiar.
 
 ## Success Criteria *(mandatory)*
 
@@ -205,6 +266,15 @@ diseño. Comprobar:
   desbordamientos horizontales y 0 incumplimientos de accesibilidad AA.
 - **SC-008**: Ninguna variante del logotipo pesa más de 50 KB. La que se descarga mide al menos el
   doble del tamaño en pantalla en las de alta densidad.
+- **SC-009**: El logotipo en negativo se ve completo en el pie del 100 % de las páginas públicas a
+  320, 360, 768, 1024 y 1440 px y en los anchos de cambio de diseño. En ningún pie queda la
+  silueta ni el texto en dos filas.
+- **SC-010**: La cabecera no cambia (diferencia de 0 px). Las columnas 2.ª a 4.ª del pie conservan
+  su posición horizontal y su ancho (diferencia de 0 px). Hay 0 desbordamientos y 0
+  incumplimientos de accesibilidad AA. La parte naranja tiene un contraste de al menos 3:1 con el
+  fondo del pie.
+- **SC-011**: Ninguna variante del logotipo del pie pesa más de 50 KB. La que se descarga mide al
+  menos el doble del tamaño en pantalla en las de alta densidad.
 
 ## Assumptions
 
@@ -219,7 +289,17 @@ diseño. Comprobar:
   oscuro y usan la marca en blanco. El logotipo nuevo, con el texto oscuro, no se leería allí, así
   que conservan la marca actual. El icono del navegador también se mantiene: un logotipo
   apaisado no se distingue a 16 px. Si el propietario quiere también una versión clara del
-  logotipo para esos fondos, se añadirá como historia.
+  logotipo para esos fondos, se añadirá como historia. *(Actualizado por la US4: el propietario
+  pidió el logotipo también en el pie, decisión P8.)*
 - **Tamaño del logotipo**: lo limita la altura de la cabecera, que no cambia. El nombre
   «TRAIL PEÑASAGRA» dentro del logotipo queda aproximadamente del mismo tamaño que el texto
   anterior.
+- **Versión en negativo (US4)**: el propietario no ha aportado una versión para fondo oscuro. Se
+  deriva del original sin redibujar nada: solo cambia el color de la tinta oscura a blanco. Si el
+  propietario aporta una versión oficial, basta con sustituir los archivos.
+- **Tamaño del logotipo en el pie (US4)**: el ancho es el de la marca anterior (silueta, separación
+  y texto), o el de la columna si es menor. Con la proporción del logotipo, queda algo más alto que
+  la marca anterior. Por eso el párrafo y el enlace a Instagram de la primera columna bajan esa
+  diferencia. El pie solo crece donde la primera columna es la más alta.
+- **Barra lateral del panel (US4)**: el propietario habla del pie. La barra lateral del panel
+  conserva su marca. Si la quiere también allí, se añadirá como historia.

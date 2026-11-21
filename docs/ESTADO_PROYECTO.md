@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-20
+Última actualización: 2026-11-21
 
 ## Punto de continuidad
 
@@ -46,6 +46,27 @@
     - axe 0;
     - capturas: solo cambia la cabecera, más un reescalado imperceptible del icono del pie;
     - regresión correcta.
+  - Publicada en GitHub a petición del propietario: `main` 22aa4f0.
+- **US4 terminada** (decisión P8: «pon también el logo en el pie»):
+  - Cambio: el pie muestra el logotipo nuevo en negativo (texto y montañas en blanco, naranja
+    intacto), derivado del original sin redibujar.
+    - Archivos: `reused/logos/logo_pie-{480,720}.webp`, de 17,6 y 27,3 KB.
+    - Código: componente `Logo` (cabecera y pie) en `Site.tsx`; `Brand` eliminado;
+      `ajustes.css` A-006.
+    - Tamaño: 233 px de ancho, el de la marca anterior (228 a 701 px), y 74,8 px de alto.
+    - Efecto: el resto de la primera columna baja 22,8 px; el pie crece 0–22,8 px según el ancho.
+  - Fuera (supuesto de la spec): la barra lateral del panel conserva la marca blanca; el favicon
+    no cambia.
+  - Verificación:
+    - `verificar-logo.mjs` en 90 vistas: cabecera con 0 px de diferencia; columnas 2.ª–4.ª del pie
+      en su sitio; nada baja más de lo que crece la marca;
+    - contraste: naranja 5,52:1 y blanco 16,24:1;
+    - nitidez en densidad 2 y panel sin cambios;
+    - axe 0; 44 capturas sin desbordamientos;
+    - caso en que el logotipo no carga: el hueco se conserva;
+    - regresión correcta.
+  - Herramientas: `cargarTodo` y `verificar-logo` se desplazan de forma instantánea, porque
+    `scroll-behavior: smooth` falseaba las medidas y las capturas del pie.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
      GitHub (`main`, push del 2026-11-20 a petición del propietario).
@@ -100,6 +121,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-21 | Logotipo también en el pie, en negativo (tinta oscura → blanco, naranja intacto), con el ancho de la marca anterior; el panel conserva la marca blanca | Propietario (P8), 012 research R5 |
 | 2026-11-21 | Logotipo nuevo en la cabecera pública; el pie y el panel conservan la marca blanca | Propietario (P7), 012 research R4 |
 
 ## Supuestos
@@ -224,6 +246,10 @@
 | 2026-11-21 | 012 | US3: axe y desbordamiento; capturas antes y después (44) | 0 incumplimientos; 0 desbordamientos; solo cambia la cabecera. A 1440 px, el icono del pie (mismo `logo1.webp`) se reescala distinto (máximo 36/255 en 55 × 29 px, imperceptible) porque ya no comparte la imagen decodificada con la cabecera |
 | 2026-11-21 | 012 | US3: logotipo que no carga (petición abortada, 360 y 1440 px) | Cabecera con la misma altura, INSCRIPCIONES en su sitio, enlace a la portada con su nombre accesible; favicon sin cambios (`logo1.webp`) |
 | 2026-11-21 | 012 | US3: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 75 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
+| 2026-11-21 | 012 | US4 (P8): `verificar-logo.mjs` contra una referencia previa nueva (`pie-antes-012.json`, 6 rutas × 15 anchos y barra del panel con `/pantallas` en local) | Cabecera con 0 px de diferencia; logotipo del pie completo, sin deformar y no más ancho que la marca anterior ni que su columna; columnas 2.ª–4.ª con la misma `x` y el mismo ancho; bajada máxima de 22,8 px (= lo que crece la marca); 0 desbordamientos; variantes de 17,6 y 27,3 KB; densidad 2 correcta; contraste naranja 5,52:1 y blanco 16,24:1; panel sin cambios |
+| 2026-11-21 | 012 | US4: axe y desbordamiento; capturas (44) y revisión visual del pie a 360, 768, 1024 y 1440 px | 0 incumplimientos en 17 rutas; 0 desbordamientos; solo cambia el pie |
+| 2026-11-21 | 012 | US4: logotipo del pie que no carga (petición abortada, 360 y 1440 px) | Mismo hueco (74,8 px) y párrafo en el mismo sitio; enlace a la portada con su nombre accesible |
+| 2026-11-21 | 012 | US4: regresión (vitest, typecheck, build, rutas, cierre, fotos) | 75 passed; OK; 42/42; 7/7; 100/100 fotos sin el panel |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

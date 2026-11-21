@@ -7,14 +7,19 @@ export async function navegador() {
   return chromium.launch();
 }
 
-/** Desplaza la página hasta el final para forzar la carga de imágenes `loading="lazy"`. */
+/**
+ * Desplaza la página hasta el final para forzar la carga de imágenes `loading="lazy"`. El
+ * desplazamiento es instantáneo: con `scroll-behavior: smooth` no llegaría al pie.
+ */
 export async function cargarTodo(page) {
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += 600) {
-      window.scrollTo(0, y);
+      window.scrollTo({ top: y, behavior: 'instant' });
       await new Promise((r) => setTimeout(r, 60));
     }
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' });
+    await new Promise((r) => setTimeout(r, 60));
+    window.scrollTo({ top: 0, behavior: 'instant' });
   });
   await page.waitForLoadState('networkidle').catch(() => {});
 }

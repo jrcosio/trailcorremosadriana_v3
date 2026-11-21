@@ -23,9 +23,18 @@ US3 (decisión P7): logotipo nuevo en la cabecera pública.
 - `ajustes.css` (A-005) fija la altura del logotipo en cada tramo de la cabecera. Esa altura cabe
   en la cabecera y en el ancho de la marca anterior. El enlace conserva ese ancho, así que nada más
   se mueve.
-- El pie y la barra lateral del panel conservan la marca blanca.
+- La barra lateral del panel conserva la marca blanca.
 
-Detalle en [research.md](research.md).
+US4 (decisión P8): el logotipo también en el pie.
+
+- Se usa una versión en negativo: la tinta oscura en blanco y el naranja conservado. Sus variantes
+  WebP de 480 y 720 px se generan del mismo PNG y con el mismo recorte.
+- Un componente `Logo` sirve a la cabecera y al pie; `Brand` se elimina.
+- `ajustes.css` (A-006) da al logotipo del pie el ancho de la marca anterior, 233 px, o el de su
+  columna si es menor. Su alto sale de la proporción.
+- Las demás columnas del pie no se mueven.
+
+Detalle en [research.md](research.md) (R4 y R5).
 
 ## Technical Context
 
@@ -44,6 +53,9 @@ Detalle en [research.md](research.md).
 **US3**: `Site.tsx` (cabecera), `ajustes.css` A-005 y 2 archivos WebP nuevos en
 `public/reused/logos/`. Sin cambios de API ni de datos. Verificación de la geometría de la
 cabecera con Playwright, con una referencia tomada antes del cambio.
+**US4**: `Site.tsx` (pie), `ajustes.css` A-006 y 2 archivos WebP nuevos
+(`logo_pie-{480,720}.webp`). La geometría de la cabecera y del pie se verifica contra una
+referencia nueva.
 
 ## Constitution Check
 
@@ -52,6 +64,8 @@ cabecera con Playwright, con una referencia tomada antes del cambio.
 | I | Cambio visual ordenado por el propietario (P6); marcos y diseño sin mover; capturas antes y después | ✅ |
 | I (US3) | Cambio de marca ordenado por el propietario (P7). La cabecera conserva su altura y la posición de la navegación y de «INSCRIPCIONES»; el título literal «TRAIL PENASAGRA» de la portada no cambia. Capturas antes y después | ✅ |
 | IV (US3) | Procedencia del logotipo en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
+| I (US4) | Cambio de marca ordenado por el propietario (P8). La cabecera no cambia y las columnas 2.ª–4.ª del pie conservan su posición horizontal. Solo baja el resto de la primera columna, lo que crece el logotipo. Capturas antes y después | ✅ |
+| IV (US4) | Procedencia de la versión en negativo (derivada de `new_logo.png`) en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -73,6 +87,10 @@ frontend/public/reused/logos/logo_cabecera-{480,720}.webp (nuevos)
 frontend/src/components/Site.tsx (cabecera) · frontend/src/styles/ajustes.css (A-005)
 frontend/scripts/verificar-logo.mjs (nuevo)
 docs/{PROCEDENCIA_RECURSOS,referencia/DISCREPANCIAS}.md
+# US4
+frontend/public/reused/logos/logo_pie-{480,720}.webp (nuevos)
+frontend/src/components/Site.tsx (Logo en cabecera y pie) · frontend/src/styles/ajustes.css (A-006)
+frontend/scripts/verificar-logo.mjs (pie, contraste y densidad del pie)
 ```
 
 ## Complexity Tracking

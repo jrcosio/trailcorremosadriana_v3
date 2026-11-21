@@ -113,7 +113,8 @@ hay credenciales. Para cada `<img>` de foto comprueba:
   - SVG: no hay vectorial del propietario, y vectorizar a mano alteraría el dibujo.
   - Ampliar la cabecera para un logotipo mayor: movería todo el diseño aprobado.
   - Poner el logotipo también en el pie y en el panel: el texto oscuro no se lee sobre el verde
-    oscuro (supuesto de la spec).
+    oscuro (supuesto de la spec). *(La US4 lo cambia para el pie con una versión en negativo; véase
+    R5.)*
 - **Ajuste durante la implementación**:
   - El problema: a 360–371 px la cabecera ya iba justa (el botón de menú sobresalía unos 12 px de
     su contenedor, dentro del margen). Por eso el ancho de la marca decide dónde quedan
@@ -134,3 +135,69 @@ hay credenciales. Para cada `<img>` de foto comprueba:
     - que no hay desbordamiento;
     - la variante descargada (densidad 1 y 2);
     - el pie y el panel sin cambios.
+
+## R5. Logotipo en el pie (US4, decisión P8)
+
+- **Versión en negativo**: el pie tiene fondo `--forest-deep` (#10241e), así que el texto casi
+  negro y las montañas verde oscuro del original no se leerían. La tinta tiene tres colores:
+  - casi negro (texto), con R ≈ 0–32;
+  - verde oscuro (montañas), con R ≈ 16–32;
+  - naranja (niña y rayas), con R ≈ 208–240.
+
+  Cada píxel se mezcla hacia el blanco según su rojo: k = (R − 80) / 80, limitado a [0, 1]. La
+  tinta oscura pasa a blanco, el naranja queda igual y los bordes suavizados no hacen escalones.
+  El alfa no cambia.
+- **Mismo recorte que la cabecera**: contenido más 6 px, 2118 × 681. Variantes de 480 y 720 px
+  (Lanczos, WebP con calidad 90).
+- **Tamaño**: el ancho es el de la marca anterior del pie o el de la columna si es menor.
+  - Marca anterior: silueta de 57 px, separación de 12 px y texto de 164,7 px, en total 233,7 px
+    medidos. En CSS, 233 px.
+  - Columna menor: 228 px a 701 px, donde el texto anterior ya se partía en dos líneas.
+
+  Queda así:
+  - el nombre «TRAIL PEÑASAGRA» del logotipo, ≈ 16 px de alto, frente a los 17 px de antes;
+  - el logotipo, 74,8 px de alto (73,2 a 701 px), frente a los 52 de la marca anterior (64 a
+    701 px).
+
+  El resto de la primera columna baja 22,8 px. El pie crece según cómo se reparten las columnas
+  en cada ancho:
+
+  | Ancho | El pie crece |
+  |---|---|
+  | ≤ 700 px (primera columna a lo ancho) | 22,8 px |
+  | 1000 px y 1200–1440 px | 11 px |
+  | 701–768 px y 1001 px (las columnas de enlaces son más altas) | 0 px |
+- **Carga diferida**: el pie queda fuera de la primera pantalla. El `<img>` lleva
+  `loading="lazy"`, y `width`/`height` reservan su hueco.
+- **Contraste**: el blanco y el naranja medidos sobre `--forest-deep` se comprueban en el script.
+  El naranja debe tener al menos 3:1 (gráfico) y el blanco, al menos 4,5:1. WCAG exime los
+  logotipos, pero se mide igualmente.
+- **Componente**: `Logo` sirve a la cabecera y al pie (variante y `sizes`). `Brand`, con la
+  silueta y el texto, deja de usarse en la web pública y se elimina. El panel tiene su propio
+  marcado.
+- **Alternativas descartadas**:
+  - Logotipo original sobre una placa clara: añade un recuadro blanco que no está en el diseño.
+  - `filter: brightness(0) invert(1)`: lo vuelve todo blanco y pierde el naranja de la niña.
+  - Mantener el alto de 52 px: el lema quedaría con ≈ 5 px de alto, ilegible.
+- **Ajustes durante la verificación**:
+  - Problema 1: con `scroll-behavior: smooth`, un `scrollTo` no es instantáneo. La primera
+    referencia midió una vista a mitad de animación, con 3 px de desfase.
+    - Solución: el script se desplaza con `behavior: 'instant'` y mide en coordenadas de
+      documento.
+    - La referencia se repitió con el pie anterior, restaurado solo para medir.
+  - Problema 2: por el mismo motivo, `cargarTodo` (`scripts/comun.mjs`) no llegaba al pie, así que
+    las capturas no cargaban su logotipo diferido.
+    - Solución: ahora también usa el desplazamiento instantáneo y baja hasta el final.
+- **Verificación** (`scripts/verificar-logo.mjs`, ampliado):
+  - Referencia nueva antes del cambio: `capturas/pie-antes-012.json`, con la huella de la marca
+    anterior, las columnas y el contenido de la primera columna.
+  - Con `--comparar`:
+    - la cabecera, con 0 px de diferencia, como en la US3;
+    - el pie con el logotipo en negativo, completo y sin deformar;
+    - sin texto de marca y con el enlace a la portada;
+    - el ancho, no mayor que el de la marca anterior ni que su columna;
+    - las columnas 2.ª a 4.ª, con la misma `x` y el mismo ancho;
+    - lo que baja, no más que lo que crece el logotipo;
+    - el contraste;
+    - la variante descargada en densidad 2;
+    - el panel, sin cambios.
