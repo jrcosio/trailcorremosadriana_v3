@@ -203,7 +203,8 @@
   subieron `main` (56ccde5) y `012-ajustes-revision` (446dd14). Para actualizar la MV:
   `cd /srv/trail-v3 && git pull && dc build web && dc up -d web`. Los siguientes push, solo cuando
   el propietario los pida. El 2026-11-22, también a petición del propietario, se subieron las
-  US10 y US11: `main` (cf2d395) y `012-ajustes-revision` (3e51b53). En la MV hay que reconstruir
+  US10 y US11: `main` (cf2d395) y `012-ajustes-revision` (3e51b53). La US12 (`deploy.sh`) se subió
+  el mismo día: `main` (cb15265) y `012-ajustes-revision` (63e0fa5). En la MV hay que reconstruir
   **api y web**:
   `git pull && dc build api web && dc up -d api web`.
 - **Siguiente acción concreta**:
