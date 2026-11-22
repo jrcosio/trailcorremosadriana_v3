@@ -174,6 +174,26 @@
     - axe público (17 rutas) y del panel (69 vistas): 0;
     - capturas: solo cambian la virgulilla del título y los textos de ayuda del contacto;
     - rutas, cierre, respaldo y evento y pruebas, correctos.
+- **US12 terminada** (despliegue automático, a petición del propietario):
+  - `deploy.sh` en la raíz. En la MV: `git clone …/trailcorremosadriana_v3.git /srv/trail-v3`,
+    copiar el `.env` y `sudo ./deploy.sh`. Cada actualización: `sudo ./deploy.sh`.
+  - Hace, en orden:
+    - comprobaciones y descarga del código, con relanzado si cambia el propio script;
+    - copia previa;
+    - construcción y migraciones;
+    - datos aprobados y clasificaciones de 2026 desde la carpeta de la v2, solo en una base
+      vacía;
+    - cuenta `organizacion` si no hay ninguna;
+    - parada de la v2 sin borrar nada;
+    - arranque con espera por HTTPS y vuelta atrás automática si falla;
+    - comprobaciones de §6;
+    - copia diaria a las 04:00 (14 días).
+  - `.env.produccion` en la raíz local: ignorado por Git, con secretos aleatorios. Se copia a la
+    MV como `.env`. Respuestas del propietario: instalación limpia, fotos en disco y usuario
+    `organizacion`.
+  - Verificación: ensayo local con una v2 simulada en 80/443. Todos los casos correctos
+    (primera vez, repetición, actualización con relanzado, fallo con vuelta atrás, cron y poda);
+    `shellcheck` sin avisos. Dos fallos encontrados en el ensayo y corregidos (research R12).
 - **Dato cambiado fuera de las verificaciones**: la noticia «Peñasagra 2027 ya está en el
   horizonte» (`proxima-edicion`) pasó a no publicada a las 15:52 (hora peninsular) del
   2026-11-21. Fue entre el push y el inicio de la US10, cuando no se ejecutó ningún script de
@@ -187,8 +207,8 @@
   **api y web**:
   `git pull && dc build api web && dc up -d api web`.
 - **Siguiente acción concreta**:
-  1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
-     GitHub (`main`, push del 2026-11-20 a petición del propietario).
+  1. El propietario despliega en la MV con `deploy.sh` (`docs/operacion.md` §0). Copia allí como
+     `.env` el `.env.produccion` que se le ha entregado en su copia local.
   2. Seguir con los demás ajustes de la revisión como historias nuevas de la 012.
 - **Pendiente del propietario**: despliegue y datos de lanzamiento (ver «Bloqueos»). Los push
   siguientes, solo cuando el propietario los pida.
@@ -240,6 +260,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-22 | `deploy.sh` idempotente para la MV: instalación limpia (datos aprobados + CSV de 2026 de la v2), fotos en disco, cuenta `organizacion`; para la v2 sin `-v` y vuelve a ella si la nueva no responde; `.env.produccion` fuera de Git | Propietario (US12, tres preguntas respondidas), 012 research R12 |
 | 2026-11-22 | Título de la portada «TRAIL PEÑASAGRA», con Ñ (constitución 1.0.1); revisión ortográfica de la web y del panel; los contenidos de la organización no se tocan desde el código | Propietario (P13), 012 research R11 |
 | 2026-11-21 | Podio por sexo (3 + 3 sin filtros) y por categoría al filtrar, calculado en el servidor sin la búsqueda; etiqueta junto al nombre y «Pos.» con la posición general | Propietario (P12, con las dos preguntas respondidas), 012 research R10 |
 | 2026-11-21 | Contraste AA también en el panel con la sesión iniciada: cabeceras de tabla y pie del panel en `--muted` | Propietario (P4, confirmado para el panel), 012 research R9 |
@@ -400,6 +421,8 @@
 | 2026-11-22 | 012 | US11: vitest `ortografia.test.tsx` (17) y pytest (5 nuevas en `test_csv.py` y `test_meta.py` ajustada), antes y después | Antes: módulo inexistente y «category» en el error. Después: vitest 121 passed y pytest 399 passed; ruff correcto |
 | 2026-11-22 | 012 | US11: `verificar-titulo.mjs` a 320/360/768/1024/1440 px contra `capturas/titulo-antes-012.json` | Antes: falla (sin Ñ). Después: «TRAIL PEÑASAGRA» en Barlow Condensed, mismo tamaño y color, caja con 0 px de diferencia, sin desbordamiento; virgulilla a 0,7–1,4 px de «TRAIL», sin invadirla |
 | 2026-11-22 | 012 | US11: segunda revisión, axe público (17 rutas) y del panel (69 vistas), capturas (44), rutas, cierre, respaldo y evento y pruebas | Ningún error de la lista; axe 0; capturas: solo cambian la virgulilla (dentro de la caja del título) y el contacto. Rutas: 40/42; fallan `/noticias` y `/noticias/proxima-edicion` porque la noticia sigue despublicada (dato, no código) |
+| 2026-11-22 | 012 | US12: `deploy.sh` con `bash -n` y `shellcheck` | Sin avisos (dos notas intencionadas, anotadas en el script) |
+| 2026-11-22 | 012 | US12: ensayo local (bash 3.2) con un *bare* como origen, un clon limpio, una v2 simulada (Caddy en 80/443 y los CSV) y `xn--trailpeasagra-okb.localhost` | 1.ª ejecución: v2 parada, 63/205/224, login de `organizacion` 200 (otra contraseña 401), 11 comprobaciones OK. 2.ª: copia previa, sin importación ni cuenta. Actualización: relanzado. Fallo forzado (`DEPLOY_ESPERA=0`): la v2 vuelve a responder y la v3 queda parada con sus 3 volúmenes. Cron simulado: otras tareas intactas, una sola línea; la copia se ejecuta y borra las de más de 14 días. Al retirar el ensayo, el Docker de desarrollo sigue intacto |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

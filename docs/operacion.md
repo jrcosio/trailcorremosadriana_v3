@@ -8,8 +8,9 @@ servidor propio. Probada en dos ensayos locales desde un clon limpio:
 
 Nada de esta guía se ha ejecutado contra el dominio ni la producción real.
 
-> **¿Sustituyes la web anterior en su misma MV?** Sigue la **sección 12**. **¿Cómo entro al
-> panel?** Lo explica la **sección 13**.
+> **Lo más sencillo: `deploy.sh`** (sección 0). Instala o actualiza todo con una orden, también
+> cuando sustituye a la web anterior en su misma MV. Las secciones 2–12 explican los mismos pasos a
+> mano. **¿Cómo entro al panel?** Lo explica la **sección 13**.
 
 > Todos los comandos se ejecutan en la carpeta del repositorio. En producción, añade siempre
 > `-f compose.yaml -f compose.produccion.yaml`. En esta guía se hace con la función `dc`, que
@@ -17,6 +18,76 @@ Nada de esta guía se ha ejecutado contra el dominio ni la producción real.
 
 ```bash
 dc() { docker compose -f compose.yaml -f compose.produccion.yaml "$@"; }
+```
+
+## 0. Despliegue automático con `deploy.sh`
+
+Feature 012, US12. Ensayado en local con una web anterior simulada (ver `docs/ESTADO_PROYECTO.md`).
+
+**Primera vez** (como root o con `sudo`):
+
+```bash
+git clone https://github.com/jrcosio/trailcorremosadriana_v3.git /srv/trail-v3
+# desde tu ordenador, el .env de producción preparado para la MV:
+scp .env.produccion <usuario>@<mv>:/srv/trail-v3/.env
+# en la MV:
+cd /srv/trail-v3 && sudo ./deploy.sh
+```
+
+**Cada actualización**: `cd /srv/trail-v3 && sudo ./deploy.sh`. El script descarga el código nuevo
+y, si `deploy.sh` ha cambiado, se relanza con la versión nueva.
+
+**Qué hace, en orden** (se puede repetir sin riesgo):
+
+1. Comprueba Docker y Compose 2.24 o posterior, el `.env` (lo deja con permisos 600) y la
+   configuración de producción.
+2. Descarga el código (`git pull --ff-only`). Se detiene si hay cambios locales en archivos del
+   repositorio. `--sin-descargar` se salta este paso.
+3. Si ya hay una base en marcha, hace una copia (`infra/scripts/backup.sh`) en `COPIAS_DIR`.
+4. Construye las imágenes, arranca la base y aplica las migraciones.
+5. **Solo si la base está vacía** (sin ediciones):
+   - importa los datos aprobados;
+   - importa las 3 clasificaciones de 2026, que busca en `CSV_2026_DIR` o en la carpeta de la web
+     anterior (`datos/2026`). Si no las encuentra, avisa: se pueden subir desde el panel.
+
+   Con datos, no importa nada ni sobrescribe.
+6. Si no hay ninguna cuenta del panel, crea `ADMIN_USUARIO` con `ADMIN_PASSWORD`. Si ya hay
+   cuentas, no cambia ninguna contraseña.
+7. Detecta otra web (otro proyecto de Docker) que ocupe los puertos 80/443, como la v2, y la para
+   con `docker compose down`, **sin `-v`**, así que sus datos se conservan. Anota cuál era en
+   `.despliegue/web-anterior`. Si los puertos los ocupa un programa que no es Docker, se detiene
+   sin arrancar.
+8. Arranca la web y espera hasta 180 s (`DEPLOY_ESPERA`) a que
+   `https://<dominio>/api/ready` responda «disponible», con su certificado. **Si no responde y
+   había parado la web anterior, la vuelve a arrancar** y termina con error: la web nueva queda
+   parada con sus datos.
+9. Repite las comprobaciones de la sección 6 e informa de cada una:
+   - HTTP a HTTPS y `www` al dominio principal;
+   - las cabeceras de seguridad;
+   - 404 en `/no-existe` y en `/pantallas`;
+   - el esquema en `head`;
+   - el emisor del certificado.
+10. Programa la copia diaria a las 04:00 en el crontab de quien lo ejecuta y conserva 14 días; el
+    registro queda en `COPIAS_DIR/copias.log`. No duplica la tarea ni toca las demás. Con
+    `COPIAS_PROGRAMADAS=no`, no la programa. Al final, borra las imágenes de Docker huérfanas.
+
+Al terminar muestra la dirección de la web y del panel, el usuario y la orden exacta para volver a
+la web anterior. Cada ejecución deja su registro en `COPIAS_DIR/despliegue-AAAAMMDD-HHMMSS.log`.
+
+**Variables del `.env` que solo usa `deploy.sh`** (Compose no las pasa a los contenedores):
+
+| Variable | Uso |
+|---|---|
+| `ADMIN_USUARIO`, `ADMIN_PASSWORD` | Cuenta del panel que se crea si no hay ninguna. Después se puede borrar `ADMIN_PASSWORD` del `.env` |
+| `COPIAS_DIR` | Copias y registros (por defecto `/srv/copias-trail`) |
+| `COPIAS_PROGRAMADAS` | `si` (por defecto) o `no` |
+| `WEB_ANTERIOR_DIR`, `CSV_2026_DIR` | Solo si no detecta sola la carpeta de la web anterior o los CSV |
+
+**Volver a la web anterior** (lo que imprime el script al final):
+
+```bash
+cd /srv/trail-v3 && docker compose -f compose.yaml -f compose.produccion.yaml down
+cd <carpeta de la v2> && docker compose -p <proyecto de la v2> up -d
 ```
 
 ## 1. Requisitos
@@ -141,6 +212,8 @@ dc up -d
 
 ## 8. Actualizar a una versión nueva
 
+Con `sudo ./deploy.sh` (sección 0) estos pasos se hacen solos. A mano:
+
 1. Haz una copia (sección 7).
 2. Descarga el código: `git pull` o la etiqueta de la versión.
 3. Construye y migra:
@@ -206,6 +279,9 @@ El ensayo se hizo en la máquina de desarrollo, sin servidor ni dominio real:
 | Entorno de desarrollo | Intacto tras la retirada |
 
 ## 12. Migración desde la web anterior en la misma MV
+
+> `deploy.sh` (sección 0) hace esta migración entera, con la vuelta atrás automática si la web
+> nueva no responde. Esta sección queda como referencia del procedimiento manual.
 
 La web anterior (v2) se ejecuta en la MV con su propio `docker-compose.yml`: un servicio `app` y
 un `caddy` que ocupa los puertos 80/443 y tiene los certificados de `trailpeñasagra.com`. Las dos

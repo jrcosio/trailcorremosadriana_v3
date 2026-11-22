@@ -469,3 +469,40 @@ hay credenciales. Para cada `<img>` de foto comprueba:
     corregidos.
   - Cambiar los textos de la organización desde una migración: son datos que se editan en el
     panel, y la constitución (IV) prohíbe sobrescribirlos sin una acción explícita.
+
+## R12. Despliegue automático con `deploy.sh` (US12)
+
+- **Problema**: el cambio de la v2 a la v3 en la MV y cada actualización exigían repetir a mano
+  unas 15 órdenes (§12 de `docs/operacion.md`), en un orden concreto.
+- **Decisión**: un `deploy.sh` en la raíz, idempotente, que encadena los pasos de la guía.
+  Reutiliza lo que ya existe:
+  - `compose.produccion.yaml`;
+  - las órdenes de `app.cli`: `importar-inicial`, `importar-clasificacion`,
+    `crear-admin --password-stdin` y `listar-admins`;
+  - `infra/scripts/backup.sh`.
+- **Detalles**:
+  - **El `.env` no se ejecuta**: se lee línea a línea. Los secretos del panel no llegan a los
+    contenedores, porque Compose solo pasa las variables que nombra.
+  - **Base vacía**: se detecta con `count(*) FROM ediciones`. Con datos no se importa nada
+    (constitución IV). `importar-inicial` solo rellena partes vacías, pero en una base en uso
+    volvería a crear, por ejemplo, unos patrocinadores borrados a propósito.
+  - **Web anterior**: se detecta por los puertos 80/443 publicados por otro proyecto de Compose,
+    con sus etiquetas `com.docker.compose.project` y `working_dir`. Se para con `down` sin `-v`.
+    Esa carpeta permite encontrar los CSV de 2026 (`datos/2026`), donde los tiene la v2.
+  - **Espera**: `https://<dominio>/api/ready` con `curl --resolve` a 127.0.0.1, que comprueba a
+    la vez la API, Caddy y el certificado. Si no responde y se paró la v2, la vuelve a arrancar.
+  - **Actualización del propio script**: si `git pull` cambia `deploy.sh`, se relanza la versión
+    nueva (`exec`, con una variable de guarda).
+  - **Compatibilidad**: bash 3.2 o posterior (`${@+"$@"}` y variables entre llaves cuando les
+    sigue un carácter no ASCII) y `shellcheck` sin avisos.
+- **Fallos encontrados en el ensayo y corregidos**:
+  - con bash 3.2, «$ADMIN_USUARIO»» tomaba la comilla de cierre como parte del nombre de la
+    variable;
+  - leer y escribir el crontab en la misma tubería podía perder las demás tareas: ahora se lee la
+    tabla antes de escribirla.
+- **Alternativas descartadas**:
+  - **Restaurar una copia del Docker local**: el propietario eligió una instalación limpia.
+  - **Pedir la contraseña del panel en pantalla**: el propietario quiere que lo haga todo. Se
+    genera y va en el `.env`, solo en la MV.
+  - **Instalar Docker desde el script**: es invasivo, y la MV ya lo tiene por la v2. Si falta, el
+    script lo dice.

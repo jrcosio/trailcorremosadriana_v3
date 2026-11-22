@@ -30,3 +30,6 @@ frontend/capturas/
 frontend/test-results/
 frontend/playwright-report/
 copias/
+
+# Estado local de deploy.sh en la MV
+.despliegue/

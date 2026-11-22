@@ -304,6 +304,33 @@ de los metadatos; `verificar-titulo.mjs --comparar capturas/titulo-antes-012.jso
 - [X] T061 [US11] Registrar la decisión P13 en `docs/referencia/DISCREPANCIAS.md` y actualizar
   `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`.
 
+## Phase 3j: User Story 12 — Despliegue automático con `deploy.sh` (P1)
+
+**Goal**: en la MV basta con descargar el repositorio, copiar el `.env` y ejecutar `./deploy.sh`,
+tanto la primera vez como en cada actualización.
+
+**Independent Test**: el ensayo local de `quickstart.md` (US12).
+
+- [X] T062 [US12] Crear `deploy.sh` en la raíz con los pasos de R12: comprobaciones, descarga y
+  relanzado, copia previa, construcción y esquema, datos en una base vacía, cuenta del panel,
+  web anterior, arranque con espera y vuelta atrás, comprobaciones de §6, copia diaria y resumen.
+  Pasarle `bash -n` y `shellcheck`.
+- [X] T063 [P] [US12] Generar `.env.produccion` (ignorado por Git) con secretos aleatorios, el
+  dominio en *punycode*, almacenamiento local y la cuenta `organizacion`. Añadir `.despliegue/` a
+  `.gitignore`.
+- [X] T064 [US12] Ensayo local en el scratchpad con un *bare* como origen, un clon limpio, una v2
+  simulada en 80/443 con los CSV y un dominio `.localhost`. Casos:
+  - primera ejecución;
+  - segunda;
+  - actualización con relanzado;
+  - fallo forzado (`DEPLOY_ESPERA=0`) con vuelta atrás;
+  - copia programada con un `crontab` simulado;
+  - poda de copias de más de 14 días.
+
+  Retirar el ensayo y comprobar que el Docker de desarrollo sigue intacto.
+- [X] T065 [US12] Documentar la sección 0 de `docs/operacion.md` (con avisos en §8 y §12) y el
+  `README.md`. Actualizar `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`.
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -323,8 +350,9 @@ de los metadatos; `verificar-titulo.mjs --comparar capturas/titulo-antes-012.jso
   T051 → T052 → T053.
 - **US11**: T054 (revisión) → T055 [P], T056 [P] y T057 [P] (referencia y pruebas que fallan
   antes del cambio) → T058 → T059 → T060 → T061.
+- **US12**: T062 → T063 [P] → T064 → T065.
 
 ## Implementation Strategy
 
-- **Alcance**: hasta ahora, las US1–US11 completas. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US12…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US12 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US13…) de esta misma feature.
