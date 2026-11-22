@@ -412,3 +412,60 @@ hay credenciales. Para cada `<img>` de foto comprueba:
   - `scripts/verificar-podio.mjs`, reescrito. Calcula el podio esperado leyendo todas las páginas
     de la API y lo compara en 5 anchos sin filtros, y con «Femenino», «Masculino», «Senior F» y la
     búsqueda de la campeona en las 3 pruebas.
+
+## R11. «PEÑASAGRA» con Ñ y revisión ortográfica (US11, decisión P13)
+
+- **Título**: la portada escribía «PENASAGRA» porque la referencia aprobada pedía ese literal. El
+  propietario lo corrige. Los tres archivos de Barlow Condensed (600, 700 y 800) incluyen la Ñ y
+  todas las vocales con tilde (comprobado con fontTools), así que no hace falta otra fuente ni
+  cambiar el estilo. Solo cambia la letra en `Site.tsx`.
+- **Riesgo medido**: con un interlineado de 0,91, la virgulilla de la Ñ queda cerca de la línea
+  «TRAIL». `verificar-titulo.mjs` calcula la separación con las métricas reales de la fuente
+  (alto de la Ñ y lo que baja «TRAIL») y comprueba que no se invaden. También comprueba que la
+  caja del título y de cada línea no se mueve.
+- **Método de la revisión**:
+  - textos de 56 vistas con Playwright: públicas, cada noticia, prueba y álbum, y todas las vistas
+    del panel, con las escrituras abortadas;
+  - para cada vista: el texto, los atributos `alt`, `aria-label`, `title` y `placeholder`, el
+    título y la descripción de la página;
+  - las cadenas de `frontend/src` y `backend/app` que no aparecen en esas vistas: errores,
+    avisos, validaciones y CLI;
+  - un diccionario español (`pyspellchecker`, solo para la revisión, sin añadirlo al proyecto)
+    señala 859 palabras desconocidas. Se revisan a mano, igual que todas las apariciones de las
+    palabras que cambian con la tilde (esta/está, solo, mas/más, si/sí, tu/tú, que/qué, como/cómo,
+    publica/pública…).
+- **Errores encontrados**:
+  1. El título «PENASAGRA».
+  2. El panel forma textos con el nombre interno de la sección (`galeria`) y con un nombre sin
+     artículo:
+     - «Buscar galeria…» y «Volver a galeria»;
+     - «Información del noticia» e «Información del prueba»;
+     - «Añade noticia y publícalo cuando esté listo.».
+  3. Los nombres accesibles de las subidas: «Subir Imagen de portada», con mayúscula.
+  4. Los errores de longitud del CSV, en el navegador y en el servidor: «“category” admite hasta
+     150 caracteres.», con el nombre interno en inglés.
+  5. Los textos de ayuda del contacto «Cómo te llamas» y «Sobre qué quieres hablar», preguntas
+     directas sin signos.
+  6. La descripción del álbum «Fotografías de Volver a sentir la montaña (2026).», con el título
+     sin comillas.
+- **Corrección**:
+  - `lib/textosPanel.ts` (nuevo) reúne, para cada sección, el nombre de la lista y el del
+    elemento, con su género. De ahí salen el buscador, la vuelta, el bloque del formulario y la
+    lista vacía. `Admin.tsx` deja de usar el nombre interno en los textos.
+  - Las subidas usan `etiquetaSubida(label)`: «Subir» y la etiqueta en minúscula.
+  - El CSV nombra el campo con la etiqueta que ya usa el asistente de columnas: «Categoría»,
+    «Club», «Tiempo», «Sexo», «Estado».
+- **Sin cambios**:
+  - los contenidos de la organización (noticias, pruebas, reglamento, álbumes y patrocinadores):
+    sin faltas;
+  - los datos oficiales: participantes, clubes, categorías y nombres de archivo;
+  - las direcciones y los identificadores;
+  - la plantilla CSV, con cabeceras sin tildes a propósito;
+  - textos correctos que el diccionario no conoce: «Sénior», «Choví», «Busneu», «Carandía»…
+- **Alternativas descartadas**:
+  - Añadir al proyecto un corrector ortográfico automático: el diccionario disponible desconoce
+    plurales y formas verbales corrientes (859 avisos para unas 20 000 letras de texto) y obligaría
+    a mantener una lista de excepciones muy larga. La regresión la cubren pruebas de los textos
+    corregidos.
+  - Cambiar los textos de la organización desde una migración: son datos que se editan en el
+    panel, y la constitución (IV) prohíbe sobrescribirlos sin una acción explícita.

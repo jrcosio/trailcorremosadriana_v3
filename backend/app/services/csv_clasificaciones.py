@@ -24,6 +24,7 @@ CAMPOS = (
     ("gender", "Sexo", False),
     ("status", "Estado", False),
 )
+ETIQUETAS = {campo: etiqueta for campo, etiqueta, _ in CAMPOS}
 ALIAS = {
     "position": [
         "posicion",
@@ -282,12 +283,13 @@ def mapear(tabla: TablaCsv, mapeo: dict[str, int]) -> list[dict]:
             "gender": leer("gender"),
             "status": estado,
         }
+        # Feature 012 · US11 (decisión P13): el error nombra el campo en español.
         for clave in ("category", "club"):
             if len(fila[clave]) > 150:
-                raise fallo(f"«{clave}» admite hasta 150 caracteres.")
+                raise fallo(f"«{ETIQUETAS[clave]}» admite hasta 150 caracteres.")
         for clave in ("time", "gender", "status"):
             if len(fila[clave]) > 60:
-                raise fallo(f"«{clave}» admite hasta 60 caracteres.")
+                raise fallo(f"«{ETIQUETAS[clave]}» admite hasta 60 caracteres.")
         filas.append(fila)
     # Orden estable por posición; los no clasificados al final (igual que el cliente).
     return sorted(filas, key=lambda f: (f["position"] is None, f["position"] or 0))

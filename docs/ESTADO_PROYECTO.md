@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-21
+Última actualización: 2026-11-22
 
 ## Punto de continuidad
 
@@ -149,6 +149,31 @@
     - `verificar-podio` contra un oráculo que lee todas las páginas de la API: 18 filas sin
       filtros y 11 casos con filtro o búsqueda;
     - clasificaciones, axe público y del panel, rutas, cierre y fotos, correctos.
+- **US11 terminada** (decisión P13: «PEÑASAGRA» con Ñ y textos bien escritos):
+  - Título: la portada decía «PENASAGRA», el literal de la referencia aprobada. Ahora dice «TRAIL
+    PEÑASAGRA». Barlow Condensed tiene la Ñ, así que no cambian la fuente, el tamaño, el color ni
+    la caja (0 px de diferencia en 5 anchos). La virgulilla queda a 0,7–1,4 px de «TRAIL», sin
+    tocarla.
+  - Constitución 1.0.1 (principio I) y referencia anotada.
+  - Revisión ortográfica: 56 vistas (públicas y del panel, sin escrituras) y los mensajes del
+    código. Corregido:
+    - en el panel, «Buscar galeria…», «Volver a galeria», «Información del noticia» y «Añade
+      noticia y publícalo…», ahora con `lib/textosPanel.ts`;
+    - las subidas, «Subir Imagen de portada» → «Subir imagen de portada»;
+    - el CSV, «“category” admite…» → «“Categoría” admite…», en el navegador y en el servidor;
+    - el contacto, «¿Cómo te llamas?» y «¿Sobre qué quieres hablar?»;
+    - el álbum, «Fotografías de “Volver a sentir la montaña” (2026).», con comillas.
+  - Los contenidos de la organización (noticias, pruebas, reglamento, álbumes y patrocinadores) no
+    tienen faltas. Una frase del reglamento se puede mejorar: «Se sancionan […] los residuos»
+    (quiere decir abandonarlos). Se le ha sugerido al propietario, que puede cambiarla desde el
+    panel.
+  - Verificación:
+    - vitest: 121 (17 nuevas); pytest: 399 (5 nuevas y 1 ajustada), que fallaban antes;
+    - `verificar-titulo` contra la referencia previa;
+    - la segunda revisión no encuentra ninguno de los errores;
+    - axe público (17 rutas) y del panel (69 vistas): 0;
+    - capturas: solo cambian la virgulilla del título y los textos de ayuda del contacto;
+    - rutas, cierre, respaldo y evento y pruebas, correctos.
 - **Dato cambiado fuera de las verificaciones**: la noticia «Peñasagra 2027 ya está en el
   horizonte» (`proxima-edicion`) pasó a no publicada a las 15:52 (hora peninsular) del
   2026-11-21. Fue entre el push y el inicio de la US10, cuando no se ejecutó ningún script de
@@ -157,8 +182,8 @@
 - **Publicación**: las US1–US9 están en GitHub. El 2026-11-21, a petición del propietario, se
   subieron `main` (56ccde5) y `012-ajustes-revision` (446dd14). Para actualizar la MV:
   `cd /srv/trail-v3 && git pull && dc build web && dc up -d web`. Los siguientes push, solo cuando
-  el propietario los pida. La US10 está solo en local, en `012-ajustes-revision` y fusionada en
-  `main`. Al publicarla, en la MV hay que reconstruir **api y web**:
+  el propietario los pida. Las US10 y US11 están solo en local, en `012-ajustes-revision` y fusionadas
+  en `main`. Al publicarlas, en la MV hay que reconstruir **api y web**:
   `git pull && dc build api web && dc up -d api web`.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV siguiendo `docs/operacion.md` §12. El código ya está en
@@ -214,6 +239,7 @@
 | 2026-11-20 | Reglamento por edición con respaldo a la edición más reciente que lo tenga; la referencia de 2026 se asocia a su edición | 010 research R1/R2 |
 | 2026-11-20 | Contacto en una configuración de fila única; «Imanol» y «Plaza de Cosío» siguen fijos; el usuario de Instagram se deriva del enlace | 010 research R4/R7, DISCREPANCIAS C2 |
 | 2026-11-20 | Se retira `PUT /api/content`; un cambio sin recurso se rechaza en el cliente | 010 research R6, DISCREPANCIAS M1 |
+| 2026-11-22 | Título de la portada «TRAIL PEÑASAGRA», con Ñ (constitución 1.0.1); revisión ortográfica de la web y del panel; los contenidos de la organización no se tocan desde el código | Propietario (P13), 012 research R11 |
 | 2026-11-21 | Podio por sexo (3 + 3 sin filtros) y por categoría al filtrar, calculado en el servidor sin la búsqueda; etiqueta junto al nombre y «Pos.» con la posición general | Propietario (P12, con las dos preguntas respondidas), 012 research R10 |
 | 2026-11-21 | Contraste AA también en el panel con la sesión iniciada: cabeceras de tabla y pie del panel en `--muted` | Propietario (P4, confirmado para el panel), 012 research R9 |
 | 2026-11-21 | Logotipo oficial en negativo en la barra lateral del panel (con «ADMINISTRACIÓN») y en el acceso; favicon sin cambios | Propietario (P11), 012 research R8 |
@@ -369,6 +395,10 @@
 | 2026-11-21 | 012 | US10 (P12): pytest de la consulta (5 nuevas: sexo, filtro de sexo, categoría, búsqueda, sin sexo) y vitest `podio.test.tsx` (16), antes y después | Antes: `KeyError: 'podium'` y `rangosPodio` inexistente. Después: pytest 394 passed y vitest 104 passed |
 | 2026-11-21 | 012 | US10: `verificar-podio.mjs` contra un oráculo que lee todas las páginas de la API (5 anchos, y a 1440 y 360 px con «Femenino», «Masculino», «Senior F» y la búsqueda de la campeona en las 3 pruebas) | Antes: 326 problemas (sin podio femenino y con la medalla). Después: 18 filas sin filtros (3 + 3 por prueba) y 11 casos con filtro o búsqueda correctos; 144 filas del podio con su etiqueta; contraste mínimo 5,68:1; sin desbordamientos. Información: 5 filas que no son del podio cambian de salto de línea a 1024 y 1440 px |
 | 2026-11-21 | 012 | US10: `verificar-clasificaciones`, axe público (17 rutas), `verificar-panel-aa` (69 vistas), capturas, rutas, cierre y fotos | Todo correcto. Capturas: cambian las 4 de clasificaciones (podio) y las 8 de inicio y noticias, por la noticia despublicada a las 15:52, no por el código |
+| 2026-11-22 | 012 | US11 (P13): revisión ortográfica de 56 vistas (Playwright, escrituras abortadas) y de los mensajes de `frontend/src` y `backend/app`, con diccionario español y revisión a mano | 6 tipos de error (research R11); contenidos de la organización sin faltas |
+| 2026-11-22 | 012 | US11: vitest `ortografia.test.tsx` (17) y pytest (5 nuevas en `test_csv.py` y `test_meta.py` ajustada), antes y después | Antes: módulo inexistente y «category» en el error. Después: vitest 121 passed y pytest 399 passed; ruff correcto |
+| 2026-11-22 | 012 | US11: `verificar-titulo.mjs` a 320/360/768/1024/1440 px contra `capturas/titulo-antes-012.json` | Antes: falla (sin Ñ). Después: «TRAIL PEÑASAGRA» en Barlow Condensed, mismo tamaño y color, caja con 0 px de diferencia, sin desbordamiento; virgulilla a 0,7–1,4 px de «TRAIL», sin invadirla |
+| 2026-11-22 | 012 | US11: segunda revisión, axe público (17 rutas) y del panel (69 vistas), capturas (44), rutas, cierre, respaldo y evento y pruebas | Ningún error de la lista; axe 0; capturas: solo cambian la virgulilla (dentro de la caja del título) y el contacto. Rutas: 40/42; fallan `/noticias` y `/noticias/proxima-edicion` porque la noticia sigue despublicada (dato, no código) |
 | 2026-11-20 | 011 | `/speckit-converge` | 1.ª pasada: T022 (cierre en ROADMAP y estado) y T023 (`research` R3 alineado con `verificar-copia.sh`); 2.ª pasada: Converged |
 | 2026-11-20 | 010 | `analyze`: 0 críticos/HIGH; 1 MEDIUM (captura de referencia de SC-005) y 2 LOW corregidos antes de implementar | OK |
 | 2026-11-20 | 010 | ruff; pytest (PostgreSQL real): reglamento de 200 000 caracteres, CRLF, respaldo, versión compartida, contacto válido/no válido, alta concurrente, importación sin pisar datos, 405 | **355 passed** (tras la convergencia) |

@@ -14,7 +14,7 @@ No sustituir fotografías reales de la carrera por corredores genéricos o imág
 | Verde profundo | `#10241e` | Pie de página |
 | Naranja principal | `#dc6537` | Botones y acentos |
 | Naranja oscuro | `#b64b24` | Hover y acentos de texto |
-| Naranja del título | `#ed834e` | «PENASAGRA» en la portada |
+| Naranja del título | `#ed834e` | «PEÑASAGRA» en la portada |
 | Naranja de la silueta | `#f1a074` | Silueta de Adriana |
 | Terracota solidaria | `#ba4b2e` | Bloque destacado del dorsal en portada |
 | Texto secundario | `#66716b` | Explicaciones y metadatos |
@@ -35,7 +35,7 @@ Los valores exactos están en `proyecto/app/globals.css`. Conservar contraste de
 ## Portada aprobada
 
 - Cabecera blanca con logo y enlaces; botón fijo de texto **INSCRIPCIONES**.
-- Título en dos líneas: **TRAIL** en blanco y **PENASAGRA** en naranja. Esta escritura literal fue solicitada por el propietario.
+- Título en dos líneas: **TRAIL** en blanco y **PEÑASAGRA** en naranja. Esta escritura literal fue solicitada por el propietario. *(Decisión P13 del propietario, 2026-11-22: se escribe «PEÑASAGRA», con Ñ; antes, «PENASAGRA».)*
 - Tamaño ampliado: regla principal `clamp(5.4rem, 9vw, 8.7rem)`, con ajustes específicos por anchura.
 - Paisaje original con capas oscuras para asegurar lectura.
 - «Corremos por Adriana.» ampliado, junto a la silueta aportada por el propietario; ya no lleva un corazón.
@@ -57,6 +57,6 @@ Los valores exactos están en `proyecto/app/globals.css`. Conservar contraste de
 
 Contenedor principal de unos 1200 px, márgenes amplios y secciones de 80 px en escritorio; cerca de 48 px en móvil. Radios bajos, sombras suaves y bordes discretos. Puntos de adaptación presentes: 1200, 1000, 700 y 480 px, con ajustes para pantallas grandes.
 
-La apariencia final debe comprobarse a 360, 768, 1024 y 1440 px. Evitar desbordamiento de «PENASAGRA», de la frase solidaria, de tablas y de URLs largas. En pantallas estrechas las tablas pueden tener desplazamiento horizontal local.
+La apariencia final debe comprobarse a 360, 768, 1024 y 1440 px. Evitar desbordamiento de «PEÑASAGRA», de la frase solidaria, de tablas y de URLs largas. En pantallas estrechas las tablas pueden tener desplazamiento horizontal local.
 
 Respetar `prefers-reduced-motion`, foco visible, etiquetas de formularios y navegación por teclado. Evitar animaciones continuas decorativas.

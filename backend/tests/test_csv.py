@@ -93,6 +93,27 @@ def test_filas_no_validas(cambio, mensaje):
         _filas(cambio(PLANTILLA))
 
 
+@pytest.mark.parametrize(
+    ("columna", "valor", "mensaje"),
+    [
+        (5, "C" * 151, "«Categoría» admite hasta 150 caracteres."),
+        (6, "C" * 151, "«Club» admite hasta 150 caracteres."),
+        (4, "1" * 61, "«Tiempo» admite hasta 60 caracteres."),
+        (7, "F" * 61, "«Sexo» admite hasta 60 caracteres."),
+        (8, "R" * 61, "«Estado» admite hasta 60 caracteres."),
+    ],
+)
+def test_longitud_con_el_campo_en_espanol(columna, valor, mensaje):
+    """Feature 012 · US11 (P13): el error nombra el campo en español, no con su clave interna."""
+    lineas = PLANTILLA.splitlines()
+    celdas = lineas[1].split(";")
+    celdas[columna] = valor
+    lineas[1] = ";".join(celdas)
+    with pytest.raises(CsvNoValido) as error:
+        _filas("\n".join(lineas) + "\n")
+    assert str(error.value) == f"Fila de datos 1: {mensaje}"
+
+
 def test_mapeo_obligatorio_y_columnas_distintas():
     tabla = leer_csv(PLANTILLA)
     with pytest.raises(CsvNoValido, match="Posición"):

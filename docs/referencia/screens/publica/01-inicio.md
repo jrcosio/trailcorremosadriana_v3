@@ -13,7 +13,7 @@ Presentar la carrera, su causa y la próxima edición; llevar a pruebas, inscrip
 ## Composición y contenido
 
 - Cabecera blanca con logo y navegación; botón «INSCRIPCIONES».
-- Paisaje original; título grande en dos líneas «TRAIL / PENASAGRA».
+- Paisaje original; título grande en dos líneas «TRAIL / PEÑASAGRA». *(Decisión P13 del propietario, 2026-11-22: se escribe «PEÑASAGRA», con Ñ; antes, «PENASAGRA».)*
 - Frase ampliada «Corremos por Adriana.» y silueta naranja enviada por el propietario.
 - Cuenta atrás lateral o apilada, sin el rótulo de marca/edición que se retiró de encima.
 - Franja de fecha y ubicación; tres tarjetas fotográficas de pruebas con distancia y desnivel.

@@ -6,6 +6,7 @@ export const resultFields = [
   ['club', 'Club', false], ['gender', 'Sexo', false], ['status', 'Estado', false],
 ] as const;
 export type ResultField = typeof resultFields[number][0];
+const etiquetaCampo = Object.fromEntries(resultFields.map(([campo, etiqueta]) => [campo, etiqueta])) as Record<ResultField, string>;
 export type ColumnMapping = Partial<Record<ResultField, number>>;
 // `podium`: puesto en el podio (1–3) que da la consulta pública del servidor (feature 012, US10).
 export type ClassificationRow = { position: number | null; bib: string; name: string; time: string; category: string; club: string; gender: string; status: string; podium?: number | null };
@@ -125,8 +126,9 @@ export function mapClassification(table: CsvTable, mapping: ColumnMapping): Clas
     if (position !== null && !time) fail('falta el tiempo de un participante clasificado.');
     if (position === null && (!status || status === '-')) fail('indica un estado (por ejemplo, DNF) para un participante sin posición.');
     const row = { position, bib, name, time, category: read('category'), club: read('club'), gender: read('gender'), status };
-    for (const key of ['category', 'club'] as const) if (row[key].length > 150) fail(`«${key}» admite hasta 150 caracteres.`);
-    for (const key of ['time', 'gender', 'status'] as const) if (row[key].length > 60) fail(`«${key}» admite hasta 60 caracteres.`);
+    // Feature 012 · US11 (decisión P13): el error nombra el campo en español, como el asistente de columnas.
+    for (const key of ['category', 'club'] as const) if (row[key].length > 150) fail(`«${etiquetaCampo[key]}» admite hasta 150 caracteres.`);
+    for (const key of ['time', 'gender', 'status'] as const) if (row[key].length > 60) fail(`«${etiquetaCampo[key]}» admite hasta 60 caracteres.`);
     return row;
   }).sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
 }

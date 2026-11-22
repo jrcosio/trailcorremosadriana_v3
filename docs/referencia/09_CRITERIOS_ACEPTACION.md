@@ -2,7 +2,7 @@
 
 ## Presentación
 
-- El título de portada conserva «TRAIL PENASAGRA», mayor que en la primera propuesta.
+- El título de portada conserva «TRAIL PEÑASAGRA», mayor que en la primera propuesta. *(Decisión P13 del propietario, 2026-11-22: se escribe «PEÑASAGRA», con Ñ; antes, «PENASAGRA».)*
 - La frase «Corremos por Adriana.» tiene la silueta enviada, está ampliada y no muestra el corazón anterior.
 - El botón de cabecera dice «INSCRIPCIONES» y abre esa página.
 - No aparece el rótulo retirado sobre el contador.

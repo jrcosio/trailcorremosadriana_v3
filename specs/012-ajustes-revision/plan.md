@@ -65,7 +65,16 @@ US10 (decisión P12): podio por sexo y por categoría.
 - La tabla muestra una etiqueta junto al nombre («1.ª mujer») en lugar de la medalla, y «Pos.»
   conserva la posición general.
 
-Detalle en [research.md](research.md) (R4, R5, R6, R7, R8, R9 y R10).
+US11 (decisión P13): el título de la portada pasa a «TRAIL PEÑASAGRA», con Ñ, en la misma fuente
+y la misma caja. Una revisión ortográfica de las 56 vistas y de los mensajes del código corrige:
+
+- los textos del panel formados con el nombre interno de la sección (`lib/textosPanel.ts`);
+- los nombres accesibles de las subidas;
+- los errores del CSV con el campo en inglés;
+- dos preguntas sin signos en el contacto;
+- las comillas de la descripción de un álbum.
+
+Detalle en [research.md](research.md) (R4, R5, R6, R7, R8, R9, R10 y R11).
 
 ## Technical Context
 
@@ -104,13 +113,20 @@ escrituras interceptadas).
   `ClassificationTable.tsx` y `ajustes.css` A-007.
 - Pruebas y contrato: `tests/podio.test.tsx`, `scripts/verificar-podio.mjs` y el contrato de la
   006.
+**US11**:
+- Frontend: `Site.tsx` (título y contacto), `lib/textosPanel.ts` (nuevo), `Admin.tsx` y
+  `lib/classifications.ts`.
+- Backend: `services/csv_clasificaciones.py` y `services/meta.py`, sin cambios de API ni de datos.
+- Pruebas: `tests/ortografia.test.tsx` (nuevo), pytest y `scripts/verificar-titulo.mjs` (nuevo,
+  con referencia previa).
+- Gobierno: constitución 1.0.1 (principio I: «TRAIL PEÑASAGRA»).
 
 ## Constitution Check
 
 | Principio | Cumplimiento | Estado |
 |---|---|---|
 | I | Cambio visual ordenado por el propietario (P6); marcos y diseño sin mover; capturas antes y después | ✅ |
-| I (US3) | Cambio de marca ordenado por el propietario (P7). La cabecera conserva su altura y la posición de la navegación y de «INSCRIPCIONES»; el título literal «TRAIL PENASAGRA» de la portada no cambia. Capturas antes y después | ✅ |
+| I (US3) | Cambio de marca ordenado por el propietario (P7). La cabecera conserva su altura y la posición de la navegación y de «INSCRIPCIONES»; el título literal «TRAIL PENASAGRA» de la portada no cambia (la US11 lo corrige a «PEÑASAGRA», decisión P13). Capturas antes y después | ✅ |
 | IV (US3) | Procedencia del logotipo en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
 | I (US4) | Cambio de marca ordenado por el propietario (P8). La cabecera no cambia y las columnas 2.ª–4.ª del pie conservan su posición horizontal. Solo baja el resto de la primera columna, lo que crece el logotipo. Capturas antes y después | ✅ |
 | IV (US4) | Procedencia de la versión en negativo (derivada de `new_logo.png`) en `docs/PROCEDENCIA_RECURSOS.md` | ✅ |
@@ -126,6 +142,9 @@ escrituras interceptadas).
 | I (US10) | Cambio visual ordenado por el propietario (P12) con la presentación que eligió; fondos y franjas iguales | ✅ |
 | IV (US10) | Contrato de la consulta pública ampliado (`podium`), compatible: solo añade un campo | ✅ |
 | VI (US10) | El podio sale del puesto, el sexo y la categoría publicados; no se inventa nada | ✅ |
+| I (US11) | El propietario corrige el título literal (P13). Se enmienda la constitución (1.0.1) y se anota la referencia. Misma fuente, tamaño, color y caja; capturas antes y después | ✅ |
+| IV (US11) | Los contenidos de la organización no se tocan desde el código; URLs, identificadores y plantilla CSV intactos | ✅ |
+| V (US11) | vitest, pytest y Playwright (título), con pruebas que fallan antes del cambio; la revisión se repite al final | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
 | IV | URLs y recursos intactos | ✅ |
@@ -168,6 +187,12 @@ backend/app/services/clasificaciones.py (_podio) · backend/tests/test_consulta_
 frontend/src/lib/classifications.ts · frontend/src/components/ClassificationTable.tsx · frontend/src/styles/ajustes.css (A-007)
 frontend/tests/podio.test.tsx · frontend/scripts/verificar-podio.mjs
 specs/006-clasificaciones-csv/contracts/api-clasificaciones.openapi.yaml (podium)
+# US11
+frontend/src/components/Site.tsx · frontend/src/lib/textosPanel.ts (nuevo) · frontend/src/components/admin/Admin.tsx
+frontend/src/lib/classifications.ts · backend/app/services/{csv_clasificaciones,meta}.py
+frontend/tests/ortografia.test.tsx (nuevo) · backend/tests/{test_csv,test_meta}.py
+frontend/scripts/verificar-titulo.mjs (nuevo) · frontend/scripts/{verificar-rutas,verificar-respaldo,verificar-evento-carreras}.mjs
+.specify/memory/constitution.md · docs/referencia/{12_DECISIONES_APROBADAS,02_ESTILO_VISUAL,09_CRITERIOS_ACEPTACION}.md
 ```
 
 ## Complexity Tracking

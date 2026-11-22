@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4). Historia 10 (P12): «si cambio a femenino no me identifica a las tres campeonas»; podio de las tres primeras chicas y los tres primeros chicos de todas las pruebas, y también por categoría."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4). Historia 10 (P12): «si cambio a femenino no me identifica a las tres campeonas»; podio de las tres primeras chicas y los tres primeros chicos de todas las pruebas, y también por categoría. Historia 11 (P13): «en la home, como título principal en grande, pone PENASAGRA y es PEÑASAGRA; repasa para que todo esté bien escrito»."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -412,6 +412,61 @@ con una categoría, sus 3 primeros. Al buscar a la campeona por su dorsal, conse
    La etiqueta ensancha la columna del nombre. Por eso la tabla puede repartir de nuevo los anchos
    y algún texto largo (el club) puede cambiar de salto de línea.
 
+### User Story 11 - «PEÑASAGRA» con Ñ y textos bien escritos (Priority: P1)
+
+Decisión P13 del propietario: «en la home, como título principal en grande, pone PENASAGRA y es
+PEÑASAGRA; repasa para que todo esté bien escrito». El título de la portada pasa a «TRAIL» /
+«PEÑASAGRA», con el mismo tamaño, color y posición. Además se repasa la ortografía de todos los
+textos de la web pública y del panel, y se corrige lo que esté mal escrito.
+
+La revisión cubre los textos de 56 vistas, sus atributos legibles (texto alternativo, nombres
+accesibles, textos de ayuda de los campos, título y descripción de la página) y los mensajes del
+código que solo aparecen en algunos estados: errores, avisos y validaciones. Encuentra:
+
+- el título «PENASAGRA», sin Ñ;
+- en el panel, textos formados con el nombre interno de la sección: «Buscar galeria…» y «Volver a
+  galeria», sin tilde; «Información del noticia» e «Información del prueba», con el género
+  equivocado; «Añade noticia y publícalo cuando esté listo.», sin artículo y con el género
+  equivocado;
+- los nombres accesibles de los botones de subida con mayúscula a mitad de frase: «Subir Imagen
+  de portada»;
+- los errores del CSV que nombran el campo en inglés: «“category” admite hasta 150 caracteres»;
+- en el formulario de contacto, dos preguntas sin signos de interrogación: «Cómo te llamas» y
+  «Sobre qué quieres hablar»;
+- la descripción de la página de un álbum, con el título sin comillas: «Fotografías de Volver a
+  sentir la montaña (2026).».
+
+**Why this priority**: es el nombre de la carrera en el lugar más visible de la web. Los textos mal
+escritos dan una imagen descuidada de la organización.
+
+**Independent Test**: abrir la portada a 320, 360, 768, 1024 y 1440 px y leer «TRAIL PEÑASAGRA» en
+la misma caja que antes. Repetir la revisión de textos y comprobar que no queda ninguno de los
+errores encontrados.
+
+**Acceptance Scenarios**:
+
+1. **Given** la portada, **When** se muestra a cualquier ancho, **Then** el título dice «TRAIL» y
+   «PEÑASAGRA», con la Ñ dibujada en la misma fuente. Tiene el mismo tamaño, color y posición que
+   antes, sin desbordamiento, y la virgulilla no toca la línea «TRAIL».
+2. **Given** una lista del panel (noticias, galería, pruebas, patrocinadores o colaboradores),
+   **When** se abre, **Then** el buscador dice «Buscar noticias…», «Buscar galería…»… Si está
+   vacía, invita a añadir con el artículo y el género correctos: «Añade una noticia y publícala
+   cuando esté lista.», «Añade un álbum y publícalo cuando esté listo.».
+3. **Given** el alta o la edición de un elemento del panel, **When** se abre, **Then** el enlace de
+   vuelta dice «Volver a galería» y el bloque del formulario, «Información de la noticia»,
+   «Información del álbum», «Información de la prueba»…
+4. **Given** un campo de subida de archivos, **When** se lee su nombre accesible, **Then** sigue la
+   frase en minúscula: «Subir imagen de portada», «Subir track GPX».
+5. **Given** un CSV con una categoría, un club, un tiempo, un sexo o un estado demasiado largos,
+   **When** se valida en el navegador o en el servidor, **Then** el error nombra el campo en
+   español: «“Categoría” admite hasta 150 caracteres.» (con las comillas latinas de la web).
+6. **Given** el formulario de contacto, **When** se muestran sus textos de ayuda, **Then** las
+   preguntas llevan sus dos signos: «¿Cómo te llamas?» y «¿Sobre qué quieres hablar?».
+7. **Given** la página de un álbum, **When** se lee su descripción, **Then** el título del álbum va
+   entre comillas latinas: «Fotografías de “Volver a sentir la montaña” (2026).».
+8. **Given** el resto de la web, **When** se compara con la versión anterior, **Then** solo cambian
+   los textos corregidos.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -438,6 +493,14 @@ con una categoría, sus 3 primeros. Al buscar a la campeona por su dorsal, conse
 - **Categoría con los dos sexos (US10)**: su podio se calcula para cada sexo, cada uno con la
   etiqueta de la categoría y el ordinal de su género.
 - **Podio fuera de la primera página (US10)**: la etiqueta aparece igual en la página donde esté.
+- **Fuente del título que no carga (US11)**: la Ñ se dibuja con la fuente de reserva, igual que el
+  resto del título. Barlow Condensed incluye la Ñ, así que no se mezclan fuentes dentro de la
+  palabra.
+- **Contenido escrito por la organización (US11)**: las noticias, las pruebas, el reglamento, los
+  álbumes y los nombres de patrocinadores son datos que la organización edita desde el panel. Se
+  revisan, pero no se cambian desde el código.
+- **Datos oficiales (US11)**: los nombres de participantes y clubes, los valores de categoría
+  («Senior F») y los nombres de los archivos CSV importados se muestran tal como llegan.
 
 ## Requirements *(mandatory)*
 
@@ -536,6 +599,23 @@ con una categoría, sus 3 primeros. Al buscar a la campeona por su dorsal, conse
 - **FR-031**: La etiqueta MUST tener un contraste de al menos 4,5:1. Las filas que no son del podio
   MUST conservar su fondo, y la página MUST NOT desbordarse. El reparto de anchos de la tabla
   puede cambiar el salto de línea de algún texto largo.
+- **FR-032**: El título de la portada MUST decir «TRAIL» y «PEÑASAGRA», con Ñ. MUST conservar el
+  tamaño, el color, la posición y la caja de cada línea, sin desbordamiento entre 320 y 1440 px.
+  La virgulilla MUST NOT tocar la línea «TRAIL».
+- **FR-033**: Los textos del panel que dependen de la sección MUST escribirse con tildes y con el
+  artículo y el género de cada elemento:
+  - el buscador y el enlace de vuelta: «Buscar galería…», «Volver a galería»;
+  - el bloque del formulario: «Información de la noticia», «Información del álbum»;
+  - la invitación de la lista vacía: «Añade una noticia y publícala cuando esté lista.».
+- **FR-034**: El nombre accesible de cada campo de subida MUST seguir en minúscula tras «Subir»:
+  «Subir imagen de portada».
+- **FR-035**: Los errores de longitud del CSV MUST nombrar el campo con su nombre en español
+  («Categoría», «Club», «Tiempo», «Sexo», «Estado»), en el navegador y en el servidor.
+- **FR-036**: Las preguntas de los textos de ayuda del formulario de contacto MUST llevar los
+  signos de apertura y cierre. La descripción de la página de un álbum MUST poner su título entre
+  comillas latinas.
+- **FR-037**: El resto de los textos, los estilos y la disposición MUST NOT cambiar. Los contenidos
+  que edita la organización y los datos oficiales MUST NOT modificarse desde el código.
 
 ## Success Criteria *(mandatory)*
 
@@ -602,6 +682,16 @@ con una categoría, sus 3 primeros. Al buscar a la campeona por su dorsal, conse
   revisadas: todas las secciones, un elemento existente y el alta de cada colección, a 360, 1024
   y 1440 px, más los estados de guardado. Ningún dato cambia durante la revisión. Las capturas
   del panel solo difieren en el color de los textos corregidos.
+- **SC-018**: A 320, 360, 768, 1024 y 1440 px, la portada muestra «TRAIL PEÑASAGRA» en Barlow
+  Condensed:
+  - con el mismo tamaño y color, y con 0 px de diferencia en la caja del título y en la posición y
+    el alto de cada línea;
+  - el ancho de la segunda línea varía como mucho un 5 % del tamaño de letra;
+  - 0 desbordamientos, y la virgulilla no invade la línea «TRAIL».
+- **SC-019**: Una segunda revisión de los textos de las 56 vistas y de los mensajes del código no
+  encuentra ninguno de los errores corregidos. Las capturas de las páginas públicas solo difieren
+  en el título de la portada y en los textos de ayuda del formulario de contacto. Hay 0
+  incumplimientos AA en la web y en el panel.
 
 ## Assumptions
 
@@ -660,3 +750,15 @@ con una categoría, sus 3 primeros. Al buscar a la campeona por su dorsal, conse
 - **Etiqueta del podio (US10)**: «hombre» sale de los valores «Masculino», «M» u «Hombre» del CSV,
   y «mujer», de «Femenino», «F» o «Mujer». Si el CSV usa otro valor de sexo, la etiqueta lo
   muestra tal cual, con «.º».
+- **Título literal (US11)**: la constitución (principio I) y la referencia aprobada pedían el
+  título literal «TRAIL PENASAGRA». El propietario corrige ahora esa escritura: es «PEÑASAGRA».
+  Se enmienda la constitución (1.0.1) y se anota la referencia. Se mantienen las dos líneas,
+  «TRAIL» en blanco y «PEÑASAGRA» en naranja.
+- **Contenidos de la organización (US11)**: en la revisión no aparece ninguna falta de ortografía
+  en las noticias, las pruebas, el reglamento, los álbumes ni los patrocinadores. Si apareciera,
+  se comunicaría al propietario para corregirla desde el panel, porque esos textos viven en la
+  base de datos de cada instalación. Una frase del reglamento se puede mejorar en estilo: «Se
+  sancionan […] los residuos» se refiere a abandonarlos. Se le comunica como sugerencia.
+- **Plantilla CSV (US11)**: las cabeceras de la plantilla (`posicion`, `categoria`…) van sin
+  tildes a propósito. Son nombres de columna, que la importación reconoce con o sin tilde. Sin
+  tildes, la hoja de cálculo las abre bien con cualquier codificación.

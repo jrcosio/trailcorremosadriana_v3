@@ -6,7 +6,7 @@ const base = process.argv[2] ?? 'http://localhost:8080';
 const AVISO = 'No se han podido comprobar las últimas novedades';
 const browser = await navegador();
 const page = await browser.newPage();
-for (const [ruta, esperado] of [['/', 'PENASAGRA'], ['/carreras', 'Speed Trail'], ['/patrocinadores', 'Patrocinadores']]) {
+for (const [ruta, esperado] of [['/', 'PEÑASAGRA'], ['/carreras', 'Speed Trail'], ['/patrocinadores', 'Patrocinadores']]) {
   // Site.tsx no consume el cuerpo de una respuesta de error: Chromium deja esa petición abierta y
   // `networkidle` nunca llega. Se espera a la carga y al aviso de respaldo.
   await page.goto(base + ruta, { waitUntil: 'load' });

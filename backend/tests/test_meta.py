@@ -36,7 +36,8 @@ def test_noticia_publicada(admin_importado):
 def test_album_prueba_y_alias_recorridos(admin_importado):
     album = _meta(admin_importado, "/galeria/edicion-2026")
     assert _etiqueta(album, "og:title") == "Volver a sentir la montaña | Trail Peñasagra"
-    assert _etiqueta(album, "description") == "Fotografías de Volver a sentir la montaña (2026)."
+    # Feature 012 · US11 (P13): el título del álbum va entre comillas latinas.
+    assert _etiqueta(album, "description") == "Fotografías de «Volver a sentir la montaña» (2026)."
     carrera = _meta(admin_importado, "/carreras/speed-14k")
     assert _etiqueta(carrera, "og:title").endswith("| Trail Peñasagra")
     assert "14 km" in _etiqueta(carrera, "og:title")

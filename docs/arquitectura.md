@@ -106,7 +106,13 @@ repositorio.
   - A-009: contraste AA del panel con la sesión iniciada (decisión P4; feature 012, US9).
     - Las cabeceras de las tablas de listados y el pie del panel pasan a `--muted`.
     - Lo vigila `scripts/verificar-panel-aa.mjs`.
-- **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`.
+- **Textos del panel por sección** (decisión P13; feature 012, US11): `src/lib/textosPanel.ts`
+  da el nombre de la lista y del elemento de cada sección, con tilde, artículo y género. De ahí
+  salen el buscador, el enlace de vuelta, el bloque del formulario, la lista vacía y el nombre
+  accesible de las subidas. El nombre interno de la sección (`galeria`) solo se usa en rutas.
+- **Fuentes**: WOFF2 real (Barlow Condensed y Manrope, OFL), servidas desde `/fonts`. Las tres
+  variantes de Barlow Condensed incluyen la Ñ y las vocales con tilde: el título «TRAIL
+  PEÑASAGRA» de la portada (decisión P13) se dibuja entero en esa fuente.
 - **Respaldo**: `src/lib/data.ts` (semilla) se muestra si `/api/content` falla, junto con el aviso
   existente.
 

@@ -10,7 +10,7 @@ const NO_ENCONTRADA = 'Este sendero no está en el mapa.';
 const ADMIN = ['', '/noticias', '/noticias/nuevo', '/noticias/proxima-edicion', '/clasificaciones', '/clasificaciones/nuevo', '/galeria', '/galeria/nuevo', '/galeria/edicion-2026', '/recorridos', '/recorridos/nuevo', '/recorridos/trail-27k', '/patrocinadores', '/patrocinadores/nuevo', '/colaboradores', '/colaboradores/nuevo', '/inscripciones', '/evento', '/reglamento', '/ajustes'];
 // [ruta, texto que debe aparecer]
 const RUTAS = [
-  ['/', 'PENASAGRA'],
+  ['/', 'PEÑASAGRA'],
   ['/carreras', 'Trail Peñasagra'],
   ['/carreras/trail-27k', 'Trail Peñasagra'],
   ['/carreras/speed-14k', 'Speed Trail'],
