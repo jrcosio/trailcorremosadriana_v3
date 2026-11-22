@@ -29,6 +29,7 @@ actualiza todo, y sustituye a la web anterior si la encuentra. Ver la sección 0
 
 | Documento | Contenido |
 |---|---|
+| [CLAUDE.md](CLAUDE.md) | Guía para agentes de IA: reglas, flujo de trabajo, comandos y trampas conocidas |
 | [docs/ESTADO_PROYECTO.md](docs/ESTADO_PROYECTO.md) | Estado actual, decisiones, pruebas y punto de continuidad |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Features y su estado |
 | [docs/arquitectura.md](docs/arquitectura.md) | Procesos, estructura y decisiones técnicas |
