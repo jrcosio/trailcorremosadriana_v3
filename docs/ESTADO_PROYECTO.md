@@ -207,6 +207,10 @@
   el mismo día: `main` (cb15265) y `012-ajustes-revision` (63e0fa5). En la MV hay que reconstruir
   **api y web**:
   `git pull && dc build api web && dc up -d api web`.
+- **`CLAUDE.md`** (2026-11-22, a petición del propietario): guía para Claude Code en la raíz, con
+  las reglas de trabajo, el flujo de Spec Kit, los comandos, el mapa del código, las convenciones
+  y las trampas conocidas. Se comprobaron sus comandos: CLI, pytest suelto, vitest y ruff. Se
+  enlaza desde el README.
 - **Siguiente acción concreta**:
   1. El propietario despliega en la MV con `deploy.sh` (`docs/operacion.md` §0). Copia allí como
      `.env` el `.env.produccion` que se le ha entregado en su copia local.
