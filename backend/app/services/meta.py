@@ -74,7 +74,8 @@ def resolver(db: Session, ruta: str, origen: str) -> MetadatosPagina | None:
     if seccion == "galeria" and (a := _buscar(galeria.listar(db, privado=False), ident)):
         return MetadatosPagina(
             _titulo(a["title"]),
-            f"Fotografías de {a['title']} ({a['year']}).",
+            # Feature 012 · US11 (decisión P13): el título del álbum, entre comillas latinas.
+            f"Fotografías de «{a['title']}» ({a['year']}).",
             _absoluta(origen, a.get("image") or ""),
             canonica,
         )

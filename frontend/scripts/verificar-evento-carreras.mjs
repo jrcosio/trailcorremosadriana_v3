@@ -131,7 +131,7 @@ const sinGpx = !(await texto(page)).includes('Descargar GPX');
 const gpx = join(tmpdir(), 'trail-27k-verificacion.gpx');
 writeFileSync(gpx, '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="verificacion"><trk><name>Trail</name><trkseg><trkpt lat="43.2" lon="-4.5"/></trkseg></trk></gpx>');
 await page.goto(base + '/admin/recorridos/trail-27k', { waitUntil: 'networkidle' });
-await page.locator('input[type="file"][aria-label="Subir Track GPX"]').setInputFiles(gpx);
+await page.locator('input[type="file"][aria-label="Subir track GPX"]').setInputFiles(gpx);
 await page.waitForFunction(() => !document.body.innerText.includes('Subiendo…'), null, { timeout: 15000 });
 r = await guardarYEsperar(page);
 await page.goto(base + '/carreras/trail-27k', { waitUntil: 'networkidle' });

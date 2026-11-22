@@ -4,8 +4,8 @@ Esta tabla evita que una nueva sesión de desarrollo deshaga los ajustes de la p
 
 | Elemento | Decisión final |
 |---|---|
-| Título de portada | Sustituir «LA MONTAÑA NOS UNE.» por «TRAIL PENASAGRA» y aumentarlo ligeramente |
-| Color del título | «TRAIL» blanco; «PENASAGRA» naranja; dos líneas |
+| Título de portada | Sustituir «LA MONTAÑA NOS UNE.» por «TRAIL PEÑASAGRA» y aumentarlo ligeramente. *(Decisión P13 del propietario, 2026-11-22: se escribe «PEÑASAGRA», con Ñ; antes, «PENASAGRA».)* |
+| Color del título | «TRAIL» blanco; «PEÑASAGRA» naranja; dos líneas |
 | Frase de causa | «Corremos por Adriana.» más grande |
 | Icono junto a la frase | Silueta de la niña aportada por el propietario, en naranja; retirar el corazón de esa ubicación |
 | Texto sobre el contador | Eliminar «TRAIL PEÑASAGRA 2027» de esa ubicación |

@@ -152,3 +152,25 @@ Resultados esperados:
 - Al buscar a la campeona, conserva su etiqueta.
 - «Pos.» con la posición general.
 - Contraste de 4,5:1 o más y sin desbordamientos.
+
+## US11: «PEÑASAGRA» con Ñ y textos bien escritos
+
+```bash
+cd frontend && node scripts/verificar-titulo.mjs --referencia capturas/titulo-antes-012.json   # antes del cambio
+npx vitest run tests/ortografia.test.tsx
+docker compose -f compose.yaml -f compose.dev.yaml --profile test run --rm --build api-test pytest -q tests/test_csv.py tests/test_meta.py
+docker compose build api web && docker compose up -d api web
+node scripts/verificar-titulo.mjs --comparar capturas/titulo-antes-012.json
+curl -s http://localhost:8080/galeria/edicion-2026 | grep -o '<meta name="description"[^>]*>'
+```
+
+Resultados esperados:
+
+- La portada dice «TRAIL PEÑASAGRA» en Barlow Condensed, en la misma caja que antes y sin
+  desbordamiento a 320, 360, 768, 1024 y 1440 px. La virgulilla no toca «TRAIL».
+- El panel dice «Buscar galería…», «Volver a galería», «Información de la noticia» y, en una lista
+  vacía, «Añade un colaborador y publícalo cuando esté listo.».
+- Un CSV con una categoría de más de 150 caracteres da «Fila de datos N: «Categoría» admite hasta
+  150 caracteres.».
+- El contacto muestra «¿Cómo te llamas?» y «¿Sobre qué quieres hablar?», y el álbum, la descripción
+  «Fotografías de «Volver a sentir la montaña» (2026).».

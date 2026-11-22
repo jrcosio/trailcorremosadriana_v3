@@ -255,6 +255,55 @@ nombre.
 - [X] T053 [US10] Registrar la decisión P12 en `docs/referencia/DISCREPANCIAS.md` y actualizar
   `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
 
+## Phase 3i: User Story 11 — «PEÑASAGRA» con Ñ y textos bien escritos (P1)
+
+**Goal**: el título de la portada dice «TRAIL PEÑASAGRA» y no queda ninguna falta en los textos
+de la web y del panel.
+
+**Independent Test**: `npx vitest run tests/ortografia.test.tsx`; pytest de la importación CSV y
+de los metadatos; `verificar-titulo.mjs --comparar capturas/titulo-antes-012.json`.
+
+- [X] T054 [US11] Revisar la ortografía de los textos de 56 vistas (públicas y del panel, con las
+  escrituras interceptadas): textos, atributos legibles, título y descripción de cada página. Revisar
+  también los mensajes del código de `frontend/src` y `backend/app`. Usar un diccionario español y
+  revisar a mano las palabras que cambian con la tilde. Anotar los errores en `research.md` (R11).
+- [X] T055 [P] [US11] Crear `frontend/scripts/verificar-titulo.mjs`. Tomar la referencia
+  `capturas/titulo-antes-012.json` y comprobar que `--comparar` falla con la versión previa. Tomar
+  las capturas `capturas/antes-orto-012`.
+- [X] T056 [P] [US11] Crear `frontend/tests/ortografia.test.tsx`, que debe fallar antes del
+  cambio. Cubre:
+  - el título de la portada;
+  - los textos de ayuda del formulario de contacto;
+  - los textos del panel por sección (`lib/textosPanel.ts`);
+  - el nombre accesible de las subidas;
+  - el error de longitud del CSV.
+- [X] T057 [P] [US11] Añadir a `backend/tests` el error de longitud del CSV con el campo en
+  español y la descripción del álbum con comillas, y ajustar `test_meta.py`. Deben fallar antes
+  del cambio.
+- [X] T058 [US11] Corregir los textos:
+  - `Site.tsx`: título y textos de ayuda del contacto;
+  - `lib/textosPanel.ts` (nuevo) y `Admin.tsx`: buscador, vuelta, bloque del formulario, lista
+    vacía y subidas;
+  - `lib/classifications.ts` y `backend/app/services/csv_clasificaciones.py`: el campo en
+    español;
+  - `backend/app/services/meta.py`: comillas en la descripción del álbum;
+  - el comentario de `ajustes.css`.
+
+  Actualizar `verificar-rutas.mjs`, `verificar-respaldo.mjs` y `verificar-evento-carreras.mjs`.
+- [X] T059 [US11] Enmendar la constitución (1.0.1, principio I) y anotar
+  `docs/referencia/12_DECISIONES_APROBADAS.md`, `02_ESTILO_VISUAL.md`,
+  `09_CRITERIOS_ACEPTACION.md` y `screens/publica/01-inicio.md`.
+- [X] T060 [US11] Reconstruir `api` y `web` y ejecutar:
+  - pytest completo, vitest, `typecheck` y `build`;
+  - `verificar-titulo.mjs --comparar`;
+  - repetir la revisión de T054;
+  - `verificar-rutas`, `verificar-accesibilidad`, `verificar-panel-aa` y `verificar-cierre`;
+  - capturas en `capturas/despues-orto-012`, comparadas con `antes-orto-012`.
+
+  Revisión visual del título a 360 y 1440 px.
+- [X] T061 [US11] Registrar la decisión P13 en `docs/referencia/DISCREPANCIAS.md` y actualizar
+  `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`.
+
 ## Phase 4: Polish
 
 - [X] T007 Regresión: vitest, `typecheck`, `build`, `verificar-rutas`, `verificar-cierre` y `verificar-galeria`. Actualizar `docs/arquitectura.md`, `docs/ROADMAP.md` y `docs/ESTADO_PROYECTO.md`
@@ -272,8 +321,10 @@ nombre.
 - **US9**: T042 y T043 (auditoría y capturas antes del cambio) → T044 → T045 → T046.
 - **US10**: T047 [P], T048 [P] y T049 (pruebas y referencia que fallan antes del cambio) → T050 →
   T051 → T052 → T053.
+- **US11**: T054 (revisión) → T055 [P], T056 [P] y T057 [P] (referencia y pruebas que fallan
+  antes del cambio) → T058 → T059 → T060 → T061.
 
 ## Implementation Strategy
 
-- **Alcance**: hasta ahora, las US1–US10 completas. Los próximos ajustes del propietario se
-  añadirán como historias nuevas (US11…) de esta misma feature.
+- **Alcance**: hasta ahora, las US1–US11 completas. Los próximos ajustes del propietario se
+  añadirán como historias nuevas (US12…) de esta misma feature.

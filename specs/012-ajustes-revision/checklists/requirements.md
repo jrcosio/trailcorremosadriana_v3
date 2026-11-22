@@ -76,3 +76,9 @@
   con una etiqueta junto al nombre. La regla (FR-028) es objetiva y se comprueba con un oráculo
   independiente. El reajuste de columnas que causa la etiqueta se ha medido y queda escrito
   (FR-031). FR-028–FR-031 tienen escenarios en la US10.
+- Revisión (2026-11-22, US11/P13): el propietario corrige un literal que la constitución y la
+  referencia fijaban. Se enmienda la constitución (1.0.1) y se anota la referencia, sin otras
+  consecuencias. «Repasa para que todo esté bien escrito» se acota a todos los textos de la web y
+  del panel, y a los mensajes del código. Los contenidos de la organización se revisan, pero no se
+  cambian desde el código (constitución IV). Los errores encontrados se enumeran en la US11 y en
+  research R11. FR-032–FR-037 tienen escenarios en la US11, y SC-018 y SC-019 son medibles.

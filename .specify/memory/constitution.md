@@ -7,7 +7,7 @@
 - Las pantallas, URLs y decisiones aprobadas (`docs/referencia/12_DECISIONES_APROBADAS.md`,
   `02_ESTILO_VISUAL.md` y `docs/referencia/screens/`) MUST conservarse al cambiar la
   implementación.
-- MUST mantenerse: el título literal «TRAIL PENASAGRA» (TRAIL blanco, PENASAGRA naranja), la
+- MUST mantenerse: el título literal «TRAIL PEÑASAGRA» (TRAIL blanco, PEÑASAGRA naranja), la
   silueta de Adriana junto a la frase solidaria ampliada «Corremos por Adriana.», la ausencia de
   rótulo sobre el contador, el botón superior «INSCRIPCIONES» hacia `/inscripciones` y los
   logotipos de patrocinadores en tamaño grande sin recortar ni deformar.
@@ -117,4 +117,12 @@ Razón: la web informa sobre un evento real y una causa real; los datos falsos c
   diseño; cualquier excepción se justifica en su tabla de complejidad.
 - `/speckit-analyze` trata como CRÍTICO cualquier conflicto con estos principios.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-19
+Enmiendas:
+
+- **1.0.1 (2026-11-22)**: en el principio I, el título literal de la portada pasa de «TRAIL
+  PENASAGRA» a «TRAIL PEÑASAGRA», con Ñ, por instrucción del propietario (decisión P13; feature
+  012, US11). Impacto: solo cambia la escritura de esa palabra; se mantienen las dos líneas, los
+  colores y el tamaño. Los demás principios, las plantillas y los planes no cambian. Se anotan
+  `docs/referencia/12_DECISIONES_APROBADAS.md` y `02_ESTILO_VISUAL.md`.
+
+**Version**: 1.0.1 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-22

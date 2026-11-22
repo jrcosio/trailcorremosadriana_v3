@@ -50,7 +50,7 @@
 /*
  * A-003 (feature 011): a 320 y 340 px la cabecera necesitaba 342 px y desbordaba hasta 357 px.
  * Solo por debajo de 360 px (fuera de los anchos aprobados): márgenes, logotipo, texto de la
- * marca y botón de inscripción algo más compactos. «TRAIL PENASAGRA» y los textos no cambian.
+ * marca y botón de inscripción algo más compactos. «TRAIL PEÑASAGRA» y los textos no cambian.
  */
 @media (max-width: 359px) {
   .header-inner {
