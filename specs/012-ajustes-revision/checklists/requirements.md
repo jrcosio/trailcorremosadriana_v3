@@ -82,3 +82,8 @@
   del panel, y a los mensajes del código. Los contenidos de la organización se revisan, pero no se
   cambian desde el código (constitución IV). Los errores encontrados se enumeran en la US11 y en
   research R11. FR-032–FR-037 tienen escenarios en la US11, y SC-018 y SC-019 son medibles.
+- Revisión (2026-11-22, US12): el propietario fija el alcance («que el deploy haga todo») y
+  responde tres preguntas: instalación limpia con los CSV de la v2, fotos en disco y usuario
+  `organizacion`. Lo que el script no debe hacer queda escrito (FR-039): no sobrescribe datos, no
+  cambia contraseñas y no borra volúmenes. FR-038–FR-042 tienen escenarios en la US12, y SC-020 se
+  mide con el ensayo local.

@@ -19,6 +19,12 @@ docker compose run --rm api python -m app.cli importar-inicial
 docker compose up -d        # http://localhost:8080
 ```
 
+## Desplegar en el servidor
+
+Con el `.env` de producción copiado en la carpeta del repositorio: `sudo ./deploy.sh`. Instala o
+actualiza todo, y sustituye a la web anterior si la encuentra. Ver la sección 0 de
+[docs/operacion.md](docs/operacion.md).
+
 ## Documentación
 
 | Documento | Contenido |

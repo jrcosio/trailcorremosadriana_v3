@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4). Historia 10 (P12): «si cambio a femenino no me identifica a las tres campeonas»; podio de las tres primeras chicas y los tres primeros chicos de todas las pruebas, y también por categoría. Historia 11 (P13): «en la home, como título principal en grande, pone PENASAGRA y es PEÑASAGRA; repasa para que todo esté bien escrito»."
+**Input**: User description: "Ajustes que pide el propietario tras revisar la web; se irán añadiendo historias. Historia 1: «las fotos se tienen que ver completas siempre». La foto de Adriana sale con la cabeza cortada en la portada y en /solidaridad. Historia 3 (P7): logotipo nuevo en la cabecera en lugar de la silueta y el texto en dos filas. Historia 4 (P8): «pon también el logo en el pie». Historia 5 (P9): cambiar la frase del pie «Hecho con pasión por JR BLANCO · Hackers Cosío» por «Hecho por la Escuela Hacker Cosío». Historia 6 (P10): en la clasificación, que los 3 primeros, además del 1, 2 y 3 en negrita, se diferencien con un color suave cada uno («lo que tú decidas que queda más visual para el podio»). Historia 7: «en el panel del admin, si la pantalla está más pequeña, no tiene scroll el panel de opciones». Historia 8 (P11): «el logo, es cierto que hay que poner el oficial también aquí» (panel de administración). Historia 9: «sí, corrige el contraste del panel» (incumplimientos AA hallados con la sesión iniciada; decisión P4). Historia 10 (P12): «si cambio a femenino no me identifica a las tres campeonas»; podio de las tres primeras chicas y los tres primeros chicos de todas las pruebas, y también por categoría. Historia 11 (P13): «en la home, como título principal en grande, pone PENASAGRA y es PEÑASAGRA; repasa para que todo esté bien escrito». Historia 12: «un deploy.sh que, al descargar el repositorio en la máquina virtual y ejecutarlo, lo haga todo, y el .env para copiarlo directamente en la MV»."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -467,6 +467,51 @@ errores encontrados.
 8. **Given** el resto de la web, **When** se compara con la versión anterior, **Then** solo cambian
    los textos corregidos.
 
+### User Story 12 - Despliegue automático con `deploy.sh` (Priority: P1)
+
+El propietario quiere desplegar sin seguir una lista de comandos. Entra en la MV, descarga el
+repositorio, copia el `.env` que se le entrega preparado y ejecuta `./deploy.sh`. El script lo hace
+todo, y lo mismo en cada actualización.
+
+Sus respuestas:
+
+- **Datos**: instalación limpia, con los datos aprobados y las clasificaciones de 2026 de la
+  carpeta de la web anterior en la MV.
+- **Fotos**: en el disco de la MV.
+- **Usuario del panel**: `organizacion`, con una contraseña generada.
+
+**Why this priority**: sin esto, el cambio de la web anterior a la nueva depende de repetir a mano
+una quincena de órdenes en el orden correcto.
+
+**Independent Test**: ensayar en local un clon limpio con una web anterior simulada en 80/443:
+
+- primera ejecución, segunda ejecución y actualización con cambios en `deploy.sh`;
+- un fallo al arrancar, con vuelta atrás;
+- la copia programada.
+
+**Acceptance Scenarios**:
+
+1. **Given** una MV con la web anterior en 80/443 y el repositorio recién descargado con su
+   `.env`, **When** se ejecuta `./deploy.sh`, **Then**:
+   - construye y migra la base;
+   - carga los datos aprobados y las 3 clasificaciones de 2026 (63, 205 y 224 participantes);
+   - crea la cuenta `organizacion`;
+   - para la web anterior sin borrar sus datos y arranca la nueva por HTTPS;
+   - comprueba redirecciones, cabeceras, 404 y certificado, y programa la copia diaria.
+2. **Given** la web nueva ya instalada, **When** se ejecuta de nuevo, **Then** hace una copia
+   previa, actualiza el código y el esquema, y no importa datos, no crea cuentas ni cambia
+   contraseñas.
+3. **Given** un `deploy.sh` nuevo en el repositorio, **When** se ejecuta el antiguo, **Then**
+   descarga el código y continúa con la versión nueva.
+4. **Given** que la web nueva no responde por HTTPS a tiempo, **When** había parado la web
+   anterior, **Then** la vuelve a arrancar, deja la nueva parada con sus datos y termina con
+   error.
+5. **Given** un `.env` que falta, está incompleto o tiene valores sin rellenar, o Docker o Compose
+   demasiado antiguos, **When** se ejecuta, **Then** se detiene antes de tocar nada, con un
+   mensaje que dice qué falta.
+6. **Given** otras tareas en el crontab, **When** se programa la copia, **Then** se conservan, y
+   la del proyecto aparece una sola vez.
+
 ### Edge Cases
 
 - **Foto con la misma proporción que su marco**: se ve igual que antes, sin relleno visible.
@@ -499,6 +544,11 @@ errores encontrados.
 - **Contenido escrito por la organización (US11)**: las noticias, las pruebas, el reglamento, los
   álbumes y los nombres de patrocinadores son datos que la organización edita desde el panel. Se
   revisan, pero no se cambian desde el código.
+- **Puertos ocupados por un programa que no es Docker (US12)**: el script se detiene antes de
+  arrancar la web nueva y vuelve a arrancar la anterior si la había parado.
+- **CSV de 2026 no encontrados (US12)**: avisa y sigue. Las clasificaciones se suben desde el
+  panel.
+- **Base con datos (US12)**: nunca se importa ni se sobrescribe nada (constitución IV).
 - **Datos oficiales (US11)**: los nombres de participantes y clubes, los valores de categoría
   («Senior F») y los nombres de los archivos CSV importados se muestran tal como llegan.
 
@@ -616,6 +666,20 @@ errores encontrados.
   comillas latinas.
 - **FR-037**: El resto de los textos, los estilos y la disposición MUST NOT cambiar. Los contenidos
   que edita la organización y los datos oficiales MUST NOT modificarse desde el código.
+- **FR-038**: `deploy.sh` MUST instalar o actualizar la web en la MV con una sola orden y poder
+  repetirse sin efectos no deseados. Hace todo lo necesario:
+  - comprobaciones, descarga del código, copia previa, construcción y migraciones;
+  - datos iniciales en una base vacía y cuenta del panel si no hay ninguna;
+  - cambio desde la web anterior y arranque;
+  - comprobaciones y copia diaria.
+- **FR-039**: El script MUST NOT sobrescribir datos existentes, cambiar contraseñas de cuentas
+  existentes ni borrar los volúmenes de la web anterior ni de la nueva.
+- **FR-040**: Si la web nueva no responde por HTTPS en el tiempo de espera, el script MUST volver
+  a arrancar la web anterior que haya parado y terminar con error.
+- **FR-041**: El `.env` de producción MUST entregarse fuera del repositorio, con secretos
+  aleatorios y el dominio en *punycode*. MUST NOT versionarse.
+- **FR-042**: La guía de operación MUST explicar el flujo, lo que hace el script, sus variables
+  y la vuelta atrás.
 
 ## Success Criteria *(mandatory)*
 
@@ -692,6 +756,15 @@ errores encontrados.
   encuentra ninguno de los errores corregidos. Las capturas de las páginas públicas solo difieren
   en el título de la portada y en los textos de ayuda del formulario de contacto. Hay 0
   incumplimientos AA en la web y en el panel.
+- **SC-020**: En el ensayo local (clon limpio, web anterior simulada en 80/443 y dominio
+  `.localhost`):
+  - la primera ejecución termina sin fallos, con 63/205/224 participantes y acceso al panel con la
+    cuenta creada;
+  - la segunda hace una copia y no cambia datos;
+  - un `deploy.sh` nuevo se relanza solo;
+  - un fallo forzado devuelve la web anterior al aire con los datos de la nueva intactos;
+  - la copia programada conserva las demás tareas;
+  - `shellcheck` sin avisos, y el Docker de desarrollo intacto.
 
 ## Assumptions
 
@@ -762,3 +835,9 @@ errores encontrados.
 - **Plantilla CSV (US11)**: las cabeceras de la plantilla (`posicion`, `categoria`…) van sin
   tildes a propósito. Son nombres de columna, que la importación reconoce con o sin tilde. Sin
   tildes, la hoja de cálculo las abre bien con cualquier codificación.
+- **`.env` de producción (US12)**: se entrega como `.env.produccion` en la raíz del repositorio
+  local. Está ignorado por Git, y no se llama `.env` porque Compose lo leería y estropearía el
+  entorno de desarrollo. En la MV se copia como `.env`. La contraseña inicial del panel va en ese
+  archivo; no se escribe en otros sitios.
+- **Copias programadas (US12)**: se instalan en el crontab de quien ejecuta el script (root con
+  `sudo`). El registro queda en `COPIAS_DIR`, no en `/var/log`.

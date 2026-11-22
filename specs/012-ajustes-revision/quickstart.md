@@ -174,3 +174,28 @@ Resultados esperados:
   150 caracteres.».
 - El contacto muestra «¿Cómo te llamas?» y «¿Sobre qué quieres hablar?», y el álbum, la descripción
   «Fotografías de «Volver a sentir la montaña» (2026).».
+
+## US12: despliegue automático con `deploy.sh`
+
+En la MV (ver `docs/operacion.md` §0):
+
+```bash
+git clone https://github.com/jrcosio/trailcorremosadriana_v3.git /srv/trail-v3
+scp .env.produccion <usuario>@<mv>:/srv/trail-v3/.env      # desde el ordenador del propietario
+cd /srv/trail-v3 && sudo ./deploy.sh
+```
+
+Ensayo local, sin MV:
+
+- crear un clon limpio desde un *bare*;
+- levantar una v2 simulada (Compose con Caddy en 80/443 y `datos/2026/Clasificacion_*.csv`);
+- usar un `.env` con `COMPOSE_PROJECT_NAME` propio, `SITE_ADDRESS=xn--trailpeasagra-okb.localhost`
+  y `COPIAS_PROGRAMADAS=no` (o un `crontab` simulado en el `PATH`);
+- ejecutar `./deploy.sh` dos veces, una con `DEPLOY_ESPERA=0` para forzar la vuelta atrás.
+
+Resultados esperados:
+
+- **Primera vez**: para la v2; 63/205/224 participantes; cuenta `organizacion` con acceso;
+  todas las comprobaciones OK.
+- **Segunda vez**: copia previa, sin importar ni crear cuentas.
+- **Fallo forzado**: la v2 vuelve a responder y la v3 queda parada con sus volúmenes.

@@ -74,7 +74,12 @@ y la misma caja. Una revisión ortográfica de las 56 vistas y de los mensajes d
 - dos preguntas sin signos en el contacto;
 - las comillas de la descripción de un álbum.
 
-Detalle en [research.md](research.md) (R4, R5, R6, R7, R8, R9, R10 y R11).
+US12: `deploy.sh` instala o actualiza la web en la MV con una orden. Lo hace con las piezas
+existentes: compose de producción, las órdenes de `app.cli` y `backup.sh`. Para la web anterior
+y vuelve a ella si la nueva no responde. El `.env` de producción se entrega fuera de Git
+(`.env.produccion`).
+
+Detalle en [research.md](research.md) (R4, R5, R6, R7, R8, R9, R10, R11 y R12).
 
 ## Technical Context
 
@@ -120,6 +125,8 @@ escrituras interceptadas).
 - Pruebas: `tests/ortografia.test.tsx` (nuevo), pytest y `scripts/verificar-titulo.mjs` (nuevo,
   con referencia previa).
 - Gobierno: constitución 1.0.1 (principio I: «TRAIL PEÑASAGRA»).
+**US12**: `deploy.sh` (nuevo, raíz), `.gitignore` (`.despliegue/`), `docs/operacion.md` §0 y
+`README.md`. Sin cambios de código de la aplicación ni de datos. Ensayo local con una v2 simulada.
 
 ## Constitution Check
 
@@ -144,6 +151,10 @@ escrituras interceptadas).
 | VI (US10) | El podio sale del puesto, el sexo y la categoría publicados; no se inventa nada | ✅ |
 | I (US11) | El propietario corrige el título literal (P13). Se enmienda la constitución (1.0.1) y se anota la referencia. Misma fuente, tamaño, color y caja; capturas antes y después | ✅ |
 | IV (US11) | Los contenidos de la organización no se tocan desde el código; URLs, identificadores y plantilla CSV intactos | ✅ |
+| II (US12) | Nunca importa sobre una base con datos ni borra volúmenes; copia previa en cada actualización | ✅ |
+| III (US12) | Secretos aleatorios solo en el `.env` (fuera de Git, permisos 600); la contraseña del panel no llega a los contenedores ni a los registros | ✅ |
+| IV (US12) | Datos existentes intactos; la v2 se para sin `-v` y se puede recuperar | ✅ |
+| V (US12) | Ensayo completo en local (primera vez, repetición, actualización, fallo con vuelta atrás y cron) y `shellcheck` | ✅ |
 | V (US11) | vitest, pytest y Playwright (título), con pruebas que fallan antes del cambio; la revisión se repite al final | ✅ |
 | II | Sin cambios de persistencia | ✅ |
 | III | Compatible con la CSP (CSSOM); el panel no cambia de comportamiento | ✅ |
@@ -193,6 +204,8 @@ frontend/src/lib/classifications.ts · backend/app/services/{csv_clasificaciones
 frontend/tests/ortografia.test.tsx (nuevo) · backend/tests/{test_csv,test_meta}.py
 frontend/scripts/verificar-titulo.mjs (nuevo) · frontend/scripts/{verificar-rutas,verificar-respaldo,verificar-evento-carreras}.mjs
 .specify/memory/constitution.md · docs/referencia/{12_DECISIONES_APROBADAS,02_ESTILO_VISUAL,09_CRITERIOS_ACEPTACION}.md
+# US12
+deploy.sh (nuevo) · .gitignore · docs/operacion.md (§0) · README.md · .env.produccion (local, ignorado)
 ```
 
 ## Complexity Tracking
